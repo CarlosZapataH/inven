@@ -1,0 +1,37 @@
+#cajacookies {
+    box-shadow: 0 0 5px 5px #343a40;
+    background-color: #087AC0;
+    color: #FFFFFF;
+    padding: 10px;
+    margin: 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 10001;
+}
+
+#cajacookies #popup-text {
+    color: #fff;
+    float: left;
+    font-weight: bold;
+    margin: 5px 0 0;
+    max-width: 60%;
+
+}
+#cajacookies #popup-text h2{
+    font-size: 14px !important;
+    line-height: 1.2;
+    color: #FFFFFF !important;
+}
+
+#cajacookies #popup-buttons {
+    display: flex;
+    flex-direction: initial;
+    float: right;
+    margin: 0 0 1em 0;
+    max-width: 40%;
+}
+
+#cajacookies button {
+    color: black;
+}

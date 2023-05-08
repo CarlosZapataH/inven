@@ -1,0 +1,11 @@
+
+IN -> INGRESOS -> ACTUAL
+-------------------
+TRA-> TRANSFERENCIA -> ACTUAL
+-------------------
+SO -> RETIRO SIN OT -> ACTUAL
+SW -> RETIRO CON OT
+PT -> RETIRO COMO PRÉSTAMO
+--------------------
+DV -> DEVOLUCIÓN ALMACEN  ->ACTUAL
+DC -> DEVOLUCIÓN CLIENTE
