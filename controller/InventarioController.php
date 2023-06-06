@@ -3416,7 +3416,9 @@ class InventarioController {
 
                     if ($movimiento['action_mov'] == "TRA" && !is_null($movimiento['nroguia_mov'] && $optionReporte == 1)){
                         $numberGuia = $movimiento['nroguia_mov'];
-                        $btnGuia='<button type="button" class="btn btn-outline-danger btn-hover-transform fz-16" id="dataExportPDF_Guia" data-opt="1" data-id="' . $obj_fn->encrypt_decrypt("encrypt",$movimiento['id_movt']) . '" title="Generar"><i class="fa fa-file-pdf-o mr-7"></i> Guia</button>';
+                        $btnGuia='
+                        <a class="btn btn-outline-info btn-hover-transform fz-16 mb-2" href="movimiento-detalle.php?idMovimiento='.$movimiento['id_movt'].'">Detalle</a>
+                        <button type="button" class="btn btn-outline-danger btn-hover-transform fz-16" id="dataExportPDF_Guia" data-opt="1" data-id="' . $obj_fn->encrypt_decrypt("encrypt",$movimiento['id_movt']) . '" title="Generar"><i class="fa fa-file-pdf-o mr-7"></i> Guia</button>';
                     }
 
                     $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Transito</span>';
