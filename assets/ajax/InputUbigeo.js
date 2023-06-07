@@ -4,6 +4,10 @@ Vue.component("input-ubigeo", {
       type: [String, Number],
       required: false,
     },
+    initialName: {
+      type: [String],
+      required: false,
+    },
   },
   data() {
     return {
@@ -18,27 +22,36 @@ Vue.component("input-ubigeo", {
   template: `
       <div>
         <div class="form-group row">
-            <label class="col-sm-3 col-form-label">Departamento</label>
+            <label class="col-sm-3 col-form-label">Departamento
+              <span class="text-danger font-weight-bold">*</span>
+            </label>
             <div class="col-sm-9">
-                <select v-model="selectedDepartamento" @change="onChangeDepartamento" class="form-control">
+                <select v-model="selectedDepartamento" @change="onChangeDepartamento" :name="initialName + '_Departamento'" v-validate="'required'" class="form-control">
                     <option v-for="item in departamentos" :value="item.inei">{{ item.departamento }}</option>
                 </select>
+                <span class="text-danger">{{ errors.first(initialName + '_Departamento') }}</span>
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-3 col-form-label">Provincia</label>
+            <label class="col-sm-3 col-form-label">Provincia
+              <span class="text-danger font-weight-bold">*</span>
+            </label>
             <div class="col-sm-9">
-                <select v-model="selectedProvincia" @change="onChangeProvincia" class="form-control">
+                <select v-model="selectedProvincia" @change="onChangeProvincia" :name="initialName + '_Provincia'" v-validate="'required'" class="form-control">
                     <option v-for="item in provincias" :value="item.inei">{{ item.provincia }}</option>
                 </select>
+                <span class="text-danger">{{ errors.first(initialName + '_Provincia') }}</span>
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-sm-3 col-form-label">Distrito</label>
+            <label class="col-sm-3 col-form-label">Distrito
+              <span class="text-danger font-weight-bold">*</span>
+            </label>
             <div class="col-sm-9">
-                <select v-model="selectedDistrito" @change="onChangeDistrito" class="form-control">
+                <select v-model="selectedDistrito" @change="onChangeDistrito" :name="initialName + '_Distrito'" v-validate="'required'" class="form-control">
                     <option v-for="item in distritos" :value="item.inei">{{ item.distrito }}</option>
                 </select>
+                <span class="text-danger">{{ errors.first(initialName + '_Distrito') }}</span>
             </div>
         </div>
       </div>
@@ -53,6 +66,12 @@ Vue.component("input-ubigeo", {
       this.selectedProvincia = ubigeo.substring(0, 4) + "00";
       this.selectedDistrito = ubigeo;
     }
+  },
+  mounted() {
+    // this.$validator.localize("es", {
+    //   // Configura los mensajes de error en el idioma deseado
+    // });
+    // this.$validator.attach(this.initialName + "_Provincia", "required");
   },
   computed: {
     ubigeo: {
