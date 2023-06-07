@@ -17,6 +17,14 @@ class TransitMovementHelper{
                     $response['nro_mov'] = $row['nro_mov'];
                     $response['fechaguia_mov'] = $row['fechaguia_mov'];
 
+                    $response['transfer_guide_id'] = $row['transfers_guides_id_id'];
+                    $response['fecha_emision'] = $row['transfers_guides_date_issue'];
+                    $response['serie'] = $row['transfers_guides_serie'];
+                    $response['numero'] = $row['transfers_guides_number'];
+                    $response['observacion'] = $row['transfers_guides_observations'];
+                    $response['hora_emision'] = $row['transfers_guides_time_issue'];
+                    $response['peso'] = $row['transfers_guides_total_witght'];
+
                     // DETAIL
                     $response['detalle'] = [];
         
@@ -42,6 +50,8 @@ class TransitMovementHelper{
                     $response['almacen_destino'] = [
                         'titulo_alm' => $row['almacen_des_titulo_alm'],
                         'direccion_alm' => $row['almacen_des_direccion_alm'],
+                        'email_principal' => $row['transfers_guides_email_principal'],
+                        'email_secondary' => $row['transfers_guides_email_secondary'],
                         'company' => [
                             'name' => $row['company_des_name'],
                             'commercial_name' => $row['company_des_commercial_name'],
@@ -55,13 +65,24 @@ class TransitMovementHelper{
                             'code' => $row['u_alm_des_codigo_inei']
                         ]
                     ];
+
+                    // TRANSPORT
+                    $response['transporte'] = [
+                        'modalidad' => $row['transports_modalidad'],
+                        'fecha_inicio' => $row['transports_fecha_inicio'],
+                        'tipo_documento' => $row['transports_tipo_documento'],
+                        'documento' => $row['transports_documento'],
+                        'razon_social' => $row['transports_razon_social'],
+                        'numero_mtc' => $row['transports_numero_mtc']
+                    ];
                 }
 
                 // DETAIL
                 array_push($response['detalle'], [
                     'des_mde' => $row['des_mde'],
                     'um_mde' => $row['inventario_um_inv'],
-                    'cant_mde' => $row['cant_mde']
+                    'cant_mde' => $row['cant_mde'],
+                    'cod_inv' => $row['inventario_cod_inv'],
                 ]);
             }
         }

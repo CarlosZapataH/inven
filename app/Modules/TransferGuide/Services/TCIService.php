@@ -26,7 +26,9 @@ class TCIService{
     |--------------------------------------------------------------------------
     */
     public function registerGRR20($data){
-        return self::sendAction('RegistrarGRR20', $data);
+        return self::sendAction('RegistrarGRR20', [
+            'RegistrarGRR20' => $data
+        ]);
     }
 
     private function getHeaders($action){
@@ -54,11 +56,35 @@ class TCIService{
         if($response['success']){
             if(isset($response['response'][$action.'Response'])){
                 $data = isset($response['response'][$action.'Response'][$action.'Result'])?$response['response'][$action.'Response'][$action.'Result'] : null;
+                if($data){
+                    if(isset($data['at_CodigoError']) && isset($data['at_NivelResultado'])){
+                        if(!self::isBoolString($data['at_NivelResultado'])){
+                            $response['code'] = 400;
+                        }
+                    }
+
+                    if(isset($data['at_MensajeResultado'])){
+                        $response['success'] = self::isBoolString($data['at_NivelResultado']);
+                    }
+
+                    if(isset($data['at_MensajeResultado'])){
+                        $response['message'] = $data['at_MensajeResultado'];
+                    }
+                }
             }
         }
 
         $response['data'] = $data;
         unset($response['response']);
         return $response;
+    }
+
+    private function isBoolString($value){
+        if(strtolower($value) == "true"){
+            return true;
+        }
+        else if(strtolower($value) == "false"){
+            return false;
+        }
     }
 }

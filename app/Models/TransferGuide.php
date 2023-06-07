@@ -14,6 +14,8 @@ class TransferGuide {
     private $unit_measure;
     private $total_quantity;
     private $movement_id;
+    private $email_principal;
+    private $email_secondary;
     private $created_at;
     private $updated_at;
 
@@ -30,6 +32,8 @@ class TransferGuide {
         $unit_measure,
         $total_quantity,
         $movement_id,
+        $email_principal,
+        $email_secondary,
         $created_at,
         $updated_at
     ) {
@@ -45,6 +49,8 @@ class TransferGuide {
         $this->unit_measure = $unit_measure;
         $this->total_quantity = $total_quantity;
         $this->movement_id = $movement_id;
+        $this->email_principal = $email_principal;
+        $this->email_secondary = $email_secondary;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
     }
@@ -69,6 +75,8 @@ class TransferGuide {
             "unit_measure" => $this->unit_measure,
             "total_quantity" => $this->total_quantity,
             "movement_id" => $this->movement_id,
+            "email_principal" => $this->email_principal,
+            "email_secondary" => $this->email_secondary,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at
         ];

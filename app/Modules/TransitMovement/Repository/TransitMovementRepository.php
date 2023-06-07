@@ -43,7 +43,27 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                     u_alm_des.id_ubigeo as u_alm_des_id_ubigeo,
                     u_alm_des.nombre_ubigeo as u_alm_des_nombre_ubigeo,
                     u_alm_des.codigo_inei as u_alm_des_codigo_inei,
-                    inventario.um_inv as inventario_um_inv
+                    inventario.um_inv as inventario_um_inv,
+                    inventario.cod_inv as inventario_cod_inv,
+                    transfers_guides.id as transfers_guides_id,
+                    transfers_guides.serie as transfers_guides_serie,
+                    transfers_guides.number as transfers_guides_number,
+                    transfers_guides.date_issue as transfers_guides_date_issue,
+                    transfers_guides.time_issue as transfers_guides_time_issue,
+                    transfers_guides.observations as transfers_guides_observations,
+                    transfers_guides.motive_code as transfers_guides_motive_code,
+                    transfers_guides.motive_description as transfers_guides_motive_description,
+                    transfers_guides.total_witght as transfers_guides_total_witght,
+                    transfers_guides.unit_measure as transfers_guides_unit_measure,
+                    transfers_guides.email_principal as transfers_guides_email_principal,
+                    transfers_guides.email_secondary as transfers_guides_email_secondary,
+                    transfers_guides.total_quantity as transfers_guides_total_quantity,
+                    transports.modality as transports_modalidad,
+                    transports.start_date as transports_fecha_inicio,
+                    transports.document_type as transports_tipo_documento,
+                    transports.document as transports_documento,
+                    transports.company_name as transports_razon_social,
+                    transports.mtc_number as transports_numero_mtc
                 FROM movimientos_transito
                 INNER JOIN movimientos_transito_detalle ON movimientos_transito_detalle.id_movt = movimientos_transito.id_movt
                 LEFT JOIN almacen as almacen_ini ON almacen_ini.id_alm = movimientos_transito.id_alm_ini
@@ -55,6 +75,8 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                 LEFT JOIN ubigeo as u_alm_ini ON u_alm_ini.id_ubigeo = almacen_ini.distrito_alm
                 LEFT JOIN ubigeo as u_alm_des ON u_alm_des.id_ubigeo = almacen_des.distrito_alm
                 LEFT JOIN inventario ON inventario.id_inv = movimientos_transito_detalle.id_inv
+                LEFT JOIN transfers_guides ON transfers_guides.movement_id = movimientos_transito.id_movt
+                LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
                 WHERE 
                     movimientos_transito.id_movt = '.$id.'
             ');
