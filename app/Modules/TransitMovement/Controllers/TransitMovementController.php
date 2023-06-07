@@ -34,6 +34,8 @@ class TransitMovementController{
         } catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
         }
+        
+        header('Content-Type: application/json');
         echo json_encode($response);
     }
 }
