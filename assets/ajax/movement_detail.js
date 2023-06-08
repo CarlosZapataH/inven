@@ -6,9 +6,6 @@ VeeValidate.Validator.localize("es", {
   },
 });
 
-console.log(this);
-const globalObject = this;
-
 VeeValidate.Validator.extend("validationRuc", {
   validate: (value) => /^[A-Za-z0-9]{11}$/.test(value),
   message:
@@ -79,6 +76,7 @@ new Vue({
       at_Nombres: "",
       at_Apellidos: "",
     },
+
     en_VehiculoGRR: {
       aa_NumeroPlaca: "",
     },
@@ -89,6 +87,7 @@ new Vue({
     movement: null,
     movementDetail: [],
     documentTypes: [],
+    apiErros: [],
   },
   // validations: {
   //   ent_RemitenteGRR: {
@@ -225,6 +224,15 @@ new Vue({
       this.ent_DatosGeneralesGRR.at_Observacion = movement?.observ_mov;
     },
 
+    convertToExtendedFormat(time) {
+      const parts = time.split(":");
+      if (parts.length === 2) {
+        const [hours, minutes] = parts;
+        return `${hours}:${minutes}:00`;
+      }
+      return time; // Si ya tiene el formato "00:00:00", retornarlo sin cambios
+    },
+
     sendGuide() {
       const data = {
         // ent_RemitenteGRR
@@ -253,10 +261,14 @@ new Vue({
         serie: this.ent_DatosGeneralesGRR?.at_Serie,
         numero: this.ent_DatosGeneralesGRR?.at_Numero,
         observacion: this.ent_DatosGeneralesGRR?.at_Observacion,
-        hora_emision: this.ent_DatosGeneralesGRR?.at_HoraEmision,
+        hora_emision: this.convertToExtendedFormat(
+          this.ent_DatosGeneralesGRR?.at_HoraEmision
+        ),
         // ent_InformacionTrasladoGRR
         // // ent_InformacionPesoBrutoGRR
         peso: this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
+        cantidad:
+          this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
         transporte: {
           modalidad: this.en_InformacionTransporteGRR?.at_Modalidad,
           fecha_inicio: this.en_InformacionTransporteGRR?.at_FechaInicio,
@@ -268,16 +280,38 @@ new Vue({
         },
       };
       const params = { id: this.idMov };
+      this.apiErros = [];
       createGuide(data, params)
         .then((response) => {
+          if (response?.success === true) {
+            swal.fire({
+              title: "",
+              type: "success",
+              text:
+                response?.message ||
+                "¡El formulario se ha guardado correctamente!",
+              showConfirmButton: false,
+              timer: 5000,
+            });
+            setTimeout(() => {
+              window.location.href = "guia-lista.php";
+            }, 5000);
+          } else if (response?.success === false) {
+            this.apiErros = response?.errors;
+            swal.fire({
+              title: "",
+              type: "info",
+              text: "Lo siento, pero los datos que has proporcionado no son válidos. Por favor, verifica la información e inténtalo nuevamente.",
+            });
+          } else {
+            swal.fire({
+              title: "",
+              type: "error",
+              text: "¡Ups! Parece que hay un problema con la API en este momento. Por favor, intenta nuevamente más tarde. Gracias por tu paciencia.",
+            });
+          }
+
           console.log(response);
-          swal.fire({
-            title: "",
-            type: "success",
-            text: "¡El formulario se ha guardado correctamente!",
-            showConfirmButton: false,
-            timer: 2000,
-          });
         })
         .catch((error) => {
           console.log(error);
@@ -285,8 +319,6 @@ new Vue({
             title: "",
             type: "error",
             text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
-            showConfirmButton: false,
-            timer: 2000,
           });
         });
     },

@@ -23,7 +23,12 @@ function createGuide(data, params) {
   const url =
     urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
   return axios
-    .post(url, data, { ...params, action: "storeTransitMovementGuide" })
+    .post(url, data, {
+      params: {
+        action: "storeTransitMovementGuide",
+        ...params,
+      },
+    })
     .then((response) => response.data)
     .catch((error) => {
       console.error("Error en la solicitud POST:", error);

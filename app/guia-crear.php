@@ -577,11 +577,20 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div v-for="(group, groupIndex) in apiErros" :key="groupIndex + '-errGroup'">
+                                <div v-for="(msm, msmIndex) in group" :key="msmIndex + '-errMsm'" class="alert alert-warning" role="alert">
+                                    {{ msm }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row justify-content-end">
                         <div class="col-auto">
                             <div class="mb-10">
                                 <button type="submit" class="btn btn-primary">Guardar Guía</button>
-                                <button type="submit" class="btn btn-success">Guardar y Enviar</button>
+                                <button type="button" class="btn btn-success" @click="asd()">Guardar y Enviar</button>
                             </div>
                         </div>
                     </div>
