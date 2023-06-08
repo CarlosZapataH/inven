@@ -4,23 +4,25 @@ error_reporting(E_ALL & ~E_NOTICE);
 $action = $_REQUEST["action"];
 
 require_once __DIR__ . '/../../../../assets/util/Session.php';
+require_once __DIR__ . '/../Repository/TransferGuideRepository.php';
 require_once __DIR__ . '/../Requests/TransitMovementGuideRequest.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
 require_once __DIR__ . '/../Helpers/FormatHelper.php';
 require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../Helpers/XMLHelper.php';
 require_once __DIR__ . '/../Services/TCIService.php';
+require_once __DIR__ . '/../../../Helpers/GlobalHelper.php';
 $controller = new TransferGuideController();
 call_user_func(array($controller,$action));
 
 
 class TransferGuideController{
-    // private $companyRepository;
+    private $transferGuideRepository;
     private $transitMovementRepository;
 
     public function __construct()
     {
-        // $this->companyRepository = new CompanyRepository();
+        $this->transferGuideRepository = new TransferGuideRepository();
         $this->transitMovementRepository = new TransitMovementRepository();
     }
 
@@ -45,36 +47,53 @@ class TransferGuideController{
     }
 
     public function storeTransitMovementGuide(){
-        $response = [
-            'data' => null,
-            'success' => false,
-            'message' => 'Error',
-            'errors' => null
-        ];
+        header('Content-Type: application/json');
+        $response = GlobalHelper::getGlobalResponse();
         try {
-            $postData = file_get_contents('php://input');
-            $data = json_decode($postData, true);
+            $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
                 $id = (int)$_GET['id'];
                 $movement = $this->transitMovementRepository->getTransitMovement($id);
                 if($movement){
                     $rules = $this->getRulesTransitMovementGuide($movement);
                     $validated = $this->validatedData($data, $rules);
-    
+ 
                     if($validated['success']){
-                        // $dataValidated = $validated['data'];
-                        // if(!ValidateHelper::validateProperty($movement, ['transfer_guide_id'])){
-                        // }
-                        $tciService = new TCIService();
-                        $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($movement, $validated['data']));
-                        $response['data'] = $tciResponse['data'];
-                        
-                        if($tciResponse['success']){
-                            $response['success'] = true;
-                            $response['message'] = $tciResponse['message'];
+                        $transferGuideId = null;
+
+                        if(!ValidateHelper::validateProperty($movement, ['transfer_guide_id'])){
+                            $transferGuideId = $this->transferGuideRepository->store($this->groupStoreTransitMovementGuide($movement, $validated['data']));
                         }
                         else{
-                            $response['errors'] = [$tciResponse['message']];
+                            $this->transferGuideRepository->update($movement['transfer_guide_id'], $this->groupStoreTransitMovementGuide($movement, $validated['data']));
+                        }
+
+                        $send = false;
+                        if(isset($data['send'])){
+                            if($data['send'] == 1){
+                                $send = true;
+                            }
+                        }
+
+                        if($send){
+                            $sendResponse = $this->sendTransitMovementGuide($id, $validated['data']);
+                            $response['data'] = $sendResponse['data'];
+                            $response['message'] = $sendResponse['message'];
+                            if($sendResponse['success']){
+                                $response['code'] = 200;
+                                $response['success'] = true;
+                            }
+                            else{
+                                $response['errors'] = $sendResponse['errors'];
+                            }
+                        }
+                        else{
+                            $response['code'] = 200;
+                            $response['success'] = true;
+                            $response['message'] = 'Información '. ($transferGuideId?'registrada':'actualizada') . ' exitosamente.';
+                            $response['data'] = [
+                                'transfer_guide_id' => ($transferGuideId?$transferGuideId:$movement['transfer_guide_id'])
+                            ];
                         }
                     }
                     else{
@@ -90,9 +109,10 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
+            echo $e->getMessage();
         }
 
-        header('Content-Type: application/json');
+        http_response_code($response['code']);
         echo json_encode($response);
     }
 
@@ -143,6 +163,10 @@ class TransferGuideController{
 
     private function getRulesTransitMovementGuide($movement){
         $rules = [];
+        $existGuide = ValidateHelper::validateProperty($movement, ['transfer_guide_id']);
+
+        // $rules['send'] = [['required']];
+
         // ent_RemitenteGRR
         if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.document'])){ 
             $rules['almacen_partida.document'] = [['required']];
@@ -172,10 +196,10 @@ class TransferGuideController{
         if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.name'])){
             $rules['almacen_destino.name'] = [['required']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.email_principal'])){
+        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.email_principal']) || $existGuide){
             $rules['almacen_destino.email_principal'] = [['required'], ['email']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.email_secondary'])){
+        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.email_secondary']) || $existGuide){
             $rules['almacen_destino.email_secondary'] = [['required'], ['email']];
         }
 
@@ -188,23 +212,26 @@ class TransferGuideController{
         }
 
         // ent_General
-        if(!ValidateHelper::validateProperty($movement, ['fecha_emision'])){
+        if(!ValidateHelper::validateProperty($movement, ['fecha_emision']) || $existGuide){
             $rules['fecha_emision'] = [['required']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['serie'])){
+        if(!ValidateHelper::validateProperty($movement, ['serie']) || $existGuide){
             $rules['serie'] = [['required']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['numero'])){
+        if(!ValidateHelper::validateProperty($movement, ['numero']) || $existGuide){
             $rules['numero'] = [['required']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['observacion'])){
+        if(!ValidateHelper::validateProperty($movement, ['observacion']) || $existGuide){
             $rules['observacion'] = [['required']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['hora_emision'])){
+        if(!ValidateHelper::validateProperty($movement, ['hora_emision']) || $existGuide){
             $rules['hora_emision'] = [['required']];
         }
-        if(!ValidateHelper::validateProperty($movement, ['peso'])){
+        if(!ValidateHelper::validateProperty($movement, ['peso']) || $existGuide){
             $rules['peso'] = [['required']];
+        }
+        if(!ValidateHelper::validateProperty($movement, ['cantidad']) || $existGuide){
+            $rules['cantidad'] = [['required']];
         }
 
         // ent_Transpor
@@ -228,5 +255,42 @@ class TransferGuideController{
         }
 
         return $rules;
+    }
+
+    private function groupStoreTransitMovementGuide($movement, $data){
+        return [
+            'serie' => $data['serie'],
+            'number' => $data['numero'],
+            'date_issue' => $data['fecha_emision'],
+            'time_issue' => $data['hora_emision'],
+            'observations' => $data['observacion'],
+            'motive_code' => '04',
+            'motive_description' => 'Traslado entre establecimientos de la misma empresa',
+            'total_witght' => $data['peso'],
+            'unit_measure' => 'KGM',
+            'total_quantity' => $data['cantidad'],
+            'email_principal' => $data['almacen_destino']['email_principal'],
+            'email_secondary' => $data['almacen_destino']['email_secondary'],
+            'movement_id' => $movement['id_movt']
+        ];
+    }
+
+    private function sendTransitMovementGuide($id, $data = []){
+        $response = GlobalHelper::getGlobalResponse();
+        $movement = $this->transitMovementRepository->getTransitMovement($id);
+        $tciService = new TCIService();
+        $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($movement, $data));
+        $response['data'] = $tciResponse['data'];
+        $response['message'] = $tciResponse['message'];
+        // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($movement, $data));
+        // $this->transferGuideRepository->update($movement['transfer_guide_id'], $this->groupStoreTransitMovementGuide($movement, $validated['data']));
+        if($tciResponse['success']){
+            $response['success'] = true;
+        }
+        else{
+            $response['errors'] = [$tciResponse['message']];
+        }
+
+        return $response;
     }
 }

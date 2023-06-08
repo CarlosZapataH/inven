@@ -17,7 +17,7 @@ class TransitMovementHelper{
                     $response['nro_mov'] = $row['nro_mov'];
                     $response['fechaguia_mov'] = $row['fechaguia_mov'];
 
-                    $response['transfer_guide_id'] = $row['transfers_guides_id_id'];
+                    $response['transfer_guide_id'] = $row['transfers_guides_id'];
                     $response['fecha_emision'] = $row['transfers_guides_date_issue'];
                     $response['serie'] = $row['transfers_guides_serie'];
                     $response['numero'] = $row['transfers_guides_number'];
