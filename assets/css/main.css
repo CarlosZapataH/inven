@@ -760,9 +760,9 @@ reset styles
     border-bottom-left-radius: .25rem;
 }
 
-.btn {
+/* .btn {
     padding: .6rem 1.2rem;
-}
+} */
 
 .custom-select {
     height: calc(2.3rem + 2px);
