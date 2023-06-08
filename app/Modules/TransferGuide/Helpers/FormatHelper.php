@@ -34,7 +34,7 @@ class FormatHelper{
         $destinatarioTipoDocumento = "";
         $destinatarioDocumento = "";
         $destinatarioRazonSocial = "";
-    // echo json_encode($data);
+    
         if(ValidateHelper::validateProperty($movement, ['almacen_destino.company.document_type_code'])){ 
             $destinatarioTipoDocumento = $movement['almacen_destino']['company']['document_type_code'];
         }
@@ -66,7 +66,7 @@ class FormatHelper{
         $generalHoraEmision = $data['hora_emision'];
 
         $trasladoPeso = $data['peso'];
-        $trasladoCantidad = count($movement['detalle']);
+        $trasladoCantidad = $data['cantidad'];
 
         $transporteModalidad = "01";
         $transporteFechaInicio = $data['transporte']['fecha_inicio'];
@@ -126,15 +126,31 @@ class FormatHelper{
             $puntoLlegadaDocumento = $data['almacen_destino']['document'];
         }
 
+       /*  $transportes = [];
+        array_push($transportes, [
+            'en_InformacionTransporteGRR' => [
+                'at_Modalidad' => $transporteModalidad,
+                'at_FechaInicio' => $transporteFechaInicio,
+                'ent_TransportePublicoGRR' => [
+                    'at_TipoDocumentoIdentidad' => $transportePublicoTipoDocumento,
+                    'at_NumeroDocumentoIdentidad' => $transportePublicoDocumento,
+                    'at_RazonSocial' => $transportePublicoRazonSocial,
+                    'at_NumeroMTC' => $transportePublicoNumeroMTC
+                ]
+            ]
+        ]); */
+
         $bienes = [];
 
-        foreach($movement['detalle'] as $item){
-            $bienes['en_BienesGRR'] = [
-                'at_Cantidad' => $item['cant_mde'],
-                'at_UnidadMedida' => $item['um_mde'],
-                'at_Descripcion' => $item['des_mde'],
-                'at_Codigo' => $item['cod_inv']
-            ];
+        foreach($movement['detalle'] as $key => $item){
+            array_push($bienes, [
+                'en_BienesGRR' => [
+                    'at_Cantidad' => $item['cant_mde'],
+                    'at_UnidadMedida' => $item['um_mde'],
+                    'at_Descripcion' => $item['des_mde'],
+                    'at_Codigo' => $item['cod_inv']
+                ]
+            ]);
         }
 
         $result = [

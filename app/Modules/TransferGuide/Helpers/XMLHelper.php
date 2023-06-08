@@ -36,9 +36,16 @@ class XMLHelper {
     private function createNodes($data, $parent) {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                $element = $this->xml->createElement('gui:'.$key);
-                $parent->appendChild($element);
-                $this->createNodes($value, $element);
+                if(is_numeric($key)){
+                    $element = $this->xml->createElement('gui:'.array_keys($data[$key])[0], $value[0][array_keys($data[$key])[0]]);
+                    $parent->appendChild($element);
+                    $this->createNodes($value[array_keys($data[$key])[0]], $element);
+                }
+                else{
+                    $element = $this->xml->createElement('gui:'.$key);
+                    $parent->appendChild($element);
+                    $this->createNodes($value, $element);
+                }
             } else {
                 $element = $this->xml->createElement('gui:'.$key, $value);
                 $parent->appendChild($element);

@@ -53,14 +53,37 @@ abstract class CommonRepository implements ICommonRepository{
         return $result;
     }
 
-    public function create($data) {
+    public function store($data) {
+        $keys = array_keys($data);
+        $fields = implode(",", $keys);
+        $fieldVars = implode(",", array_map(function ($value) { return ':' . $value; }, $keys));
         // Implementación para crear un nuevo registro
-        $query = "INSERT INTO {$this->tableName} (nombre, document) VALUES (:nombre, :document)";
+        $query = "INSERT INTO {$this->tableName} (".$fields.") VALUES (".$fieldVars.")";
+        $stm = $this->connection->prepare($query);
+
+        foreach($keys as $key){
+            $stm->bindParam(":".$key, $data[$key]);
+        }
+
+        $stm->execute();
+        return ($this->connection?$this->connection->lastInsertId():null);
     }
 
     public function update($id, $data) {
+        $keys = array_keys($data);
+        $fields = implode(",", array_map(function ($value) { return $value . '=:' . $value; }, $keys));
+
         // Implementación para actualizar un registro existente
-        $query = "UPDATE {$this->tableName} SET nombre = :nombre, document = :document WHERE id = :id";
+        $query = "UPDATE {$this->tableName} SET ". $fields ." WHERE id = :id";
+        $stm = $this->connection->prepare($query);
+
+        foreach($keys as $key){
+            $stm->bindParam(":".$key, $data[$key]);
+        }
+        $stm->bindParam(":id", $id);
+        $stm->execute();
+
+        return ($this->connection?$id:null);
     }
 
     public function delete($id) {
