@@ -33,7 +33,9 @@ class TransferGuideController{
             'message' => 'Error'
         ];
         try {
-            $data = $this->transferGuideRepository->findWithPaginate();
+            $filters = GlobalHelper::getUrlData();
+            unset($filters['action']);
+            $data = $this->transferGuideRepository->findWithPaginate($filters);
             $response['success'] = true;
             $response['data'] = $data;
         } catch (PDOException $e) {
@@ -81,9 +83,11 @@ class TransferGuideController{
                         $transferGuideId = null;
 
                         if(!ValidateHelper::validateProperty($movement, ['transfer_guide_id'])){
+                            $validated['data']['created_at'] = date("Y-m-d H:i:s");
                             $transferGuideId = $this->transferGuideRepository->store($this->groupStoreTransitMovementGuide($movement, $validated['data']));
                         }
                         else{
+                            $validated['data']['updated_at'] = date("Y-m-d H:i:s");
                             $this->transferGuideRepository->update($movement['transfer_guide_id'], $this->groupStoreTransitMovementGuide($movement, $validated['data']));
                         }
 
@@ -277,7 +281,7 @@ class TransferGuideController{
     }
 
     private function groupStoreTransitMovementGuide($movement, $data){
-        return [
+        $groupData = [
             'serie' => $data['serie'],
             'number' => $data['numero'],
             'date_issue' => $data['fecha_emision'],
@@ -292,6 +296,16 @@ class TransferGuideController{
             'email_secondary' => $data['almacen_destino']['email_secondary'],
             'movement_id' => $movement['id_movt']
         ];
+
+        if(isset($data['created_at'])){
+            $groupData['created_at'] = $data['created_at'];
+        }
+
+        if(isset($data['updated_at'])){
+            $groupData['updated_at'] = $data['updated_at'];
+        }
+
+        return $groupData;
     }
 
     private function sendTransitMovementGuide($id, $data = []){
