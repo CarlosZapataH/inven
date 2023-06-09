@@ -98,10 +98,19 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
         <div class="card">
             <div class="card-body">
                 <div class="mb-10">
-                    <h6>Filtros de busqueda</h6>
                     <div class="row">
                         <div class="col-12 col-sm-4">
-                            <input v-model="filters.q" placeholder="Busqueda" type="text" class="form-control" @input="listenFilter">
+                            <label class="col-form-label">Busqueda </label>
+                            <input v-model="filters.q" placeholder="Escriba el Código" type="text" class="form-control" @input="listenFilter">
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label class="col-form-label">Rango de fecha </label>
+                            <div class="d-flex">
+                                <input v-model="filters.date_from" :max="filters.date_to" placeholder="Fecha inicio" type="date" class="form-control" @input="listenFilter">
+                                <input v-model="filters.date_to" :min="filters.date_from" placeholder="Fecha fin" type="date" class="form-control" @input="listenFilter">
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-4">
                         </div>
                     </div>
                 </div>
@@ -109,7 +118,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     <table class="table datatable-responsive-row-control">
                         <thead>
                             <tr>
-                                <th></th>
                                 <th>Código</th>
                                 <th>Fecha</th>
                                 <th>Remitente</th>
@@ -119,15 +127,14 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>TR001-0001</td>
-                                <td>07/06/2023</td>
-                                <td>CONFIPETROL ANDINA S.A.</td>
-                                <td>CONFIPETROL ANDINA S.A.</td>
+                            <tr v-for="(guide, index) in paginatedItems" :key="index + '-item-guide'">
+                                <td>{{guide.transfers_guides_serie + '-' + guide.transfers_guides_number}}</td>
+                                <td>{{guide.transfers_guides_date_issue}}</td>
+                                <td>{{guide.almacen_ini_titulo_alm}}</td>
+                                <td>{{guide.almacen_des_titulo_alm}}</td>
                                 <td>Evaluación</td>
                                 <td>
-                                    <a href="http://localhost/inventario/app/guia-editar.php?idMovimiento=51" class="btn btn-primary btn-sm">Ver</a>
+                                    <a :href="'http://localhost/inventario/app/guia-editar.php?idMovimiento=' + guide.transfers_guides_id" class="btn btn-primary btn-sm">Ver</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -135,14 +142,14 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                 </div>
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Previous</a>
+                        <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                            <a class="page-link" href="#" @click="setCurrentPage(currentPage - 1)">Anterior</a>
                         </li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
+                        <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': currentPage === page }">
+                            <a class="page-link" href="#" @click="setCurrentPage(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                            <a class="page-link" href="#" @click="setCurrentPage(currentPage + 1)">Siguiente</a>
                         </li>
                     </ul>
                 </nav>

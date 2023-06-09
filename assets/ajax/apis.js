@@ -35,3 +35,16 @@ function createGuide(data, params) {
       throw error;
     });
 }
+
+function listGuide(params = {}) {
+  const url =
+    urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
+  params.action = "index";
+  return axios
+    .get(url, { params })
+    .then((response) => response?.data)
+    .catch((error) => {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    });
+}
