@@ -24,6 +24,10 @@ class TransitMovementHelper{
                     $response['observacion'] = $row['transfers_guides_observations'];
                     $response['hora_emision'] = $row['transfers_guides_time_issue'];
                     $response['peso'] = $row['transfers_guides_total_witght'];
+                    $response['flag_sent'] = $row['transfers_guides_flag_sent'];
+                    $response['sent_attempts'] = $row['transfers_guides_sent_attempts'] ?? 0;
+                    $response['tci_send'] = $row['transfers_guides_tci_send'];
+                    $response['tci_response'] = $row['transfers_guides_tci_response'];
 
                     // DETAIL
                     $response['detalle'] = [];

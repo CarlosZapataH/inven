@@ -58,15 +58,14 @@ class HttpHelper{
         // Crear un objeto SimpleXMLElement a partir del XML con el espacio de nombres registrado
         // $xmlObject = simplexml_load_string($response, null, 0, 'http://schemas.xmlsoap.org/soap/envelope/');
         $xmlObject = simplexml_load_string($response);
-        
         // Registrar el espacio de nombres
         $xmlObject->registerXPathNamespace('ns', 'http://schemas.xmlsoap.org/soap/envelope/');
         
         // Utilizar XPath para acceder a los elementos dentro del espacio de nombres
         $resultado = $xmlObject->xpath('//ns:Body');
-        
         // Convertir el resultado XPath en un array
         $arrayResponse = json_decode(json_encode($resultado[0]), true);
+        $arrayResponse['original'] = $response;
 
         return $arrayResponse;
     }
