@@ -94,7 +94,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                 <li class="breadcrumb-item text-muted">Formulario para generar guía de remisión electrónica (GRE)</li>
             </ol>
         </div>
-        <form @submit.prevent="submitForm">
+        <div>
             <div class="row justify-content-center">
 
                 <div class="col-12 col-lg-10" v-if="movement">
@@ -589,14 +589,14 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     <div class="row justify-content-end">
                         <div class="col-auto">
                             <div class="mb-10">
-                                <button type="submit" class="btn btn-primary">Guardar Guía</button>
-                                <button type="button" class="btn btn-success" @click="asd()">Guardar y Enviar</button>
+                                <button type="button" class="btn btn-primary" @click="submitForm(false)">Guardar Guía</button>
+                                <button type="button" class="btn btn-success" @click="submitForm(true)">Guardar y Enviar</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
 
         <!-- <div class="card card-body shadow mb-40">
             <h5 class="card-title font-weight-bold">Datos Generales</h5>
@@ -786,4 +786,4 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
     <script src="../assets/ajax/apis.js<?= $version ?>"></script>
     <script src="../assets/ajax/InputUbigeo.js<?= $version ?>"></script>
-    <script src="../assets/ajax/movement_detail.js<?= $version ?>"></script>
+    <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>

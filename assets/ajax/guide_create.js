@@ -108,6 +108,11 @@ new Vue({
       const queryValue = urlParams.get("idMovimiento");
       return queryValue;
     },
+    typeMov: function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryValue = urlParams.get("tipo");
+      return queryValue;
+    },
   },
   methods: {
     addDriver() {
@@ -130,12 +135,12 @@ new Vue({
       this.vehicles.splice(index, 1);
     },
 
-    submitForm() {
+    submitForm(isSend) {
       this.$refs.ppUbigeoSelects.$validator.validate();
       this.$refs.plUbigeoSelects.$validator.validate();
       this.$validator.validateAll().then((result) => {
         if (result) {
-          this.sendGuide();
+          this.sendGuide(isSend);
         } else {
           swal.fire({
             title: "",
@@ -150,17 +155,20 @@ new Vue({
     },
 
     getData() {
-      const urlBase = "Modules/";
+      let urlBase =
+        "Modules/TransitMovement/Controllers/TransitMovementController.php";
+      let action = "getTransitMovement";
+      if (this.typeMov == "interno") {
+        urlBase = "Modules/Movement/Controllers/MovementController.php";
+        action = "getMovement";
+      }
       axios
-        .get(
-          urlBase + "TransitMovement/Controllers/TransitMovementController.php",
-          {
-            params: {
-              action: "getTransitMovement",
-              id: this.idMov,
-            },
-          }
-        )
+        .get(urlBase, {
+          params: {
+            action: action,
+            id: this.idMov,
+          },
+        })
         .then((response) => {
           this.movement = response?.data?.data || {};
           this.movementDetail = response?.data?.data?.detalle || [];
@@ -233,9 +241,10 @@ new Vue({
       return time; // Si ya tiene el formato "00:00:00", retornarlo sin cambios
     },
 
-    sendGuide() {
+    sendGuide(isSend) {
       const data = {
         // ent_RemitenteGRR
+        send: isSend,
         almacen_partida: {
           document: this.ent_RemitenteGRR?.at_NumeroDocumentoIdentidad,
           name: this.ent_RemitenteGRR?.at_RazonSocial,
