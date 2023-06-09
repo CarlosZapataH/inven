@@ -26,6 +26,25 @@ class TransferGuideController{
         $this->transitMovementRepository = new TransitMovementRepository();
     }
 
+    public function index(){
+        $response = [
+            'data' => null,
+            'success' => false,
+            'message' => 'Error'
+        ];
+        try {
+            $data = $this->transferGuideRepository->findWithPaginate();
+            $response['success'] = true;
+            $response['data'] = $data;
+        } catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+            echo $e->getMessage();
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+
     public function show(){
         $response = [
             'data' => null,
@@ -283,7 +302,13 @@ class TransferGuideController{
         $response['data'] = $tciResponse['data'];
         $response['message'] = $tciResponse['message'];
         // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($movement, $data));
-        // $this->transferGuideRepository->update($movement['transfer_guide_id'], $this->groupStoreTransitMovementGuide($movement, $validated['data']));
+        $this->transferGuideRepository->update($movement['transfer_guide_id'], [
+            'flag_sent' => true,
+            'sent_attempts' => $movement['sent_attempts'] + 1,
+            'tci_send' => $tciResponse['content_send'],
+            'tci_response' => $tciResponse['original']
+        ]);
+
         if($tciResponse['success']){
             $response['success'] = true;
         }
