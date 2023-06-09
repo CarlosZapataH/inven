@@ -8,10 +8,11 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
         parent::__construct(TransferGuide::class);
     }
 
-    public function findWithPaginate(){
+    public function findWithPaginate($filters){
         try{
             $data = null;
-            $result = self::query('
+
+            $query = '
                 SELECT 
                     movimientos_transito.id_movt,
                     movimientos_transito.action_mov,
@@ -20,8 +21,6 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                     movimientos_transito.observ_mov,
                     movimientos_transito.nro_mov,
                     movimientos_transito.fechaguia_mov,
-                    movimientos_transito_detalle.des_mde,
-                    movimientos_transito_detalle.cant_mde,
                     almacen_ini.titulo_alm as almacen_ini_titulo_alm,
                     almacen_ini.direccion_alm as almacen_ini_direccion_alm,
                     almacen_des.titulo_alm as almacen_des_titulo_alm,
@@ -42,8 +41,6 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                     u_alm_des.id_ubigeo as u_alm_des_id_ubigeo,
                     u_alm_des.nombre_ubigeo as u_alm_des_nombre_ubigeo,
                     u_alm_des.codigo_inei as u_alm_des_codigo_inei,
-                    inventario.um_inv as inventario_um_inv,
-                    inventario.cod_inv as inventario_cod_inv,
                     transfers_guides.id as transfers_guides_id,
                     transfers_guides.serie as transfers_guides_serie,
                     transfers_guides.number as transfers_guides_number,
@@ -65,7 +62,6 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                     transports.mtc_number as transports_numero_mtc
                 FROM transfers_guides
                 LEFT JOIN movimientos_transito ON movimientos_transito.id_movt = transfers_guides.movement_id
-                LEFT JOIN movimientos_transito_detalle ON movimientos_transito_detalle.id_movt = movimientos_transito.id_movt
                 LEFT JOIN almacen as almacen_ini ON almacen_ini.id_alm = movimientos_transito.id_alm_ini
                 LEFT JOIN almacen as almacen_des ON almacen_des.id_alm = movimientos_transito.id_alm_des
                 LEFT JOIN companies as company_ini ON company_ini.id = almacen_ini.company_id
@@ -74,9 +70,30 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 LEFT JOIN document_types as document_types_des ON document_types_des.id = company_des.document_type_id
                 LEFT JOIN ubigeo as u_alm_ini ON u_alm_ini.id_ubigeo = almacen_ini.distrito_alm
                 LEFT JOIN ubigeo as u_alm_des ON u_alm_des.id_ubigeo = almacen_des.distrito_alm
-                LEFT JOIN inventario ON inventario.id_inv = movimientos_transito_detalle.id_inv
                 LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
-            ');
+            ';
+            $conditions = '';
+
+            if(count($filters) > 0){
+                if(isset($filters['q'])){
+                    $conditions .= 'CONCAT(transfers_guides.serie, "-", transfers_guides.number) LIKE "%'.$filters['q'].'%"';
+                }
+
+                if(isset($filters['date_from'])){
+                    if(strlen($conditions) > 0) $conditions .= ' AND ';
+                    $conditions .= 'transfers_guides.date_issue >= "'. $filters['date_from'].'"';
+                }
+
+                if(isset($filters['date_to'])){
+                    if(strlen($conditions) > 0) $conditions .= ' AND ';
+                    $conditions .= 'transfers_guides.date_issue <= "'. $filters['date_to'].'"';
+                }
+
+                $conditions = ' WHERE ' . $conditions;
+            }
+
+            $result = self::query($query.$conditions);
+
 
             // if($result){
             //     if(is_array($result)){
