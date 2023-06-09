@@ -534,7 +534,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <tbody>
                                         <tr v-for="(item, index) in movementDetail" :key="index + '-movementDetail'">
                                             <td>{{index + 1}}</td>
-                                            <td>{{item.cod_mde}}</td>
+                                            <td>{{item.cod_inv}}</td>
                                             <td>{{item.des_mde}}</td>
                                             <td>{{item.um_mde}}</td>
                                             <td>{{item.cant_mde}}</td>
