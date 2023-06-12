@@ -16,6 +16,7 @@ class TransferGuide {
     private $movement_id;
     private $email_principal;
     private $email_secondary;
+    private $transport_modality;
     private $created_at;
     private $updated_at;
 
@@ -51,6 +52,7 @@ class TransferGuide {
         $this->movement_id = $movement_id;
         $this->email_principal = $email_principal;
         $this->email_secondary = $email_secondary;
+        $this->transport_modality = $transport_modality;
         $this->created_at = $created_at;
         $this->updated_at = $updated_at;
     }
@@ -77,6 +79,7 @@ class TransferGuide {
             "movement_id" => $this->movement_id,
             "email_principal" => $this->email_principal,
             "email_secondary" => $this->email_secondary,
+            "transport_modality" => $this->transport_modality,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at
         ];

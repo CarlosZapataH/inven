@@ -46,6 +46,7 @@ class TCIService{
 
     private function sendAction($action, $data){
         $xmlContent = self::getXmlContent($data, $action);
+        // echo $xmlContent;
         $response = $this->httpHelper->postXML($this->baseUrl, self::getHeaders($action), $xmlContent);
         $response['content_send'] = $xmlContent;
         return self::getResponse($response, $action);

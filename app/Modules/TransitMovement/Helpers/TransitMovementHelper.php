@@ -6,6 +6,9 @@ class TransitMovementHelper{
     public static function format($data){
         $response = [];
         if($data){
+            $transportsIds = [];
+            $vehiclesIds = [];
+
             foreach($data as $index => $row){
                 if($index == 0){
                     // PRINCIPAL
@@ -28,9 +31,16 @@ class TransitMovementHelper{
                     $response['sent_attempts'] = $row['transfers_guides_sent_attempts'] ?? 0;
                     $response['tci_send'] = $row['transfers_guides_tci_send'];
                     $response['tci_response'] = $row['transfers_guides_tci_response'];
+                    $response['modalidad_transporte'] = $row['transfers_guides_transport_modality'];
 
                     // DETAIL
                     $response['detalle'] = [];
+
+                    // TRANSPORT
+                    $response['transports'] = [];
+
+                    // VEHICLES
+                    $response['vehicles'] = [];
         
                     // START
                     $response['almacen_partida'] = [
@@ -69,16 +79,31 @@ class TransitMovementHelper{
                             'code' => $row['u_alm_des_codigo_inei']
                         ]
                     ];
+                }
 
-                    // TRANSPORT
-                    $response['transporte'] = [
-                        'modalidad' => $row['transports_modalidad'],
-                        'fecha_inicio' => $row['transports_fecha_inicio'],
-                        'tipo_documento' => $row['transports_tipo_documento'],
-                        'documento' => $row['transports_documento'],
-                        'razon_social' => $row['transports_razon_social'],
-                        'numero_mtc' => $row['transports_numero_mtc']
-                    ];
+                // TRANSPORT
+                if(!in_array($row['transports_id'], $transportsIds)){
+                    array_push($response['transports'], [
+                        'id' => $row['transports_id'],
+                        'modality' => $row['transports_modalidad'],
+                        'start_date' => $row['transports_fecha_inicio'],
+                        'document_type' => $row['transports_tipo_documento'],
+                        'document' => $row['transports_documento'],
+                        'company_name' => $row['transports_razon_social'],
+                        'mtc_number' => $row['transports_numero_mtc'],
+                        'name' => $row['transports_name'],
+                        'last_name' => $row['transports_last_name'],
+                        'license' => $row['transports_license']
+                    ]);
+                    array_push($transportsIds, $row['transports_id']);
+                }
+
+                // VAHICLE
+                if(!in_array($row['vehicles_id'], $vehiclesIds)){
+                    array_push($response['vehicles'], [
+                        'plate' => $row['vehicles_plate']
+                    ]);
+                    array_push($vehiclesIds, $row['vehicles_id']);
                 }
 
                 // DETAIL

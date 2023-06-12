@@ -21,7 +21,7 @@ class ValidateHelper{
     
             if (is_array($objeto)) {
                 $subPropiedades = array_keys($objeto);
-                if (!validateProperty($objeto, $subPropiedades, $nombreObjeto . '.' . $nombrePropiedad)) {
+                if (!self::validateProperty($objeto, $subPropiedades, $nombreObjeto . '.' . $nombrePropiedad)) {
                     return null;
                 }
             }

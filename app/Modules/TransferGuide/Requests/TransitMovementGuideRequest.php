@@ -11,6 +11,30 @@ class TransitMovementGuideRequest extends CommonRequest
         return $this->validate($data, $rules, $messages);
     }
 
+    public function validatedTransportPublic($data)
+    {
+        $rules = self::validateStoreRulesTransportPublic();
+        $messages = self::validateStoreMessagesTransportPublic();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
+    public function validatedTransportPrivate($data)
+    {
+        $rules = self::validateStoreRulesTransportPrivate();
+        $messages = self::validateStoreMessagesTransportPrivate();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
+    public function validatedVehicle($data)
+    {
+        $rules = self::validateStoreRulesVehicle();
+        $messages = self::validateStoreMessagesVehicle();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
     private function validateStoreRules(){
         return [
             // // ent_RemitenteGRR
@@ -113,6 +137,9 @@ class TransitMovementGuideRequest extends CommonRequest
             'hora_emision' => [
                 'required' => 'La hora de emisión es obligatoria.',
             ],
+            'transport_modality' => [
+                'required' => 'La modalidad de transporte es obligatoria.',
+            ],
             // ent_InformacionTrasladoGRR
             // // ent_InformacionPesoBrutoGRR
             'codigo_motivo' => [
@@ -162,6 +189,30 @@ class TransitMovementGuideRequest extends CommonRequest
         return $this->validate($data, $rules, $messages);
     }
 
+    public function validateStoreTransportPublic($data)
+    {
+        $rules = self::validateStoreRulesTransportPublic();
+        $messages = self::validateStoreMessagesTransportPublic();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
+    public function validateStoreTransportPrivate($data)
+    {
+        $rules = self::validateStoreRulesTransportPrivate();
+        $messages = self::validateStoreMessagesTransportPrivate();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
+    public function validateStoreVehicle($data)
+    {
+        $rules = self::validateStoreRulesVehicle();
+        $messages = self::validateStoreMessagesVehicle();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
     private function validateStoreRulesDetail(){
         return [
             // en_BienesGRR
@@ -186,6 +237,93 @@ class TransitMovementGuideRequest extends CommonRequest
             ],
             'codigo' => [
                 'required' => 'El código de los bienes es obligatorio.',
+            ]
+        ];
+    }
+
+    // TRANSPORT PUBLIC
+    private function validateStoreRulesTransportPublic(){
+        return [
+            // en_BienesGRR
+            'start_date' => [['required']],
+            'document_type' => [['required']],
+            'document' => [['required']],
+            'company_name' => [['required']],
+            'mtc_number' => [['required']]
+        ];
+    }
+
+    private function validateStoreMessagesTransportPublic(){
+        return [
+            // en_BienesGRR
+            'start_date' => [
+                'required' => 'La fecha de inicio de transporte es obligatoria.',
+            ],
+            'document_type' => [
+                'required' => 'El tipo de documento de transporte es obligatorio.',
+            ],
+            'document' => [
+                'required' => 'El documento de transporte es obligatorio.',
+            ],
+            'company_name' => [
+                'required' => 'La razón social del transporte es obligatorio.',
+            ],
+            'mtc_number' => [
+                'required' => 'El número MTC del transporte es obligatorio.',
+            ]
+        ];
+    }
+
+    // TRANSPORT PRIVATE
+    private function validateStoreRulesTransportPrivate(){
+        return [
+            // en_BienesGRR
+            'start_date' => [['required']],
+            'document_type' => [['required']],
+            'document' => [['required']],
+            'license' => [['required']],
+            'name' => [['required']],
+            'last_name' => [['required']]
+        ];
+    }
+
+    private function validateStoreMessagesTransportPrivate(){
+        return [
+            // en_BienesGRR
+            'start_date' => [
+                'required' => 'La fecha de inicio de transporte es obligatoria.',
+            ],
+            'tipo_documento' => [
+                'required' => 'El tipo de documento de transporte es obligatorio.',
+            ],
+            'documento' => [
+                'required' => 'El documento de transporte es obligatorio.',
+            ],
+            'license' => [
+                'required' => 'La licencia de transporte es obligatoria.',
+            ],
+            'name' => [
+                'required' => 'El nombre del transporte es obligatorio.',
+            ],
+            'last_name' => [
+                'required' => 'El apellido del transporte es obligatorio.',
+            ]
+        ];
+    }
+
+    // VEHICLE
+    private function validateStoreRulesVehicle(){
+        return [
+            // en_BienesGRR
+            'plate' => [['required']]
+        ];
+    }
+
+    private function validateStoreMessagesVehicle(){
+        return [
+            // en_BienesGRR
+            'plate' => [
+                'required' => 'La placa de transporte es obligatoria.',
             ]
         ];
     }
