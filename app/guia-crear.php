@@ -280,83 +280,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
 
+                            <driver-registration-form v-model="drivers" :document-types="documentTypes" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></driver-registration-form>
 
-                            <div class="card" v-if="en_InformacionTransporteGRR.at_Modalidad == 2">
-                                <div class="card-header"> Información del Conductor(es)
-                                </div>
-                                <div class="card-body">
-                                    <form @submit.prevent="addDriver">
-                                        <div class="row">
-                                            <div class="col-12 col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="cdt_at_Nombres">Nombres</label>
-                                                    <input v-model="en_ConductorGRR.at_Nombres" type="text" class="form-control" id="cdt_at_Nombres">
-                                                </div>
-                                            </div>
-                                            <div class="col-12 col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="cdt_at_Apellidos">Apellidos</label>
-                                                    <input v-model="en_ConductorGRR.at_Apellidos" type="text" class="form-control" id="cdt_at_Apellidos">
-                                                </div>
-                                            </div>
+                            <vehicle-registration-form v-model="vehicles" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></vehicle-registration-form>
 
-                                            <div class="col-12 col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="cdt_at_TipoDocumentoIdentidad">Tipo de Documento</label>
-                                                    <select v-model="en_ConductorGRR.at_TipoDocumentoIdentidad" class="form-control" id="cdt_at_TipoDocumentoIdentidad">
-                                                        <option v-for="document in documentTypes" :key="document.id + '-documentCode'" :value="document.code">{{ document.description }}</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-12 col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="cdt_at_NumeroDocumentoIdentidad">Número de Documento</label>
-                                                    <input v-model="en_ConductorGRR.at_NumeroDocumentoIdentidad" type="text" class="form-control" id="cdt_at_NumeroDocumentoIdentidad">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-12 col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="cdt_at_Licencia">Licencia:</label>
-                                                    <input v-model="en_ConductorGRR.at_Licencia" type="text" class="form-control" id="cdt_at_Licencia">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <button type="submit" class="btn btn-primary">Registrar</button>
-                                    </form>
-                                    <hr>
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Nombres</th>
-                                                <th scope="col">Apellidos</th>
-                                                <th scope="col">Tipo de Documento</th>
-                                                <th scope="col">Número de Documento</th>
-                                                <th scope="col">Licencia</th>
-                                                <th scope="col"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(driver, index) in drivers" :key="index + '-driver'">
-                                                <td>{{ index + 1 }}</td>
-                                                <td>{{ driver.at_Nombres }}</td>
-                                                <td>{{ driver.at_Apellidos }}</td>
-                                                <td>{{ driver.at_TipoDocumentoIdentidad }}</td>
-                                                <td>{{ driver.at_NumeroDocumentoIdentidad }}</td>
-                                                <td>{{ driver.at_Licencia }}</td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger btn-sm" @click="removeDriver(index)">Eliminar</button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="card" v-if="en_InformacionTransporteGRR.at_Modalidad == 2">
+                            <!-- <div class="card" v-if="en_InformacionTransporteGRR.at_Modalidad == 2">
                                 <div class="card-header"> Información del vehículo(s) </div>
                                 <div class="card-body">
                                     <form @submit.prevent="addVehicles">
@@ -389,7 +317,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="card" v-if="en_InformacionTransporteGRR.at_Modalidad == 1">
                                 <div class="card-header"> Información del transporte público </div>
                                 <div class="card-body">
@@ -786,4 +714,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
     <script src="../assets/ajax/apis.js<?= $version ?>"></script>
     <script src="../assets/ajax/InputUbigeo.js<?= $version ?>"></script>
+    <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
+    <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>

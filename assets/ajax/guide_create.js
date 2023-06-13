@@ -115,41 +115,39 @@ new Vue({
     },
   },
   methods: {
-    addDriver() {
-      if (this.drivers.length < 3) {
-        this.drivers.push({ ...this.en_ConductorGRR });
-      }
-    },
-
-    removeDriver(index) {
-      this.drivers.splice(index, 1);
-    },
-
-    addVehicles() {
-      if (this.vehicles.length < 3) {
-        this.vehicles.push({ ...this.en_VehiculoGRR });
-      }
-    },
-
-    removeVehicle(index) {
-      this.vehicles.splice(index, 1);
-    },
-
     submitForm(isSend) {
       this.$refs.ppUbigeoSelects.$validator.validate();
       this.$refs.plUbigeoSelects.$validator.validate();
       this.$validator.validateAll().then((result) => {
-        if (result) {
+        let alertMsm = true;
+        let isCompleted = true;
+        if (result == false) {
+          isCompleted = false;
+          alertMsm = "Completar formulario correctamente";
+        } else if (
+          this.en_InformacionTransporteGRR.at_Modalidad == 2 &&
+          this.drivers.length == 0
+        ) {
+          isCompleted = false;
+          alertMsm = "Agregar conductores al registro.";
+        } else if (
+          this.en_InformacionTransporteGRR.at_Modalidad == 2 &&
+          this.vehicles.length == 0
+        ) {
+          isCompleted = false;
+          alertMsm = "Agregar vehículos al registro.";
+        }
+
+        if (isCompleted) {
           this.sendGuide(isSend);
         } else {
           swal.fire({
             title: "",
             type: "info",
-            text: "Completar formulario correctamente",
+            text: alertMsm,
             showConfirmButton: false,
-            timer: 2000,
+            timer: 3000,
           });
-          console.log(this.$validator.errors.items);
         }
       });
     },
@@ -278,7 +276,10 @@ new Vue({
         peso: this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
         cantidad:
           this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
-        transporte: {
+      };
+
+      if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
+        data.transporte = {
           modalidad: this.en_InformacionTransporteGRR?.at_Modalidad,
           fecha_inicio: this.en_InformacionTransporteGRR?.at_FechaInicio,
           tipo_documento:
@@ -286,8 +287,14 @@ new Vue({
           documento: this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
           razon_social: this.ent_TransportePublicoGRR?.at_RazonSocial,
           numero_mtc: this.ent_TransportePublicoGRR?.at_NumeroMTC,
-        },
-      };
+        };
+      } else if (this.en_InformacionTransporteGRR?.at_Modalidad == 2) {
+        data.modalidad_transporte =
+          this.en_InformacionTransporteGRR?.at_Modalidad;
+        data.transports = this.drivers;
+        data.vehicles = this.vehicles;
+      }
+
       const params = { id: this.idMov };
       this.apiErros = [];
       createGuide(data, params)
@@ -323,7 +330,8 @@ new Vue({
           console.log(response);
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error?.response?.data);
+          this.apiErros = error?.response?.data?.errors || [];
           swal.fire({
             title: "",
             type: "error",
