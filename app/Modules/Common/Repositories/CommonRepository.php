@@ -91,6 +91,15 @@ abstract class CommonRepository implements ICommonRepository{
         $query = "DELETE FROM {$this->tableName} WHERE id = :id";
     }
 
+    public function deleteBy($field, $value) {
+        // Implementación para eliminar un registro existente
+        $query = "DELETE FROM {$this->tableName} WHERE {$field} = :value";
+        $stm = $this->connection->prepare($query);
+        $stm->bindParam(":value", $value);
+        $stm->execute();
+        return ($this->connection?true:false);
+    }
+
     private function getTableName() {
         return $this->modelClass::TABLE_NAME;
     }

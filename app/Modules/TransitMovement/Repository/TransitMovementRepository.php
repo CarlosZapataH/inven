@@ -57,17 +57,24 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                     transfers_guides.unit_measure as transfers_guides_unit_measure,
                     transfers_guides.email_principal as transfers_guides_email_principal,
                     transfers_guides.email_secondary as transfers_guides_email_secondary,
+                    transfers_guides.transport_modality as transfers_guides_transport_modality,
                     transfers_guides.total_quantity as transfers_guides_total_quantity,
                     transfers_guides.flag_sent as transfers_guides_flag_sent,
                     transfers_guides.sent_attempts as transfers_guides_sent_attempts,
                     transfers_guides.tci_send as transfers_guides_tci_send,
                     transfers_guides.tci_response as transfers_guides_tci_response,
+                    transports.id as transports_id,
                     transports.modality as transports_modalidad,
                     transports.start_date as transports_fecha_inicio,
                     transports.document_type as transports_tipo_documento,
                     transports.document as transports_documento,
                     transports.company_name as transports_razon_social,
-                    transports.mtc_number as transports_numero_mtc
+                    transports.mtc_number as transports_numero_mtc,
+                    transports.name as transports_name,
+                    transports.last_name as transports_last_name,
+                    transports.license as transports_license,
+                    vehicles.id as vehicles_id,
+                    vehicles.plate as vehicles_plate
                 FROM movimientos_transito
                 INNER JOIN movimientos_transito_detalle ON movimientos_transito_detalle.id_movt = movimientos_transito.id_movt
                 LEFT JOIN almacen as almacen_ini ON almacen_ini.id_alm = movimientos_transito.id_alm_ini
@@ -81,6 +88,7 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                 LEFT JOIN inventario ON inventario.id_inv = movimientos_transito_detalle.id_inv
                 LEFT JOIN transfers_guides ON transfers_guides.movement_id = movimientos_transito.id_movt
                 LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
+                LEFT JOIN vehicles ON vehicles.transfer_guide_id = transfers_guides.id
                 WHERE 
                     movimientos_transito.id_movt = '.$id.'
             ');

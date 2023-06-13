@@ -7,6 +7,8 @@ require_once __DIR__ . '/../../../../assets/util/Session.php';
 require_once __DIR__ . '/../Repository/TransferGuideRepository.php';
 require_once __DIR__ . '/../Requests/TransitMovementGuideRequest.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
+require_once __DIR__ . '/../../Transport/Repository/TransportRepository.php';
+require_once __DIR__ . '/../../Vehicle/Repository/VehicleRepository.php';
 require_once __DIR__ . '/../Helpers/FormatHelper.php';
 require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../Helpers/XMLHelper.php';
@@ -19,11 +21,15 @@ call_user_func(array($controller,$action));
 class TransferGuideController{
     private $transferGuideRepository;
     private $transitMovementRepository;
+    private $transportRepository;
+    private $vehicleRepository;
 
     public function __construct()
     {
         $this->transferGuideRepository = new TransferGuideRepository();
         $this->transitMovementRepository = new TransitMovementRepository();
+        $this->transportRepository = new TransportRepository();
+        $this->vehicleRepository = new VehicleRepository();
     }
 
     public function index(){
@@ -75,20 +81,25 @@ class TransferGuideController{
             if (json_last_error() === JSON_ERROR_NONE){
                 $id = (int)$_GET['id'];
                 $movement = $this->transitMovementRepository->getTransitMovement($id);
+                
                 if($movement){
                     $rules = $this->getRulesTransitMovementGuide($movement);
                     $validated = $this->validatedData($data, $rules);
- 
+                    
                     if($validated['success']){
                         $transferGuideId = null;
 
                         if(!ValidateHelper::validateProperty($movement, ['transfer_guide_id'])){
                             $validated['data']['created_at'] = date("Y-m-d H:i:s");
                             $transferGuideId = $this->transferGuideRepository->store($this->groupStoreTransitMovementGuide($movement, $validated['data']));
+                            $this->storeTransport($data['modalidad_transporte'], $validated['data'], $transferGuideId);
+                            $this->storeVehicle($validated['data'], $transferGuideId);
                         }
                         else{
                             $validated['data']['updated_at'] = date("Y-m-d H:i:s");
                             $this->transferGuideRepository->update($movement['transfer_guide_id'], $this->groupStoreTransitMovementGuide($movement, $validated['data']));
+                            $this->storeTransport($data['modalidad_transporte'], $validated['data'], $movement['transfer_guide_id'], true);
+                            $this->storeVehicle($validated['data'], $movement['transfer_guide_id'], true);
                         }
 
                         $send = false;
@@ -132,7 +143,7 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo $e->getMessage();
+            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
@@ -153,6 +164,65 @@ class TransferGuideController{
         } 
         else {
             $result['errors'] = $validator->getErrors();
+        }
+        if(!$result['errors']){
+            $modality = $data['modalidad_transporte'];
+            $result['data']['transports'] = [];
+            if(isset($data['transports'])){
+                if(is_array($data['transports'])){
+                    foreach($data['transports'] as $rowTransport){
+                        $validatorTs = new TransitMovementGuideRequest();
+                        if($modality == 1){
+                            $resultTransport = $validatorTs->validatedTransportPublic($rowTransport);
+                        }
+                        else{
+                            $resultTransport = $validatorTs->validatedTransportPrivate($rowTransport);
+                        }
+                        if($resultTransport){
+                            array_push($result['data']['transports'], $validatorTs->getValidData());
+                        }
+                        else{
+                            $result['errors'] = $validatorTs->getErrors();
+                            $result['success'] = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            else{
+                $result['errors'] = [
+                    "transports" => ["El transporte es obligatorio."]
+                ];
+            }
+        }
+        
+
+        if(!$result['errors']){
+            $modality = $data['modalidad_transporte'];
+            $result['data']['vehicles']  = [];
+            if($modality == 2){
+                if(isset($data['vehicles'])){
+                    foreach($data['vehicles'] as $rowVehicle){
+                        $validatorV = new TransitMovementGuideRequest();
+
+                        $resultVehicle = $validatorV->validatedVehicle($rowVehicle);
+                      
+                        if($resultVehicle){
+                            array_push($result['data']['vehicles'], $validatorV->getValidData());
+                        }
+                        else{
+                            $result['errors'] = $validatorV->getErrors();
+                            $result['success'] = false;
+                            break;
+                        }
+                    }
+                }
+                else{
+                    $result['errors'] = [
+                        "vehicles" => ["Los vehículos son obligatorios."]
+                    ];
+                }
+            }
         }
 
         return $result;
@@ -183,6 +253,85 @@ class TransferGuideController{
 
         return $result;
     }
+
+    public function validatedTransportPublic($data){
+        $result = [
+            'success' => false,
+            'errors' => null,
+            'data' => null
+        ];
+        foreach($data as $row){
+            $validator = new TransitMovementGuideRequest();
+            $status = $validator->validateStoreTransportPublic($row);
+            if ($status) {
+                if(!$result['data']){
+                    $result['data'] = [];
+                }
+                array_push($result['data'], $validator->getValidData());
+                $result['success'] = true;
+            } 
+            else {
+                $result['success'] = false;
+                $result['errors'] = $validator->getErrors();
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    public function validatedTransportPrivate($data){
+        $result = [
+            'success' => false,
+            'errors' => null,
+            'data' => null
+        ];
+        foreach($data as $row){
+            $validator = new TransitMovementGuideRequest();
+            $status = $validator->validateStoreTransportPrivate($row);
+            if ($status) {
+                if(!$result['data']){
+                    $result['data'] = [];
+                }
+                array_push($result['data'], $validator->getValidData());
+                $result['success'] = true;
+            } 
+            else {
+                $result['success'] = false;
+                $result['errors'] = $validator->getErrors();
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    public function validatedVehicle($data){
+        $result = [
+            'success' => false,
+            'errors' => null,
+            'data' => null
+        ];
+        foreach($data as $row){
+            $validator = new TransitMovementGuideRequest();
+            $status = $validator->validateStoreVehicle($row);
+            if ($status) {
+                if(!$result['data']){
+                    $result['data'] = [];
+                }
+                array_push($result['data'], $validator->getValidData());
+                $result['success'] = true;
+            } 
+            else {
+                $result['success'] = false;
+                $result['errors'] = $validator->getErrors();
+                break;
+            }
+        }
+
+        return $result;
+    }
+    
 
     private function getRulesTransitMovementGuide($movement){
         $rules = [];
@@ -235,6 +384,9 @@ class TransferGuideController{
         }
 
         // ent_General
+        if(!ValidateHelper::validateProperty($movement, ['modalidad_transporte']) || $existGuide){
+            $rules['modalidad_transporte'] = [['required']];
+        }
         if(!ValidateHelper::validateProperty($movement, ['fecha_emision']) || $existGuide){
             $rules['fecha_emision'] = [['required']];
         }
@@ -257,8 +409,12 @@ class TransferGuideController{
             $rules['cantidad'] = [['required']];
         }
 
+        if(!ValidateHelper::validateProperty($movement, ['modalidad_transporte']) || $existGuide){
+            $rules['modalidad_transporte'] = [['required']];
+        }
+
         // ent_Transpor
-        if(!ValidateHelper::validateProperty($movement, ['transporte.modalidad'])){
+       /*  if(!ValidateHelper::validateProperty($movement, ['transporte.modalidad'])){
             $rules['transporte.modalidad'] = [['required']];
         }
         if(!ValidateHelper::validateProperty($movement, ['transporte.fecha_inicio'])){
@@ -275,7 +431,7 @@ class TransferGuideController{
         }
         if(!ValidateHelper::validateProperty($movement, ['transporte.numero_mtc'])){
             $rules['transporte.numero_mtc'] = [['required']];
-        }
+        } */
 
         return $rules;
     }
@@ -294,7 +450,8 @@ class TransferGuideController{
             'total_quantity' => $data['cantidad'],
             'email_principal' => $data['almacen_destino']['email_principal'],
             'email_secondary' => $data['almacen_destino']['email_secondary'],
-            'movement_id' => $movement['id_movt']
+            'movement_id' => $movement['id_movt'],
+            'transport_modality' => $data['modalidad_transporte']
         ];
 
         if(isset($data['created_at'])){
@@ -308,14 +465,49 @@ class TransferGuideController{
         return $groupData;
     }
 
+    private function groupStoreTransitMovementGuideTransport($data, $transferGuideId){
+        $groupData = ['modality' => $modality, 'transfer_guide_id' => $transferGuideId];
+        
+        if($modality == 1){
+            if($data['start_date']){
+                $groupData['start_date'] = $data['start_date'];
+            }
+    
+            if($data['document_type']){
+                $groupData['document_type'] = $data['document_type'];
+            }
+    
+            if($data['document']){
+                $groupData['document'] = $data['transporte']['document'];
+            }
+    
+            if($data['company_name']){
+                $groupData['company_name'] = $data['transporte']['company_name'];
+            }
+    
+            if($data['mtc_number']){
+                $groupData['mtc_number'] = $data['transporte']['mtc_number'];
+            }
+        }
+
+        if(isset($data['created_at'])){
+            $groupData['created_at'] = $data['created_at'];
+        }
+
+        if(isset($data['updated_at'])){
+            $groupData['updated_at'] = $data['updated_at'];
+        }
+        return $groupData;
+    }
+
     private function sendTransitMovementGuide($id, $data = []){
         $response = GlobalHelper::getGlobalResponse();
         $movement = $this->transitMovementRepository->getTransitMovement($id);
         $tciService = new TCIService();
+        // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($movement, $data));
         $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($movement, $data));
         $response['data'] = $tciResponse['data'];
         $response['message'] = $tciResponse['message'];
-        // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($movement, $data));
         $this->transferGuideRepository->update($movement['transfer_guide_id'], [
             'flag_sent' => true,
             'sent_attempts' => $movement['sent_attempts'] + 1,
@@ -331,5 +523,38 @@ class TransferGuideController{
         }
 
         return $response;
+    }
+
+    private function storeTransport($modality, $data, $transferGuideId, $update = false){
+        if($transferGuideId){
+            if($update){
+                $this->transportRepository->deleteBy('transfer_guide_id', $transferGuideId);
+            }
+
+            if(count($data['transports'])){
+                foreach($data['transports'] as $transport){
+                    $transport['modality'] = $modality;
+                    $transport['transfer_guide_id'] = $transferGuideId;
+                    $transport['created_at'] = date("Y-m-d H:i:s");
+                    $this->transportRepository->store($transport);
+                }
+            }
+        }
+    }
+
+    private function storeVehicle($data, $transferGuideId, $update = false){
+        if($transferGuideId && isset($data['vehicles'])){
+            if($update){
+                $this->vehicleRepository->deleteBy('transfer_guide_id', $transferGuideId);
+            }
+            
+            if(count($data['vehicles'])){
+                foreach($data['vehicles'] as $vehicle){
+                    $vehicle['transfer_guide_id'] = $transferGuideId;
+                    $vehicle['created_at'] = date("Y-m-d H:i:s");
+                    $this->vehicleRepository->store($vehicle);
+                }
+            }
+        }
     }
 }
