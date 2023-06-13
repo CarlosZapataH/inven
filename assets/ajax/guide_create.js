@@ -22,7 +22,7 @@ new Vue({
     },
 
     ent_DestinatarioGRR: {
-      at_TipoDocumentoIdentidad: 6,
+      at_TipoDocumentoIdentidad: 1,
       at_NumeroDocumentoIdentidad: null,
       at_RazonSocial: "",
       at_CorreoPrincipal: "",
@@ -239,6 +239,11 @@ new Vue({
       return time; // Si ya tiene el formato "00:00:00", retornarlo sin cambios
     },
 
+    getdocumentCodebyId(id) {
+      const document = this.documentTypes.find((e) => e.id == id);
+      return document ? document.code : undefined;
+    },
+
     sendGuide(isSend) {
       const data = {
         // ent_RemitenteGRR
@@ -253,8 +258,10 @@ new Vue({
         },
         // ent_DestinatarioGRR
         almacen_destino: {
-          document_type_code:
-            this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad,
+          document_type_id: this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad,
+          document_type_code: this.getdocumentCodebyId(
+            this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad
+          ),
           document: this.ent_DestinatarioGRR?.at_NumeroDocumentoIdentidad,
           name: this.ent_DestinatarioGRR?.at_RazonSocial,
           email_principal: this.ent_DestinatarioGRR?.at_CorreoPrincipal,
@@ -276,6 +283,7 @@ new Vue({
         peso: this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
         cantidad:
           this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
+        modalidad_transporte: this.en_InformacionTransporteGRR?.at_Modalidad,
       };
 
       if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
@@ -289,8 +297,6 @@ new Vue({
           numero_mtc: this.ent_TransportePublicoGRR?.at_NumeroMTC,
         };
       } else if (this.en_InformacionTransporteGRR?.at_Modalidad == 2) {
-        data.modalidad_transporte =
-          this.en_InformacionTransporteGRR?.at_Modalidad;
         data.transports = this.drivers;
         data.vehicles = this.vehicles;
       }

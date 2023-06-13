@@ -142,7 +142,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </label>
                                 <div class="col-sm-9">
                                     <select v-model="ent_DestinatarioGRR.at_TipoDocumentoIdentidad" name="DES_TipoDocumento" v-validate="'required'" class="form-control">
-                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.code">{{ document.description }}</option>
+                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.id">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
                                 </div>
