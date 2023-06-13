@@ -44,9 +44,11 @@ class TransitMovementHelper{
         
                     // START
                     $response['almacen_partida'] = [
+                        'id' => $row['almacen_ini_id'],
                         'titulo_alm' => $row['almacen_ini_titulo_alm'],
                         'direccion_alm' => $row['almacen_ini_direccion_alm'],
                         'company' => [
+                            'id' => $row['company_ini_id'],
                             'name' => $row['company_ini_name'],
                             'commercial_name' => $row['company_ini_commercial_name'],
                             'document_type' => $row['document_types_ini_description'],
@@ -62,11 +64,13 @@ class TransitMovementHelper{
         
                     // END
                     $response['almacen_destino'] = [
+                        'id' => $row['almacen_des_id'],
                         'titulo_alm' => $row['almacen_des_titulo_alm'],
                         'direccion_alm' => $row['almacen_des_direccion_alm'],
                         'email_principal' => $row['transfers_guides_email_principal'],
                         'email_secondary' => $row['transfers_guides_email_secondary'],
                         'company' => [
+                            'id' => $row['company_des_id'],
                             'name' => $row['company_des_name'],
                             'commercial_name' => $row['company_des_commercial_name'],
                             'document_type' => $row['document_types_des_description'],

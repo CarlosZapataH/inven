@@ -17,7 +17,9 @@ class TCIService{
     |--------------------------------------------------------------------------
     */
     public function queryStatusGRR20($data){
-        return self::sendAction('ConsultarEstadoGRR', $data);
+        return self::sendAction('ConsultarEstadoGRR', [
+            'ConsultarEstadoGRR' => $data
+        ]);
     }
 
     /*
@@ -58,21 +60,32 @@ class TCIService{
         if($response['success']){
             if(isset($response['response'][$action.'Response'])){
                 $data = isset($response['response'][$action.'Response'][$action.'Result'])?$response['response'][$action.'Response'][$action.'Result'] : null;
+                
                 if($data){
-                    if(isset($data['at_CodigoError']) && isset($data['at_NivelResultado'])){
-                        if(!self::isBoolString($data['at_NivelResultado'])){
+                    if(isset($data['at_CodigoError'])){
+                        if($data['at_CodigoError'] != "0"){
                             $response['code'] = 400;
                         }
+                        // && isset($data['at_NivelResultado'])
+                        // if(!self::isBoolString($data['at_NivelResultado'])){
+                        // }
                     }
 
                     if(isset($data['at_MensajeResultado'])){
-                        $response['success'] = self::isBoolString($data['at_NivelResultado']);
+                        if(!isset($data['at_CodigoError'])){
+                            if($data['at_CodigoError'] != "0"){
+                                $response['success'] = true;
+                            }
+                        }
+                        // $response['success'] = self::isBoolString($data['at_NivelResultado']);
+                        // $response['success'] = !isset($data['at_CodigoError']);
                     }
 
                     if(isset($data['at_MensajeResultado'])){
                         $response['message'] = $data['at_MensajeResultado'];
                     }
                 }
+
             }
         }
 
