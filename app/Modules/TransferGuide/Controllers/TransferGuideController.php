@@ -9,6 +9,8 @@ require_once __DIR__ . '/../Requests/TransitMovementGuideRequest.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
 require_once __DIR__ . '/../../Transport/Repository/TransportRepository.php';
 require_once __DIR__ . '/../../Vehicle/Repository/VehicleRepository.php';
+require_once __DIR__ . '/../../Company/Repository/CompanyRepository.php';
+require_once __DIR__ . '/../../Store/Repository/StoreRepository.php';
 require_once __DIR__ . '/../Helpers/FormatHelper.php';
 require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../Helpers/XMLHelper.php';
@@ -23,6 +25,8 @@ class TransferGuideController{
     private $transitMovementRepository;
     private $transportRepository;
     private $vehicleRepository;
+    private $companyRepository;
+    private $storeRepository;
 
     public function __construct()
     {
@@ -30,6 +34,8 @@ class TransferGuideController{
         $this->transitMovementRepository = new TransitMovementRepository();
         $this->transportRepository = new TransportRepository();
         $this->vehicleRepository = new VehicleRepository();
+        $this->companyRepository = new CompanyRepository();
+        $this->storeRepository = new StoreRepository();
     }
 
     public function index(){
@@ -102,6 +108,8 @@ class TransferGuideController{
                             $this->storeVehicle($validated['data'], $movement['transfer_guide_id'], true);
                         }
 
+                        $this->updateRelations($movement, $validated['data']);
+
                         $send = false;
                         if(isset($data['send'])){
                             if($data['send'] == 1){
@@ -114,6 +122,10 @@ class TransferGuideController{
                             $response['data'] = $sendResponse['data'];
                             $response['message'] = $sendResponse['message'];
                             if($sendResponse['success']){
+                                $this->transferGuideRepository->update(($transferGuideId?$transferGuideId:$movement['transfer_guide_id']), [
+                                    'hash_code' => $response['data']['at_CodigoHash'],
+                                    'xml_name' => $response['data']['at_NombreXML']
+                                ]);
                                 $response['code'] = 200;
                                 $response['success'] = true;
                             }
@@ -149,6 +161,44 @@ class TransferGuideController{
         http_response_code($response['code']);
         echo json_encode($response);
     }
+
+    public function queryStatus(){
+        header('Content-Type: application/json');
+        $response = GlobalHelper::getGlobalResponse();
+        try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                $tciService = new TCIService();
+                $tciResponse = $tciService->queryStatusGRR20([
+                    'ent_ConsultarEstado' => [
+                        'at_NumeroDocumentoIdentidad' => '20357259976',
+                        'at_CantidadConsultar' => 10
+                    ]
+                ]);
+                
+                $response['data'] = $tciResponse['data'];
+                $response['message'] = $tciResponse['message'];
+
+                if($tciResponse['success']){
+                    $response['data'] = $this->formatQueryStatus($response['data']);
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                }
+                else{
+                    $response['errors'] = [$tciResponse['message']];
+                }
+            } 
+        } 
+        catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+            echo json_encode($e->getMessage());
+        }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+    }
+
+    // PROCESS
 
     public function validatedData($data, $rules){
         $result = [
@@ -351,6 +401,9 @@ class TransferGuideController{
         }
 
         // // ent_PuntoPartidaGRR
+        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.id'])){
+            $rules['almacen_partida.document_type_id'] = [['required']];
+        }
         if(!ValidateHelper::validateProperty($movement, ['almacen_partida.district.code'])){
             $rules['almacen_partida.ubigeo'] = [['required']];
         }
@@ -376,6 +429,9 @@ class TransferGuideController{
         }
 
         // // ent_PuntoLlegadaGRR
+        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.id'])){
+            $rules['almacen_destino.document_type_id'] = [['required']];
+        }
         if(!ValidateHelper::validateProperty($movement, ['almacen_destino.district.code'])){
             $rules['almacen_destino.ubigeo'] = [['required']];
         }
@@ -556,5 +612,109 @@ class TransferGuideController{
                 }
             }
         }
+    }
+    
+    private function updateRelations($movement, $data){
+        
+        $this->completeStoreIni($movement, $data);
+        $this->completeStoreDes($movement, $data);
+    }
+
+    private function completeStoreIni($movement, $data){
+        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.id'])){
+            $validateCompanyIni = $this->companyRepository->validateCompany($data['almacen_partida']['document_type_id'], $data['almacen_partida']['document']);
+            $companyIniId = null;
+
+            if(!$validateCompanyIni){
+                $companyIni = [
+                    'name' => $data['almacen_partida']['name'],
+                    'commercial_name' => $data['almacen_partida']['commercial_name'],
+                    'document' => $data['almacen_partida']['document'],
+                    'document_type_id' => $data['almacen_partida']['document_type_id']
+                ];
+                $companyIniId = $this->companyRepository->store($companyIni);
+            }
+            else{
+                if(!ValidateHelper::validateProperty($validateCompanyIni, ['commercial_name'])){
+                    $this->companyRepository->update($validateCompanyIni['id'], [ 'commercial_name' => $data['almacen_partida']['commercial_name']]);
+                }
+
+                $companyIniId = $validateCompanyIni['id'];
+            }
+
+            if($companyIniId){
+                $this->storeRepository->updateBy('id_alm', $movement['almacen_partida']['id'], [ 'company_id' => $companyIniId]);
+            }
+        }
+    }
+
+    private function completeStoreDes($movement, $data){
+        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.id'])){
+            $validateCompanyDes = $this->companyRepository->validateCompany($data['almacen_destino']['document_type_id'], $data['almacen_destino']['document']);
+            $companyDesId = null;
+
+            if(!$validateCompanyDes){
+                $companyDes = [
+                    'name' => $data['almacen_destino']['name'],
+                    'commercial_name' => $data['almacen_destino']['commercial_name'],
+                    'document' => $data['almacen_destino']['document'],
+                    'document_type_id' => $data['almacen_destino']['document_type_id']
+                ];
+                $companyDesId = $this->companyRepository->store($companyDes);
+            }
+            else{
+                if(!ValidateHelper::validateProperty($validateCompanyDes, ['commercial_name'])){
+                    $this->companyRepository->update($validateCompanyDes['id'], [ 'commercial_name' => $data['almacen_destino']['commercial_name']]);
+                }
+
+                $companyDesId = $validateCompanyDes['id'];
+            }
+
+            if($companyDesId){
+                $this->storeRepository->updateBy('id_alm', $movement['almacen_destino']['id'], [ 'company_id' => $companyDesId]);
+            }
+        }
+    }
+
+    private function formatQueryStatus($data){
+        $documents = [];
+
+        if(isset($data['l_ResultadoEstadoComprobante'])){
+            if(isset($data['l_ResultadoEstadoComprobante']['en_ResultadoEstadoComprobanteGR'])){
+                foreach($data['l_ResultadoEstadoComprobante']['en_ResultadoEstadoComprobanteGR'] as $row){
+                    $item = [
+                        'serie' => $row['at_Serie'],
+                        'number' => $row['at_Numero'],
+                        'status_granted' => false,
+                        'status_granted_date' => null,
+                        'status_read' => false,
+                        'status_read_date' => null
+                    ];
+
+                    if(isset($row['ent_EstadoOtorgado'])){
+                        if(isset($row['ent_EstadoOtorgado']['at_FechaOtorgado'])){
+                            if(!empty($row['ent_EstadoOtorgado']['at_FechaOtorgado'])){
+                                $item['status_granted'] = true;
+                                $item['status_granted_date'] = $row['ent_EstadoOtorgado']['at_FechaOtorgado'];
+                            }
+                        }
+                    }
+
+                    if(isset($row['ent_EstadoLeido'])){
+                        if(isset($row['ent_EstadoLeido']['at_FechaLeido'])){
+                            if(!empty($row['ent_EstadoLeido']['at_FechaLeido'])){
+                                $item['status_read'] = true;
+                                $item['status_read_date'] = $row['ent_EstadoLeido']['at_FechaLeido'];
+                            }
+                        }
+                    }
+
+                    array_push($documents, $item);
+                }
+            }
+
+        }
+
+        return $documents;
     }
 }

@@ -86,6 +86,23 @@ abstract class CommonRepository implements ICommonRepository{
         return ($this->connection?$id:null);
     }
 
+    public function updateBy($field, $value, $data) {
+        $keys = array_keys($data);
+        $fields = implode(",", array_map(function ($value) { return $value . '=:' . $value; }, $keys));
+
+        // Implementación para actualizar un registro existente
+        $query = "UPDATE {$this->tableName} SET ". $fields ." WHERE {$field} = :value";
+        $stm = $this->connection->prepare($query);
+
+        foreach($keys as $key){
+            $stm->bindParam(":".$key, $data[$key]);
+        }
+        $stm->bindParam(":value", $value);
+        $stm->execute();
+
+        return ($this->connection?$id:null);
+    }
+
     public function delete($id) {
         // Implementación para eliminar un registro existente
         $query = "DELETE FROM {$this->tableName} WHERE id = :id";
