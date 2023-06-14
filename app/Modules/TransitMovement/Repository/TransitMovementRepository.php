@@ -49,6 +49,12 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                     u_alm_des.codigo_inei as u_alm_des_codigo_inei,
                     inventario.um_inv as inventario_um_inv,
                     inventario.cod_inv as inventario_cod_inv,
+                    (
+                        SELECT 
+                            unidad_medida.sunat_code 
+                        FROM unidad_medida 
+						WHERE CONVERT(unidad_medida.cod_um USING utf8) = CONVERT(inventario_um_inv USING utf8) LIMIT 1
+                    ) as um_sunat_code,
                     transfers_guides.id as transfers_guides_id,
                     transfers_guides.serie as transfers_guides_serie,
                     transfers_guides.number as transfers_guides_number,
