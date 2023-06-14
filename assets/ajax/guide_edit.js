@@ -268,6 +268,7 @@ new Vue({
           at_FechaInicio: transports[0].start_date,
         };
         this.drivers = movement?.transports || [];
+        this.vehicles = movement?.vehicles || [];
       }
     },
 
