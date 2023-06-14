@@ -37,6 +37,7 @@ class TransferGuide {
         $movement_id,
         $email_principal,
         $email_secondary,
+        $transport_modality,
         $hash_code,
         $xml_name,
         $created_at,

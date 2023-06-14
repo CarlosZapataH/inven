@@ -198,17 +198,23 @@ class TransferGuideController{
         echo json_encode($response);
     }
 
-    public function queryStatusSUNAT(){
+    public function confirmResponseSUNAT(){
         header('Content-Type: application/json');
         $response = GlobalHelper::getGlobalResponse();
         try {
             $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
                 $tciService = new TCIService();
-                $tciResponse = $tciService->queryStatusSUNAT([
-                    'ent_ConsultarRespuesta' => [
+                $tciResponse = $tciService->confirmResponseSUNAT([
+                    'ent_ConfirmarRespuesta' => [
                         'at_NumeroDocumentoIdentidad' => '20357259976',
-                        'at_CantidadConsultar' => 50
+                        'l_Comprobante' => [
+                            'en_ComprobanteConfirmarRespuesta' => [
+                                'at_Serie' => 'T001',
+                                'at_Numero' => '2',
+                                'at_CodigoRespuesta' => '1'
+                            ]
+                        ]
                     ]
                 ]);
                 
@@ -246,8 +252,8 @@ class TransferGuideController{
                         'at_NumeroDocumentoIdentidad' => '20357259976',
                         'ent_ComprobanteConsultarXML' => [
                             'at_Serie' => 'T001',
-                            'at_Numero' => '115',
-                            'at_NumeroRespuesta' => 10
+                            'at_Numero' => '116',
+                            'at_NumeroRespuesta' => 1
                         ]
                     ]
                 ]);
@@ -256,7 +262,7 @@ class TransferGuideController{
                 $response['message'] = $tciResponse['message'];
 
                 if($tciResponse['success']){
-                    $response['data'] = $this->formatQueryStatus($response['data']);
+                    $response['data'] = $this->formatQueryXML($response['data']);
                     $response['code'] = 200;
                     $response['success'] = true;
                 }
@@ -792,5 +798,20 @@ class TransferGuideController{
         }
 
         return $documents;
+    }
+
+    private function formatQueryXML($data){
+        $dataResponse = [];
+
+        if(isset($data['ent_ResultadoXML'])){
+            if(isset($data['ent_ResultadoXML']['at_XML'])){
+                $binaryData = base64_decode($data['ent_ResultadoXML']['at_XML']);
+                $xml = simplexml_load_string($binaryData);
+                $dataResponse['xml'] = $xml->asXML();
+            }
+
+        }
+
+        return $dataResponse;
     }
 }
