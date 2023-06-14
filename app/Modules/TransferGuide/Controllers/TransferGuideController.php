@@ -162,7 +162,7 @@ class TransferGuideController{
         echo json_encode($response);
     }
 
-    public function queryStatus(){
+    public function queryStatusTCI(){
         header('Content-Type: application/json');
         $response = GlobalHelper::getGlobalResponse();
         try {
@@ -173,6 +173,82 @@ class TransferGuideController{
                     'ent_ConsultarEstado' => [
                         'at_NumeroDocumentoIdentidad' => '20357259976',
                         'at_CantidadConsultar' => 10
+                    ]
+                ]);
+                
+                $response['data'] = $tciResponse['data'];
+                $response['message'] = $tciResponse['message'];
+
+                if($tciResponse['success']){
+                    $response['data'] = $this->formatQueryStatus($response['data']);
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                }
+                else{
+                    $response['errors'] = [$tciResponse['message']];
+                }
+            } 
+        } 
+        catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+            echo json_encode($e->getMessage());
+        }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+    }
+
+    public function queryStatusSUNAT(){
+        header('Content-Type: application/json');
+        $response = GlobalHelper::getGlobalResponse();
+        try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                $tciService = new TCIService();
+                $tciResponse = $tciService->queryStatusSUNAT([
+                    'ent_ConsultarRespuesta' => [
+                        'at_NumeroDocumentoIdentidad' => '20357259976',
+                        'at_CantidadConsultar' => 50
+                    ]
+                ]);
+                
+                $response['data'] = $tciResponse['data'];
+                $response['message'] = $tciResponse['message'];
+
+                if($tciResponse['success']){
+                    $response['data'] = $response['data'];
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                }
+                else{
+                    $response['errors'] = [$tciResponse['message']];
+                }
+            } 
+        } 
+        catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+            echo json_encode($e->getMessage());
+        }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+    }
+
+    public function queryXML(){
+        header('Content-Type: application/json');
+        $response = GlobalHelper::getGlobalResponse();
+        try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                $tciService = new TCIService();
+                $tciResponse = $tciService->queryXML([
+                    'ent_ConsultarXML' => [
+                        'at_NumeroDocumentoIdentidad' => '20357259976',
+                        'ent_ComprobanteConsultarXML' => [
+                            'at_Serie' => 'T001',
+                            'at_Numero' => '115',
+                            'at_NumeroRespuesta' => 10
+                        ]
                     ]
                 ]);
                 

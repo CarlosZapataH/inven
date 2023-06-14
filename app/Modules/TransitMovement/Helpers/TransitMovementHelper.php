@@ -32,6 +32,9 @@ class TransitMovementHelper{
                     $response['tci_send'] = $row['transfers_guides_tci_send'];
                     $response['tci_response'] = $row['transfers_guides_tci_response'];
                     $response['modalidad_transporte'] = $row['transfers_guides_transport_modality'];
+                    $response['motive_code'] = $row['transfers_guides_motive_code'];
+                    $response['motive_description'] = $row['transfers_guides_motive_description'];
+                    $response['cantidad'] = $row['transfers_guides_total_quantity'];
 
                     // DETAIL
                     $response['detalle'] = [];
@@ -113,7 +116,7 @@ class TransitMovementHelper{
                 // DETAIL
                 array_push($response['detalle'], [
                     'des_mde' => $row['des_mde'],
-                    'um_mde' => $row['inventario_um_inv'],
+                    'um_mde' => $row['um_sunat_code'],
                     'cant_mde' => $row['cant_mde'],
                     'cod_inv' => $row['inventario_cod_inv'],
                 ]);

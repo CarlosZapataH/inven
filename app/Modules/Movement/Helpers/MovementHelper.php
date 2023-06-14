@@ -46,6 +46,7 @@ class MovementHelper{
                 array_push($response['detalle'], [
                     'des_mde' => $row['des_mde'],
                     'um_mde' => $row['um_mde'],
+                    'um_sunat_code' => $row['um_sunat_code'],
                     'cant_mde' => $row['cant_mde']
                 ]);
             }

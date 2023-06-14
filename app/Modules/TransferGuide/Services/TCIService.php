@@ -13,7 +13,7 @@ class TCIService{
 
     /*
     |--------------------------------------------------------------------------
-    | RegistrarGRR20
+    | ConsultarEstadoGRR
     |--------------------------------------------------------------------------
     */
     public function queryStatusGRR20($data){
@@ -30,6 +30,28 @@ class TCIService{
     public function registerGRR20($data){
         return self::sendAction('RegistrarGRR20', [
             'RegistrarGRR20' => $data
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ConsultarXMLGRR
+    |--------------------------------------------------------------------------
+    */
+    public function queryXML($data){
+        return self::sendAction('ConsultarXMLGRR', [
+            'ConsultarXMLGRR' => $data
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ConsultarXMLGRR
+    |--------------------------------------------------------------------------
+    */
+    public function queryStatusSUNAT($data){
+        return self::sendAction('ConsultarRespuestaGRR', [
+            'ConsultarRespuestaGRR' => $data
         ]);
     }
 

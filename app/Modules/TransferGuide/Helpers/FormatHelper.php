@@ -227,7 +227,7 @@ class FormatHelper{
             array_push($bienes, [
                 'en_BienesGRR' => [
                     'at_Cantidad' => $item['cant_mde'],
-                    'at_UnidadMedida' => $item['um_mde'],
+                    'at_UnidadMedida' => $item['um_sunat_code'] ?? 'SET',
                     'at_Descripcion' => $item['des_mde'],
                     'at_Codigo' => $item['cod_inv']
                 ]
