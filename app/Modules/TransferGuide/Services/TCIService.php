@@ -49,9 +49,20 @@ class TCIService{
     | ConsultarXMLGRR
     |--------------------------------------------------------------------------
     */
-    public function queryStatusSUNAT($data){
+    public function queryResponseSUNAT($data){
         return self::sendAction('ConsultarRespuestaGRR', [
             'ConsultarRespuestaGRR' => $data
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | ConfirmarRespuestaGRR
+    |--------------------------------------------------------------------------
+    */
+    public function confirmResponseSUNAT($data){
+        return self::sendAction('ConfirmarRespuestaGRR', [
+            'ConfirmarRespuestaGRR' => $data
         ]);
     }
 
@@ -78,11 +89,9 @@ class TCIService{
 
     private function getResponse($response, $action){
         $data = null;
-
         if($response['success']){
             if(isset($response['response'][$action.'Response'])){
                 $data = isset($response['response'][$action.'Response'][$action.'Result'])?$response['response'][$action.'Response'][$action.'Result'] : null;
-                
                 if($data){
                     if(isset($data['at_CodigoError'])){
                         if($data['at_CodigoError'] != "0"){
@@ -95,9 +104,12 @@ class TCIService{
 
                     if(isset($data['at_MensajeResultado'])){
                         if(!isset($data['at_CodigoError'])){
-                            if($data['at_CodigoError'] != "0"){
+                            // if($data['at_CodigoError'] != "0"){
                                 $response['success'] = true;
-                            }
+                            // }
+                        }
+                        else if($data['at_CodigoError'] != "0"){
+                            $response['success'] = true;
                         }
                         // $response['success'] = self::isBoolString($data['at_NivelResultado']);
                         // $response['success'] = !isset($data['at_CodigoError']);

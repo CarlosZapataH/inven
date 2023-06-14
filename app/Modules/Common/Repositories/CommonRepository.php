@@ -1,5 +1,5 @@
 <?php
-require_once '../../../../ds/AccesoDB.php';
+require_once __DIR__ . '/../../../../ds/AccesoDB.php';
 require_once 'ICommonRepository.php';
 
 abstract class CommonRepository implements ICommonRepository{
@@ -33,6 +33,20 @@ abstract class CommonRepository implements ICommonRepository{
     public function findBy($field, $value) {
         // Implementación para obtener un registro por su ID
         $query = "SELECT * FROM {$this->tableName} WHERE ".$field." = :value";
+        $stm = $this->connection->prepare($query);
+        $stm->bindParam(":value",$value);
+        $stm->execute();
+        $result = $stm->fetch(PDO::FETCH_ASSOC);
+
+        if($result){
+            return $this->mapRowToModel($result);
+        }
+        return null;
+    }
+
+    public function findConcat($field1, $field2, $character, $value) {
+        // Implementación para obtener un registro por su ID
+        $query = "SELECT * FROM {$this->tableName} WHERE CONCAT({$field1}, '{$character}', {$field2}) = :value";
         $stm = $this->connection->prepare($query);
         $stm->bindParam(":value",$value);
         $stm->execute();
