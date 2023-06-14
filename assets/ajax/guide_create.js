@@ -16,13 +16,14 @@ new Vue({
   el: "#app",
   data: {
     ent_RemitenteGRR: {
+      at_TipoDocumentoIdentidad: 4,
       at_NumeroDocumentoIdentidad: "",
       at_RazonSocial: "",
       at_NombreComercial: "",
     },
 
     ent_DestinatarioGRR: {
-      at_TipoDocumentoIdentidad: 1,
+      at_TipoDocumentoIdentidad: 4,
       at_NumeroDocumentoIdentidad: null,
       at_RazonSocial: "",
       at_CorreoPrincipal: "",
@@ -67,18 +68,6 @@ new Vue({
       at_NumeroDocumentoIdentidad: "",
       at_RazonSocial: "",
       at_NumeroMTC: "",
-    },
-
-    en_ConductorGRR: {
-      at_TipoDocumentoIdentidad: null,
-      at_NumeroDocumentoIdentidad: null,
-      at_Licencia: "",
-      at_Nombres: "",
-      at_Apellidos: "",
-    },
-
-    en_VehiculoGRR: {
-      aa_NumeroPlaca: "",
     },
 
     drivers: [],
@@ -184,27 +173,47 @@ new Vue({
       });
     },
 
+    convertTimeFormat(fullTime) {
+      if (fullTime) {
+        const [hour, minutes] = fullTime.split(":");
+        const date = new Date();
+        date.setHours(hour);
+        date.setMinutes(minutes);
+        const convertedTime = date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return convertedTime;
+      }
+      return fullTime;
+    },
+
     setData() {
       const movement = { ...this.movement };
       console.log(movement);
 
       const remitente = movement?.almacen_partida?.company || {};
+      const destinatario = movement?.almacen_destino?.company || {};
+      const puntoPartida = movement?.almacen_partida || {};
+      const puntoLlegada = movement?.almacen_destino;
+      const transports = movement?.transports;
+
       this.ent_RemitenteGRR = {
-        at_NumeroDocumentoIdentidad: remitente?.document,
-        at_RazonSocial: remitente?.name,
-        at_NombreComercial: remitente?.commercial_name,
+        ...this.ent_RemitenteGRR,
+        document: remitente?.document,
+        document_type: remitente?.document_type_code || null,
+        name: remitente?.name,
+        commercial_name: remitente?.commercial_name,
       };
 
-      const destinatario = movement?.almacen_destino?.company || {};
       this.ent_DestinatarioGRR = {
-        at_TipoDocumentoIdentidad: destinatario.document_type_code || 6,
+        at_TipoDocumentoIdentidad: destinatario?.document_type_code || null,
         at_NumeroDocumentoIdentidad: destinatario.document,
         at_RazonSocial: destinatario.name,
-        at_CorreoPrincipal: "",
-        aa_CorreoSecundario: "",
+        at_CorreoPrincipal: puntoLlegada?.email_principal || null,
+        aa_CorreoSecundario: puntoLlegada?.email_secondary || null,
       };
 
-      const puntoPartida = movement?.almacen_partida || {};
       this.ent_PuntoPartidaGRR = {
         at_Ubigeo: puntoPartida?.district?.code || "",
         at_DireccionCompleta: puntoPartida?.direccion_alm,
@@ -212,7 +221,6 @@ new Vue({
         at_NumeroDocumentoIdentidad: null,
       };
 
-      const puntoLlegada = movement?.almacen_destino;
       this.ent_PuntoLlegadaGRR = {
         at_Ubigeo: puntoLlegada?.district?.code || "",
         at_DireccionCompleta: puntoLlegada?.direccion_alm,
@@ -220,14 +228,47 @@ new Vue({
         at_NumeroDocumentoIdentidad: null,
       };
 
-      // ent_DatosGeneralesGRR: {
-      //   at_FechaEmision: "2023-01-17",
-      //   at_Serie: "", //T004
-      //   at_Numero: 0, //445
-      //   at_Observacion: "",
-      //   at_HoraEmision: "16:50:00",
+      this.ent_DatosGeneralesGRR = {
+        ...this.ent_DatosGeneralesGRR,
+        at_FechaEmision: movement?.fecha_emision || null,
+        at_Serie: movement?.serie || null, //T004
+        at_Numero: movement?.numero || null, //445
+        at_Observacion: movement?.observacion || null,
+        at_HoraEmision: this.convertTimeFormat(movement?.hora_emision) || null,
+        at_CodigoMotivo: 4,
+        ent_InformacionPesoBrutoGRR: {
+          at_Peso: movement?.peso || null,
+          at_UnidadMedida: "KGM",
+          at_Cantidad: "",
+        },
+      };
 
-      this.ent_DatosGeneralesGRR.at_Observacion = movement?.observ_mov;
+      if (
+        Array.isArray(transports) &&
+        transports.length > 0 &&
+        transports[0].modality == 1
+      ) {
+        this.en_InformacionTransporteGRR = {
+          at_Modalidad: transports[0].modality,
+          at_FechaInicio: transports[0].start_date,
+        };
+        this.ent_TransportePublicoGRR = {
+          at_TipoDocumentoIdentidad: transports[0].document_type,
+          at_NumeroDocumentoIdentidad: transports[0].document,
+          at_RazonSocial: transports[0].company_name,
+          at_NumeroMTC: transports[0].mtc_number,
+        };
+      } else if (
+        Array.isArray(transports) &&
+        transports.length > 0 &&
+        transports[0].modality == 2
+      ) {
+        this.en_InformacionTransporteGRR = {
+          at_Modalidad: transports[0].modality,
+          at_FechaInicio: transports[0].start_date,
+        };
+        this.drivers = movement?.transports || [];
+      }
     },
 
     convertToExtendedFormat(time) {
@@ -240,8 +281,13 @@ new Vue({
     },
 
     getdocumentCodebyId(id) {
-      const document = this.documentTypes.find((e) => e.id == id);
+      const document = this.documentTypes.find((e) => e?.id == id);
       return document ? document.code : undefined;
+    },
+
+    getdocumentIdbyCode(code) {
+      const document = this.documentTypes.find((e) => e?.code == code);
+      return document ? document.id : undefined;
     },
 
     sendGuide(isSend) {
@@ -249,9 +295,10 @@ new Vue({
         // ent_RemitenteGRR
         send: isSend,
         almacen_partida: {
-          document: this.ent_RemitenteGRR?.at_NumeroDocumentoIdentidad,
-          name: this.ent_RemitenteGRR?.at_RazonSocial,
-          commercial_name: this.ent_RemitenteGRR?.at_NombreComercial,
+          document_type_id: this.ent_RemitenteGRR?.document_type,
+          document: this.ent_RemitenteGRR?.document,
+          name: this.ent_RemitenteGRR?.name,
+          commercial_name: this.ent_RemitenteGRR?.commercial_name,
           // ent_PuntoPartidaGRR
           ubigeo: this.ent_PuntoPartidaGRR?.at_Ubigeo,
           address: this.ent_PuntoPartidaGRR?.at_DireccionCompleta,
@@ -259,7 +306,7 @@ new Vue({
         // ent_DestinatarioGRR
         almacen_destino: {
           document_type_id: this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad,
-          document_type_code: this.getdocumentCodebyId(
+          document_type_code: this.getdocumentIdbyCode(
             this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad
           ),
           document: this.ent_DestinatarioGRR?.at_NumeroDocumentoIdentidad,
@@ -287,15 +334,17 @@ new Vue({
       };
 
       if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
-        data.transporte = {
-          modalidad: this.en_InformacionTransporteGRR?.at_Modalidad,
-          fecha_inicio: this.en_InformacionTransporteGRR?.at_FechaInicio,
-          tipo_documento:
-            this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
-          documento: this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
-          razon_social: this.ent_TransportePublicoGRR?.at_RazonSocial,
-          numero_mtc: this.ent_TransportePublicoGRR?.at_NumeroMTC,
-        };
+        data.transports = [
+          {
+            start_date: this.en_InformacionTransporteGRR?.at_FechaInicio,
+            document_type:
+              this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
+            document:
+              this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
+            company_name: this.ent_TransportePublicoGRR?.at_RazonSocial,
+            mtc_number: this.ent_TransportePublicoGRR?.at_NumeroMTC,
+          },
+        ];
       } else if (this.en_InformacionTransporteGRR?.at_Modalidad == 2) {
         data.transports = this.drivers;
         data.vehicles = this.vehicles;

@@ -104,11 +104,22 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                         <div class="card-body">
                             <div class="form-group row">
-                                <label for="at_NumeroDocumentoIdentidad" class="col-sm-3 col-form-label">RUC
+                                <label class="col-sm-3 col-form-label">Tipo de documento
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.at_NumeroDocumentoIdentidad" name="RM_Numero_Documento_Identidad" v-validate="'required|numeric|min:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad">
+                                    <select v-model="ent_RemitenteGRR.document_type" name="RM_TipoDocumento" v-validate="'required'" class="form-control">
+                                        <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
+                                    </select>
+                                    <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="at_NumeroDocumentoIdentidad" class="col-sm-3 col-form-label">Documento
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input v-model="ent_RemitenteGRR.document" name="RM_Numero_Documento_Identidad" v-validate="'required|numeric|min:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad">
                                     <span class="text-danger">{{ errors.first('RM_Numero_Documento_Identidad') }}</span>
                                 </div>
                             </div>
@@ -117,14 +128,14 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.at_RazonSocial" name="RM_Razon_Social" v-validate="'required'" type="text" class="form-control" id="rm_at_RazonSocial">
+                                    <input v-model="ent_RemitenteGRR.name" name="RM_Razon_Social" v-validate="'required'" type="text" class="form-control" id="rm_at_RazonSocial">
                                     <span class="text-danger">{{ errors.first('RM_Razon_Social') }}</span>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="at_NombreComercial" class="col-sm-3 col-form-label">Nombre comercial</label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.at_NombreComercial" name="RM_Nombre_Comercial" type="text" class="form-control" id="at_NombreComercial">
+                                    <input v-model="ent_RemitenteGRR.commercial_name" name="RM_Nombre_Comercial" type="text" class="form-control" id="at_NombreComercial">
                                     <span class="text-danger">{{ errors.first('RM_Nombre_Comercial') }}</span>
                                 </div>
                             </div>
@@ -142,7 +153,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </label>
                                 <div class="col-sm-9">
                                     <select v-model="ent_DestinatarioGRR.at_TipoDocumentoIdentidad" name="DES_TipoDocumento" v-validate="'required'" class="form-control">
-                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.id">{{ document.description }}</option>
+                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.code">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
                                 </div>

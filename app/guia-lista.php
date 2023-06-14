@@ -134,7 +134,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <td>{{guide.almacen_des_titulo_alm}}</td>
                                 <td>Evaluación</td>
                                 <td>
-                                    <a :href="'http://localhost/inventario/app/guia-editar.php?idMovimiento=' + guide.transfers_guides_id" class="btn btn-primary btn-sm">Ver</a>
+                                    <a :href="'http://localhost/inventario/app/guia-editar.php?idMovimiento=' + guide.id_movt" class="btn btn-primary btn-sm">Ver</a>
                                 </td>
                             </tr>
                         </tbody>

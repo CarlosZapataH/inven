@@ -6,9 +6,6 @@ VeeValidate.Validator.localize("es", {
   },
 });
 
-console.log(this);
-const globalObject = this;
-
 VeeValidate.Validator.extend("validationRuc", {
   validate: (value) => /^[A-Za-z0-9]{11}$/.test(value),
   message:
@@ -19,13 +16,14 @@ new Vue({
   el: "#app",
   data: {
     ent_RemitenteGRR: {
+      at_TipoDocumentoIdentidad: 4,
       at_NumeroDocumentoIdentidad: "",
       at_RazonSocial: "",
       at_NombreComercial: "",
     },
 
     ent_DestinatarioGRR: {
-      at_TipoDocumentoIdentidad: 6,
+      at_TipoDocumentoIdentidad: 4,
       at_NumeroDocumentoIdentidad: null,
       at_RazonSocial: "",
       at_CorreoPrincipal: "",
@@ -72,23 +70,13 @@ new Vue({
       at_NumeroMTC: "",
     },
 
-    en_ConductorGRR: {
-      at_TipoDocumentoIdentidad: null,
-      at_NumeroDocumentoIdentidad: null,
-      at_Licencia: "",
-      at_Nombres: "",
-      at_Apellidos: "",
-    },
-    en_VehiculoGRR: {
-      aa_NumeroPlaca: "",
-    },
-
     drivers: [],
     vehicles: [],
 
     movement: null,
     movementDetail: [],
     documentTypes: [],
+    apiErros: [],
   },
   // validations: {
   //   ent_RemitenteGRR: {
@@ -109,59 +97,65 @@ new Vue({
       const queryValue = urlParams.get("idMovimiento");
       return queryValue;
     },
+    typeMov: function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryValue = urlParams.get("tipo");
+      return queryValue;
+    },
   },
   methods: {
-    addDriver() {
-      if (this.drivers.length < 3) {
-        this.drivers.push({ ...this.en_ConductorGRR });
-      }
-    },
-
-    removeDriver(index) {
-      this.drivers.splice(index, 1);
-    },
-
-    addVehicles() {
-      if (this.vehicles.length < 3) {
-        this.vehicles.push({ ...this.en_VehiculoGRR });
-      }
-    },
-
-    removeVehicle(index) {
-      this.vehicles.splice(index, 1);
-    },
-
-    submitForm() {
+    submitForm(isSend) {
       this.$refs.ppUbigeoSelects.$validator.validate();
       this.$refs.plUbigeoSelects.$validator.validate();
       this.$validator.validateAll().then((result) => {
-        if (result) {
-          this.sendGuide();
+        let alertMsm = true;
+        let isCompleted = true;
+        if (result == false) {
+          isCompleted = false;
+          alertMsm = "Completar formulario correctamente";
+        } else if (
+          this.en_InformacionTransporteGRR.at_Modalidad == 2 &&
+          this.drivers.length == 0
+        ) {
+          isCompleted = false;
+          alertMsm = "Agregar conductores al registro.";
+        } else if (
+          this.en_InformacionTransporteGRR.at_Modalidad == 2 &&
+          this.vehicles.length == 0
+        ) {
+          isCompleted = false;
+          alertMsm = "Agregar vehículos al registro.";
+        }
+
+        if (isCompleted) {
+          this.sendGuide(isSend);
         } else {
           swal.fire({
             title: "",
             type: "info",
-            text: "Completar formulario correctamente",
+            text: alertMsm,
             showConfirmButton: false,
-            timer: 2000,
+            timer: 3000,
           });
-          console.log(this.$validator.errors.items);
         }
       });
     },
 
     getData() {
-      const urlBase = "Modules/";
+      let urlBase =
+        "Modules/TransitMovement/Controllers/TransitMovementController.php";
+      let action = "getTransitMovement";
+      if (this.typeMov == "interno") {
+        urlBase = "Modules/Movement/Controllers/MovementController.php";
+        action = "getMovement";
+      }
       axios
-        .get(
-          urlBase + "TransitMovement/Controllers/TransitMovementController.php",
-          {
-            params: {
-              action: "getTransitMovement",
-              id: this.idMov,
-            },
-          }
-        )
+        .get(urlBase, {
+          params: {
+            action: action,
+            id: this.idMov,
+          },
+        })
         .then((response) => {
           this.movement = response?.data?.data || {};
           this.movementDetail = response?.data?.data?.detalle || [];
@@ -179,27 +173,47 @@ new Vue({
       });
     },
 
+    convertTimeFormat(fullTime) {
+      if (fullTime) {
+        const [hour, minutes] = fullTime.split(":");
+        const date = new Date();
+        date.setHours(hour);
+        date.setMinutes(minutes);
+        const convertedTime = date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return convertedTime;
+      }
+      return fullTime;
+    },
+
     setData() {
       const movement = { ...this.movement };
       console.log(movement);
 
       const remitente = movement?.almacen_partida?.company || {};
+      const destinatario = movement?.almacen_destino?.company || {};
+      const puntoPartida = movement?.almacen_partida || {};
+      const puntoLlegada = movement?.almacen_destino;
+      const transports = movement?.transports;
+
       this.ent_RemitenteGRR = {
-        at_NumeroDocumentoIdentidad: remitente?.document,
-        at_RazonSocial: remitente?.name,
-        at_NombreComercial: remitente?.commercial_name,
+        ...this.ent_RemitenteGRR,
+        document: remitente?.document,
+        document_type: remitente?.document_type_code || null,
+        name: remitente?.name,
+        commercial_name: remitente?.commercial_name,
       };
 
-      const destinatario = movement?.almacen_destino?.company || {};
       this.ent_DestinatarioGRR = {
-        at_TipoDocumentoIdentidad: destinatario.document_type_code || 6,
+        at_TipoDocumentoIdentidad: destinatario?.document_type_code || null,
         at_NumeroDocumentoIdentidad: destinatario.document,
         at_RazonSocial: destinatario.name,
-        at_CorreoPrincipal: "",
-        aa_CorreoSecundario: "",
+        at_CorreoPrincipal: puntoLlegada?.email_principal || null,
+        aa_CorreoSecundario: puntoLlegada?.email_secondary || null,
       };
 
-      const puntoPartida = movement?.almacen_partida || {};
       this.ent_PuntoPartidaGRR = {
         at_Ubigeo: puntoPartida?.district?.code || "",
         at_DireccionCompleta: puntoPartida?.direccion_alm,
@@ -207,7 +221,6 @@ new Vue({
         at_NumeroDocumentoIdentidad: null,
       };
 
-      const puntoLlegada = movement?.almacen_destino;
       this.ent_PuntoLlegadaGRR = {
         at_Ubigeo: puntoLlegada?.district?.code || "",
         at_DireccionCompleta: puntoLlegada?.direccion_alm,
@@ -215,31 +228,87 @@ new Vue({
         at_NumeroDocumentoIdentidad: null,
       };
 
-      // ent_DatosGeneralesGRR: {
-      //   at_FechaEmision: "2023-01-17",
-      //   at_Serie: "", //T004
-      //   at_Numero: 0, //445
-      //   at_Observacion: "",
-      //   at_HoraEmision: "16:50:00",
+      this.ent_DatosGeneralesGRR = {
+        ...this.ent_DatosGeneralesGRR,
+        at_FechaEmision: movement?.fecha_emision || null,
+        at_Serie: movement?.serie || null, //T004
+        at_Numero: movement?.numero || null, //445
+        at_Observacion: movement?.observacion || null,
+        at_HoraEmision: this.convertTimeFormat(movement?.hora_emision) || null,
+        at_CodigoMotivo: 4,
+        ent_InformacionPesoBrutoGRR: {
+          at_Peso: movement?.peso || null,
+          at_UnidadMedida: "KGM",
+          at_Cantidad: "",
+        },
+      };
 
-      this.ent_DatosGeneralesGRR.at_Observacion = movement?.observ_mov;
+      if (
+        Array.isArray(transports) &&
+        transports.length > 0 &&
+        transports[0].modality == 1
+      ) {
+        this.en_InformacionTransporteGRR = {
+          at_Modalidad: transports[0].modality,
+          at_FechaInicio: transports[0].start_date,
+        };
+        this.ent_TransportePublicoGRR = {
+          at_TipoDocumentoIdentidad: transports[0].document_type,
+          at_NumeroDocumentoIdentidad: transports[0].document,
+          at_RazonSocial: transports[0].company_name,
+          at_NumeroMTC: transports[0].mtc_number,
+        };
+      } else if (
+        Array.isArray(transports) &&
+        transports.length > 0 &&
+        transports[0].modality == 2
+      ) {
+        this.en_InformacionTransporteGRR = {
+          at_Modalidad: transports[0].modality,
+          at_FechaInicio: transports[0].start_date,
+        };
+        this.drivers = movement?.transports || [];
+      }
     },
 
-    sendGuide() {
+    convertToExtendedFormat(time) {
+      const parts = time.split(":");
+      if (parts.length === 2) {
+        const [hours, minutes] = parts;
+        return `${hours}:${minutes}:00`;
+      }
+      return time; // Si ya tiene el formato "00:00:00", retornarlo sin cambios
+    },
+
+    getdocumentCodebyId(id) {
+      const document = this.documentTypes.find((e) => e?.id == id);
+      return document ? document.code : undefined;
+    },
+
+    getdocumentIdbyCode(code) {
+      const document = this.documentTypes.find((e) => e?.code == code);
+      return document ? document.id : undefined;
+    },
+
+    sendGuide(isSend) {
       const data = {
         // ent_RemitenteGRR
+        send: isSend,
         almacen_partida: {
-          document: this.ent_RemitenteGRR?.at_NumeroDocumentoIdentidad,
-          name: this.ent_RemitenteGRR?.at_RazonSocial,
-          commercial_name: this.ent_RemitenteGRR?.at_NombreComercial,
+          document_type_id: this.ent_RemitenteGRR?.document_type,
+          document: this.ent_RemitenteGRR?.document,
+          name: this.ent_RemitenteGRR?.name,
+          commercial_name: this.ent_RemitenteGRR?.commercial_name,
           // ent_PuntoPartidaGRR
           ubigeo: this.ent_PuntoPartidaGRR?.at_Ubigeo,
           address: this.ent_PuntoPartidaGRR?.at_DireccionCompleta,
         },
         // ent_DestinatarioGRR
         almacen_destino: {
-          document_type_code:
-            this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad,
+          document_type_id: this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad,
+          document_type_code: this.getdocumentIdbyCode(
+            this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad
+          ),
           document: this.ent_DestinatarioGRR?.at_NumeroDocumentoIdentidad,
           name: this.ent_DestinatarioGRR?.at_RazonSocial,
           email_principal: this.ent_DestinatarioGRR?.at_CorreoPrincipal,
@@ -253,40 +322,75 @@ new Vue({
         serie: this.ent_DatosGeneralesGRR?.at_Serie,
         numero: this.ent_DatosGeneralesGRR?.at_Numero,
         observacion: this.ent_DatosGeneralesGRR?.at_Observacion,
-        hora_emision: this.ent_DatosGeneralesGRR?.at_HoraEmision,
+        hora_emision: this.convertToExtendedFormat(
+          this.ent_DatosGeneralesGRR?.at_HoraEmision
+        ),
         // ent_InformacionTrasladoGRR
         // // ent_InformacionPesoBrutoGRR
         peso: this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
-        transporte: {
-          modalidad: this.en_InformacionTransporteGRR?.at_Modalidad,
-          fecha_inicio: this.en_InformacionTransporteGRR?.at_FechaInicio,
-          tipo_documento:
-            this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
-          documento: this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
-          razon_social: this.ent_TransportePublicoGRR?.at_RazonSocial,
-          numero_mtc: this.ent_TransportePublicoGRR?.at_NumeroMTC,
-        },
+        cantidad:
+          this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
+        modalidad_transporte: this.en_InformacionTransporteGRR?.at_Modalidad,
       };
+
+      if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
+        data.transports = [
+          {
+            start_date: this.en_InformacionTransporteGRR?.at_FechaInicio,
+            document_type:
+              this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
+            document:
+              this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
+            company_name: this.ent_TransportePublicoGRR?.at_RazonSocial,
+            mtc_number: this.ent_TransportePublicoGRR?.at_NumeroMTC,
+          },
+        ];
+      } else if (this.en_InformacionTransporteGRR?.at_Modalidad == 2) {
+        data.transports = this.drivers;
+        data.vehicles = this.vehicles;
+      }
+
       const params = { id: this.idMov };
+      this.apiErros = [];
       createGuide(data, params)
         .then((response) => {
+          if (response?.success === true) {
+            swal.fire({
+              title: "",
+              type: "success",
+              text:
+                response?.message ||
+                "¡El formulario se ha guardado correctamente!",
+              showConfirmButton: false,
+              timer: 5000,
+            });
+            setTimeout(() => {
+              window.location.href = "guia-lista.php";
+            }, 5000);
+          } else if (response?.success === false) {
+            this.apiErros = response?.errors;
+            swal.fire({
+              title: "",
+              type: "info",
+              text: "Lo siento, pero los datos que has proporcionado no son válidos. Por favor, verifica la información e inténtalo nuevamente.",
+            });
+          } else {
+            swal.fire({
+              title: "",
+              type: "error",
+              text: "¡Ups! Parece que hay un problema con la API en este momento. Por favor, intenta nuevamente más tarde. Gracias por tu paciencia.",
+            });
+          }
+
           console.log(response);
-          swal.fire({
-            title: "",
-            type: "success",
-            text: "¡El formulario se ha guardado correctamente!",
-            showConfirmButton: false,
-            timer: 2000,
-          });
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error?.response?.data);
+          this.apiErros = error?.response?.data?.errors || [];
           swal.fire({
             title: "",
             type: "error",
             text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
-            showConfirmButton: false,
-            timer: 2000,
           });
         });
     },
