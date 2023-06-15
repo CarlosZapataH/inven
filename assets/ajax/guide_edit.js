@@ -46,7 +46,6 @@ new Vue({
 
     en_InformacionTransporteGRR: {
       at_Modalidad: 1,
-      at_FechaInicio: "",
     },
 
     ent_PuntoPartidaGRR: {
@@ -64,6 +63,7 @@ new Vue({
     },
 
     ent_TransportePublicoGRR: {
+      at_FechaInicio: "",
       at_TipoDocumentoIdentidad: 6,
       at_NumeroDocumentoIdentidad: "",
       at_RazonSocial: "",
@@ -101,6 +101,10 @@ new Vue({
       const urlParams = new URLSearchParams(window.location.search);
       const queryValue = urlParams.get("tipo");
       return queryValue;
+    },
+    dateIssued: function () {
+      const date = this.ent_DatosGeneralesGRR?.at_FechaEmision;
+      return this.addDay(date);
     },
   },
   methods: {
@@ -188,6 +192,15 @@ new Vue({
       return fullTime;
     },
 
+    addDay(date, days = 1) {
+      if (date) {
+        let fecha = new Date(date);
+        fecha.setDate(fecha.getDate() + days);
+        return fecha.toISOString().slice(0, 10);
+      }
+      return date;
+    },
+
     setData() {
       const movement = { ...this.movement };
       console.log(movement);
@@ -235,11 +248,11 @@ new Vue({
         at_Numero: movement?.numero || null, //445
         at_Observacion: movement?.observacion || null,
         at_HoraEmision: this.convertTimeFormat(movement?.hora_emision) || null,
-        at_CodigoMotivo: 4,
+        at_CodigoMotivo: movement?.motive_code,
         ent_InformacionPesoBrutoGRR: {
           at_Peso: movement?.peso || null,
           at_UnidadMedida: "KGM",
-          at_Cantidad: "",
+          at_Cantidad: movement?.cantidad || null,
         },
       };
 
@@ -250,9 +263,9 @@ new Vue({
       ) {
         this.en_InformacionTransporteGRR = {
           at_Modalidad: transports[0].modality,
-          at_FechaInicio: transports[0].start_date,
         };
         this.ent_TransportePublicoGRR = {
+          at_FechaInicio: transports[0].start_date,
           at_TipoDocumentoIdentidad: transports[0].document_type,
           at_NumeroDocumentoIdentidad: transports[0].document,
           at_RazonSocial: transports[0].company_name,
@@ -337,7 +350,7 @@ new Vue({
       if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
         data.transports = [
           {
-            start_date: this.en_InformacionTransporteGRR?.at_FechaInicio,
+            start_date: this.ent_TransportePublicoGRR?.at_FechaInicio,
             document_type:
               this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
             document:

@@ -119,7 +119,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.document" name="RM_Numero_Documento_Identidad" v-validate="'required|numeric|min:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad">
+                                    <input v-model="ent_RemitenteGRR.document" name="RM_Numero_Documento_Identidad" v-validate="'required|alpha_dash|length:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad">
                                     <span class="text-danger">{{ errors.first('RM_Numero_Documento_Identidad') }}</span>
                                 </div>
                             </div>
@@ -270,15 +270,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         <div class="card-header"> Datos del Transporte </div>
                         <div class="card-body">
                             <div class="form-group row">
-                                <label class="col-sm-4 col-form-label">Fecha de inicio o entrega
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
-                                <div class="col-sm-8">
-                                    <input v-model="en_InformacionTransporteGRR.at_FechaInicio" name="DT_Fecha_Inicio" v-validate="'required'" type="date" class="form-control">
-                                    <span class="text-danger">{{ errors.first('DT_Fecha_Inicio') }}</span>
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Tipo Transporte
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
@@ -291,7 +282,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
 
-                            <driver-registration-form v-model="drivers" :document-types="documentTypes" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></driver-registration-form>
+                            <driver-registration-form v-model="drivers" :document-types="documentTypes" :date-issued="dateIssued" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></driver-registration-form>
 
                             <vehicle-registration-form v-model="vehicles" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></vehicle-registration-form>
 
@@ -364,6 +355,18 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                                     <span class="text-danger">{{ errors.first('TP_Razon_Social') }}</span>
                                                 </div>
                                             </div>
+
+                                            <div class="col-12 col-sm-6">
+                                                <div class="form-group">
+                                                    <label>
+                                                        Fecha de inicio o entrega
+                                                        <span class="text-danger font-weight-bold">*</span>
+                                                    </label>
+                                                    <input v-model="ent_TransportePublicoGRR.at_FechaInicio" name="TP_FechaInicio" v-validate="'required'" :min="dateIssued" type="date" class="form-control" id="tp_at_RazonSocial">
+                                                    <span class="text-danger">{{ errors.first('TP_FechaInicio') }}</span>
+                                                </div>
+                                            </div>
+
                                             <div class="col-12 col-sm-6">
                                                 <div class="form-group">
                                                     <label for="tp_at_NumeroMTC">Número MTC</label>
@@ -727,4 +730,4 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/InputUbigeo.js<?= $version ?>"></script>
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
-    <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>
+    <script src="../assets/ajax/guide_edit.js<?= $version ?>"></script>

@@ -57,5 +57,26 @@ new Vue({
         this.currentPage = page;
       }
     },
+
+    getStatusProperty(value) {
+      const list = [
+        {
+          value: "Rechazado",
+          class: "badge-danger",
+        },
+        {
+          value: "Aceptado Con Obs.",
+          class: "badge-warning",
+        },
+        {
+          value: "Aceptado",
+          class: "badge-success",
+        },
+      ];
+      if (value) {
+        return list.find((e) => e.value == value);
+      }
+      return { value, class: "" };
+    },
   },
 });

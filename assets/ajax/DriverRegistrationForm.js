@@ -8,6 +8,10 @@ Vue.component("DriverRegistrationForm", {
       type: [Array],
       required: false,
     },
+    dateIssued: {
+      type: [String],
+      required: false,
+    },
   },
   data() {
     return {
@@ -71,8 +75,8 @@ Vue.component("DriverRegistrationForm", {
 
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
-                        <label for="cdt_at_date">Fecha:</label>
-                        <input v-model="en_ConductorGRR.start_date" v-validate="'required'" name="driver_startdate" type="date" class="form-control" id="cdt_at_date">
+                        <label for="cdt_at_date">Fecha de inicio o entrega:</label>
+                        <input v-model="en_ConductorGRR.start_date" v-validate="'required'" :min="dateIssued" name="driver_startdate" type="date" class="form-control" id="cdt_at_date">
                         <span class="text-danger">{{ errors.first('driver_startdate') }}</span>
                     </div>
                 </div>

@@ -132,7 +132,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <td>{{guide.transfers_guides_date_issue}}</td>
                                 <td>{{guide.almacen_ini_titulo_alm}}</td>
                                 <td>{{guide.almacen_des_titulo_alm}}</td>
-                                <td>Evaluación</td>
+                                <td>
+                                    <span :class="'d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;">
+                                        {{guide.tci_response_description}}
+                                    </span>
+                                </td>
                                 <td>
                                     <a :href="'http://localhost/inventario/app/guia-editar.php?idMovimiento=' + guide.id_movt" class="btn btn-primary btn-sm">Ver</a>
                                 </td>
