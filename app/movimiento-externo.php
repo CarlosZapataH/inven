@@ -104,6 +104,12 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);?>
                     Buscar
                 </button>
             </div>
+            <div>
+                <button type="button" class="btn btn-primary btn-hover-transform" id="openCosolidate">
+                    <i class="ti-pencil-alt mr-10"></i>
+                    Generar Guía
+                </button>
+            </div>
         </div>
     </div>
     <hr class="no-padding mb-0 mt-0">

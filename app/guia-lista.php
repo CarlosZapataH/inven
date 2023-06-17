@@ -138,7 +138,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     </span>
                                 </td>
                                 <td>
-                                    <a :href="'http://localhost/inventario/app/guia-editar.php?idMovimiento=' + guide.id_movt" class="btn btn-primary btn-sm">Ver</a>
+                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id_movt" class="btn btn-primary btn-sm">Ver</a>
                                 </td>
                             </tr>
                         </tbody>

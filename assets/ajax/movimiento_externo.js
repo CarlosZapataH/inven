@@ -264,14 +264,25 @@ function loadTbl_Inventario_Transacciones(datos){
                 searchable: true,
                 targets: [6]
             },
+            // {
+            //     className: 'text-center align-middle',
+            //     visible: true,
+            //     searchable: false,
+            //     width: "60px",
+            //     targets: [7]
+            // }
             {
-                className: 'text-center align-middle',
-                visible: true,
-                searchable: false,
-                width: "60px",
-                targets: [7]
+                targets: [7],
+                orderable: false,
+                className: 'dt-body-center',
+                render: function(data, type, full, meta) {
+                    return '';
+                }
             }
         ],
+        select: {
+            style: 'multi'
+        },
         ajax:{
             url: '../controller/InventarioController.php?action=lst_Inventario_Movimiento_xTransaccion_Ext_JSON',
             type : "get",
@@ -298,3 +309,17 @@ function loadTbl_Inventario_Transacciones(datos){
         "drawCallback": function( settings ) {  }
     });
 }
+
+$(document).ready(function () {
+	$("#openCosolidate").on("click", function () {
+		var ids = [];
+		var baseUrl = "guia-crear.php?tipo=externo&";
+		var seleccionados = Tbl_Reporte.rows({ selected: true }).data().toArray();
+		seleccionados.forEach((element) => {
+		ids.push(element[7]);
+		});
+		if (ids.length) {
+		window.location.href = baseUrl + "idMovimiento=" + ids.join(",");
+		}
+	});
+});
