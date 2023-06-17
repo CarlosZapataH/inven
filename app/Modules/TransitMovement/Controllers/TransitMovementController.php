@@ -17,7 +17,31 @@ class TransitMovementController{
         $this->transitMovementRepository = new TransitMovementRepository();
     }
 
-    public function getTransitMovement(){
+    public function index(){
+        $response = [
+            'data' => null,
+            'success' => false,
+            'message' => 'Error'
+        ];
+        try {
+            $id = $_GET['id'];
+            $datos = $this->transitMovementRepository->findWithDetails($id);
+            if($datos){
+                // $response['data'] = $datos['data'];
+                $response['data'] = $datos;
+                $response['success'] = true;
+                $response['message'] = 'Información obtenida exitosamente.';
+            }
+        } catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+            echo $e->getMessage();
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
+
+    public function show(){
         $response = [
             'data' => null,
             'success' => false,
@@ -25,7 +49,7 @@ class TransitMovementController{
         ];
         try {
             $id = (int)$_GET['id'];
-            $datos = $this->transitMovementRepository->getTransitMovement($id);
+            $datos = $this->transitMovementRepository->findOneWithDetails($id);
             if($datos){
                 $response['data'] = $datos;
                 $response['success'] = true;
