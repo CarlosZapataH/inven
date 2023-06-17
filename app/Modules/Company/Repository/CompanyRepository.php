@@ -8,18 +8,22 @@ class CompanyRepository extends CommonRepository implements ICompany {
         parent::__construct(Company::class);
     }
 
-    public function validateCompany($documentType, $document){
+    public function validateCompany($documentType, $document, $id = null){
         try{
             $data = null;
-            $result = self::query('
+            $query = '
                 SELECT 
                     *
                 FROM companies
                 WHERE 
                     companies.document_type_id = '.$documentType.' AND
-                    companies.document = '.$document.'
-                LIMIT 1
-            ');
+                    companies.document = '.$document;
+
+            if($id){
+                $query.= ' AND companies.id != '.$id;
+            }
+
+            $result = self::query($query.' LIMIT 1');
 
             if($result){
                 if(is_array($result)){
