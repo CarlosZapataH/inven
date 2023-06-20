@@ -24,10 +24,7 @@ function createGuide(data, params) {
     urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
   return axios
     .post(url, data, {
-      params: {
-        action: "storeTransitMovementGuide",
-        ...params,
-      },
+      params,
     })
     .then((response) => response.data)
     .catch((error) => {
@@ -45,6 +42,34 @@ function listGuide(params = {}) {
     .then((response) => response?.data)
     .catch((error) => {
       console.error("Error en la solicitud:", error);
+      throw error;
+    });
+}
+
+function listCompany(params = {}) {
+  const url = urlBase + "/Company/Controllers/CompanyController.php";
+  params.action = "index";
+  return axios
+    .get(url, { params })
+    .then((response) => response?.data)
+    .catch((error) => {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    });
+}
+
+function createCompany(data, params) {
+  const url = urlBase + "/Company/Controllers/CompanyController.php";
+  return axios
+    .post(url, data, {
+      params: {
+        action: "store",
+        ...params,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error en la solicitud POST:", error);
       throw error;
     });
 }

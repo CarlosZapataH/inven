@@ -311,15 +311,34 @@ function loadTbl_Inventario_Transacciones(datos){
 }
 
 $(document).ready(function () {
-	$("#openCosolidate").on("click", function () {
-		var ids = [];
-		var baseUrl = "guia-crear.php?tipo=externo&";
-		var seleccionados = Tbl_Reporte.rows({ selected: true }).data().toArray();
-		seleccionados.forEach((element) => {
-		ids.push(element[7]);
-		});
-		if (ids.length) {
-		window.location.href = baseUrl + "idMovimiento=" + ids.join(",");
-		}
-	});
+  $("#openCosolidate").on("click", function () {
+    
+    const baseUrl = "guia-crear.php?tipo=externo&";
+    const ids = [];
+    const seleccionados = Tbl_Reporte.rows({ selected: true }).data().toArray();
+    let isSameStore = true;
+    let destinationStore
+    seleccionados.forEach((element, index) => {
+      if (index == 0) {
+        destinationStore = element[5];
+      }
+      if (index != 0 && element[5] != destinationStore) {
+        isSameStore = false;
+      }
+      ids.push(element[7]);
+    });
+    console.log("selects:", seleccionados);
+    console.log("ids:", ids);
+    if (ids.length && isSameStore) {
+      window.location.href = baseUrl + "idMovimiento=" + ids.join(",");
+    } else {
+      swal.fire({
+        title: "",
+        type: "warning",
+        text: "Lo siento, parece que has seleccionado incorrectamente los elementos de la tabla.",
+        showConfirmButton: false,
+        timer: 5000,
+      });
+    }
+  });
 });

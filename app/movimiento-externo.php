@@ -130,8 +130,9 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);?>
                             <th class="text-center">F.Registro</th>
                             <th class="text-center">Antención a</th>
                             <th class="text-center">Motivo</th>
-                            <th class="text-center">Almacén Destino</th>
-                            <th class="text-center">Nro.Guia</th>
+                            <th class="text-center">Almacén Origen</th>
+                            <th class="text-center">Almacén Destino</th>                            
+                            <!-- <th class="text-center">Nro.Guia</th> -->
                             <th class="text-center">Estado</th>
                             <th class="text-center"></th>
                         </tr>

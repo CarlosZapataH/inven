@@ -3407,17 +3407,24 @@ class InventarioController {
                 $obj_alm = new AlmacenModel();
                 foreach($lstMovimientos as $movimiento){
                     $almcenDestino = "";
+                    $almcenOrigen = "";
+                    if((int)$movimiento['id_alm_ini'] != 0) {
+                        $dtlleAlmacen = $obj_alm->detalle_Almacen_xID($movimiento['id_alm_ini']);
+                        if(is_array($dtlleAlmacen)){
+                            $almcenOrigen = $dtlleAlmacen['titulo_alm'];
+                        }
+                    }
                     if((int)$movimiento['id_alm_des'] != 0) {
                         $dtlleAlmacen = $obj_alm->detalle_Almacen_xID($movimiento['id_alm_des']);
                         if(is_array($dtlleAlmacen)){
                             $almcenDestino = $dtlleAlmacen['titulo_alm'];
                         }
-                    }
+                    }                    
                     $btnGuia = "";
-                    $numberGuia = '<span class="font-weight-bold text-danger">--°--</span>';
+                    //$numberGuia = '<span class="font-weight-bold text-danger">--°--</span>';
 
                     if ($movimiento['action_mov'] == "TRA" && !is_null($movimiento['nroguia_mov'] && $optionReporte == 1)){
-                        $numberGuia = $movimiento['nroguia_mov'];
+                        //$numberGuia = $movimiento['nroguia_mov'];
                         $btnGuia = $movimiento['id_movt'];
                         // $btnGuia='
                         // <a class="btn btn-outline-info btn-hover-transform fz-16 mb-2" href="guia-crear.php?idMovimiento='.$movimiento['id_movt'].'&tipo=externo">Crear GRE</a>
@@ -3437,9 +3444,9 @@ class InventarioController {
                         0 => $movimiento['nro_mov'],
                         1 => $obj_fn->fecha_ENG_ESP($movimiento['fecha_mov']),
                         2 => $txtRecibido,
-                        3 => $movimiento['motivotransfer_mov'],
-                        4 => $almcenDestino,
-                        5 => $numberGuia,
+                        3 => $movimiento['motivotransfer_mov'],                         
+                        4 => $almcenOrigen,    
+                        5 => $almcenDestino,
                         6 => $estdTra,
                         7 => $btnGuia
                     );
