@@ -1,5 +1,9 @@
 <?php
+require_once __DIR__ . '/../Repository/TransferGuideRepository.php';
+require_once __DIR__ . '/../../../Modules/Setting/Repository/SettingRepository.php';
+
 class TransferGuideHelper{
+
     public function __construct() {
     }
 
@@ -117,5 +121,47 @@ class TransferGuideHelper{
         }
         
         return $response;
+    }
+
+    public static function generateSerialNumber(){
+        $transferGuideRepository = new TransferGuideRepository();
+        $settingRepository = new SettingRepository();
+
+        $settingsGuide = $settingRepository->findAllBy('group', 'gruides_between_company');
+
+        $serie = "T001";
+        $number = 1;
+        $lengthNumber = 4;
+        $completeCh = "000";
+
+        if($settingsGuide){
+            foreach($settingsGuide as $setting){
+                if($setting['name'] == 'serie'){
+                    $serie = $setting['value']; 
+                }
+                else if($setting['name'] == 'number'){
+                    $number = $setting['value']; 
+                }
+                else if($setting['name'] == 'number_length'){
+                    $lengthNumber = $setting['value']; 
+                }
+            }
+        }
+        
+        $findLastCode = $transferGuideRepository->getMaxSerieNumber($serie);
+        if($findLastCode){
+            $completeCh = "";
+            $number = ((int)$findLastCode['max_number']) + 1;
+
+            $lengthCurrent = strlen(strval($number));
+            if($lengthCurrent < $lengthNumber){
+                for($i = 0; $i < ($lengthNumber - $lengthCurrent); $i++){
+                    $completeCh .= "0";
+                }
+            }
+        }
+
+        $newCode = $serie . '-' . $completeCh . $number;
+        echo $newCode;
     }
 }

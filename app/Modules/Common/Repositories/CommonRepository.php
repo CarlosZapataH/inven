@@ -30,6 +30,25 @@ abstract class CommonRepository implements ICommonRepository{
         return $models;
     }
 
+    public function findAllBy($field, $value) {
+        // Implementación para obtener todos los registros de la tabla
+        $query = "SELECT * FROM {$this->tableName} WHERE `".$field."` = :value";
+        $stm = $this->connection->prepare($query);
+        $stm->bindParam(":value",$value);
+        $stm->execute();
+        $result = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+        $models = [];
+        if($result){
+            foreach ($result as $row) {
+                $model = $this->mapRowToModel($row);
+                $models[] = $model;
+            }
+        }
+
+        return $models;
+    }
+
     public function findBy($field, $value) {
         // Implementación para obtener un registro por su ID
         $query = "SELECT * FROM {$this->tableName} WHERE ".$field." = :value";

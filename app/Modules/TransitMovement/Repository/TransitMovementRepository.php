@@ -15,7 +15,7 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
             $data = null;
             $query = self::getQueryDefault();
             if($id != ''){
-                $query .= " WHERE movimientos_transito.id_movt IN({$id})";
+                $query .= " WHERE movimientos_transito.id_movt IN({$id}) AND flag_available = 1";
             }
             $result = self::query($query);
 
@@ -117,5 +117,24 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
         ';
 
         return $query;
+    }
+
+    public function updateAvailable($id, $value){
+        $success = false;
+        try{
+            $result = self::query("
+                UPDATE movimientos_transito SET flag_available = {$value} WHERE id_movt IN({$id})
+            ");
+
+            if($result){
+                $success = $result;
+            }
+
+        }
+        catch(Exception $e){
+            echo $e->getMessage();
+        }
+        return $success;
+
     }
 }

@@ -1,6 +1,7 @@
 <?php
 interface ICommonRepository {
     public function find();
+    public function findAllBy($field, $value);
     public function findBy($field, $value);
     public function findConcat($field1, $field2, $character, $value);
     public function store($data);

@@ -6,6 +6,7 @@ $action = $_REQUEST["action"];
 require_once __DIR__ . '/../../../../assets/util/Session.php';
 require_once __DIR__ . '/../Repository/TransferGuideRepository.php';
 require_once __DIR__ . '/../Requests/TransitMovementGuideRequest.php';
+require_once __DIR__ . '/../Helpers/TransferGuideHelper.php';
 require_once __DIR__ . '/../Requests/TransferBetweenCompanyRequest.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
 require_once __DIR__ . '/../../Transport/Repository/TransportRepository.php';
@@ -74,6 +75,8 @@ class TransferGuideController{
     }
 
     public function show(){
+        TransferGuideHelper::generateSerialNumber();
+
         header('Content-Type: application/json');
         $response = [
             'data' => null,
@@ -330,6 +333,13 @@ class TransferGuideController{
             $this->dataEndCompany = $validateEndStoreCompany['data'];
         }
 
+        // BETWEEN COMPANY
+        $validateSameCompany = $this->validateSameCompany();
+
+        if($validateSameCompany['errors']){
+            $errors = array_merge($errors, $validateSameCompany['errors']);
+        }
+
         // DETAILS
         $validateDetails = $this->validateDetails();
 
@@ -442,6 +452,47 @@ class TransferGuideController{
             if(!ValidateHelper::validateProperty($this->data, ['end_store.company_id'])){
                 $result['errors'] = ['La informacion de la empresa del almacén de llegada es obligatoria.'];
             }
+        }
+
+        return $result;
+    }
+
+    public function validateSameCompany(){
+        $result = [
+            'success' => false,
+            'errors' => null,
+            'data' => null
+        ];
+
+        $startStoreCompanyId = null;
+        $endStoreCompanyId = null;
+
+        if($this->startStore){
+            if(ValidateHelper::validateProperty($this->startStore, ['company.id'])){
+                $startStoreCompanyId = $this->startStore['company']['id'];
+            }
+        }
+
+        if(!$startStoreCompanyId){
+            if(ValidateHelper::validateProperty($this->data, ['start_store.company_id'])){
+                $startStoreCompanyId = $this->data['start_store']['company_id'];
+            }
+        }
+
+        if($this->endStore){
+            if(ValidateHelper::validateProperty($this->endStore, ['company.id'])){
+                $endStoreCompanyId = $this->endStore['company']['id'];
+            }
+        }
+
+        if(!$endStoreCompanyId){
+            if(ValidateHelper::validateProperty($this->data, ['end_store.company_id'])){
+                $endStoreCompanyId = $this->data['end_store']['company_id'];
+            }
+        }
+
+        if($startStoreCompanyId && $endStoreCompanyId && $startStoreCompanyId != $endStoreCompanyId){
+            $result['errors'] = ['El remitente y destinatario debe ser el mismo.'];
         }
 
         return $result;
@@ -630,7 +681,6 @@ class TransferGuideController{
         return $result;
     }
 
-
     public function validateExistEndCompany(){
 
     }
@@ -692,8 +742,19 @@ class TransferGuideController{
     }
 
     private function updateRelations(){
+        $this->updateAvailableMovement();
         $this->completeStoreIni();
         $this->completeStoreDes();
+    }
+
+    private function updateAvailableMovement(){
+        $movementsId = [];
+        foreach($this->movements as $movement){
+            if(!in_array($movement['id'], $movementsId)){
+                array_push($movementsId, $movement['id']);
+            }
+        }
+        $this->transitMovementRepository->updateAvailable(implode(",", $movementsId), 0);
     }
 
     private function completeStoreIni(){
