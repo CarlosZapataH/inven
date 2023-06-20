@@ -98,7 +98,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
             <div class="row justify-content-center">
 
                 <div class="col-12 col-lg-10" v-if="movement">
-                    <div class="card">
+                    <div class="card" id="section_origin">
                         <div class="card-header">
                             Datos del Remitente
                         </div>
@@ -142,7 +142,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_detination">
                         <div class="card-header">
                             Datos del Destinatario
                         </div>
@@ -210,7 +210,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_general">
                         <div class="card-header">
                             Datos Generales - Tipo y Motivo de Traslado
                         </div>
@@ -230,24 +230,24 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
                             <div class="form-group row" v-if="ent_DatosGeneralesGRR.at_CodigoMotivo == 13">
-                                <label class="col-sm-3 col-form-label">Motivo de Traslado
+                                <label class="col-sm-3 col-form-label">Descripción del Motivo
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <select v-model="ent_DatosGeneralesGRR.at_DescripcionMotivo" name="description" v-validate="'required'" class="form-control">
+                                            <select v-model="ent_DatosGeneralesGRR.description_transfer" name="description" v-validate="'required'" class="form-control">
                                                 <option value="Traslado de muestras de aceite para análisis">Otros (Traslado de muestras de aceite para análisis)</option>
                                                 <option value="Traslado de equipos para su mantenimiento/reparación">Otros (Traslado de equipos para su mantenimiento/reparación)</option>
                                                 <option value="Traslado de instrumentos de medición para calibración">Otros (Traslado de instrumentos de medición para calibración)</option>
                                                 <option value="Traslado de materiales EPPS, instrumentos al trabajador">Otros (Traslado de materiales EPPS, instrumentos al trabajador)</option>
                                                 <option value="Traslado para uso en servicio">Otros (Traslado para uso en servicio)</option>
-                                                <option value="NEW">Escribir nuevo motivo</option>
+                                                <option value="NEW">Escribir nueva descripción</option>
                                             </select>
                                             <span class="text-danger">{{ errors.first('description') }}</span>
                                         </div>
                                         <div class="col-sm-6" v-if="ent_DatosGeneralesGRR.at_DescripcionMotivo == 'NEW'">
-                                            <input v-model="ent_DatosGeneralesGRR.new_motive" name="new_motive" v-validate="'required'" type="text" class="form-control" placeholder="">
+                                            <input v-model="ent_DatosGeneralesGRR.new_description" name="new_motive" v-validate="'required'" type="text" class="form-control" placeholder="">
                                             <span class="text-danger">{{ errors.first('new_motive') }}</span>
                                         </div>
                                     </div>
@@ -300,7 +300,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card" v-if="ent_DatosGeneralesGRR.at_CodigoMotivo == 13">
+                    <div class="card" v-if="ent_DatosGeneralesGRR.at_CodigoMotivo == 13" id="section_supplier">
                         <div class="card-header">
                             Datos del Proveedor
                         </div>
@@ -337,7 +337,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card" v-if="ent_DatosGeneralesGRR.at_CodigoMotivo == 13">
+                    <div class="card" v-if="ent_DatosGeneralesGRR.at_CodigoMotivo == 13" id="section_buyer">
                         <div class="card-header">
                             Datos del Comprador
                         </div>
@@ -374,7 +374,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_transports">
                         <div class="card-header"> Datos del Transporte </div>
                         <div class="card-body">
                             <div class="form-group row">
@@ -488,7 +488,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_ubication">
                         <div class="card-header">
                             Ubicaciones
                         </div>
@@ -565,7 +565,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_states">
                         <div class="card-header">
                             Bienes
                         </div>

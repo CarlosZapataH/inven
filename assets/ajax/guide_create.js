@@ -25,6 +25,8 @@ new Vue({
       at_Observacion: "",
       at_HoraEmision: "",
       at_CodigoMotivo: 4,
+      description_transfer: null,
+      new_description: null,
       ent_InformacionPesoBrutoGRR: {
         at_Peso: "",
         at_UnidadMedida: "KGM",
@@ -347,6 +349,21 @@ new Vue({
         detail,
       };
 
+      if (
+        this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13 &&
+        this.ent_DatosGeneralesGRR.description_transfer == "NEW"
+      ) {
+        data.description_transfer = this.ent_DatosGeneralesGRR.new_description;
+      } else if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13) {
+        data.description_transfer =
+          this.ent_DatosGeneralesGRR.description_transfer;
+      }
+
+      if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13) {
+        data.supplier = this.supplier;
+        data.buyer = this.buyer;
+      }
+
       if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
         data.transports = [
           {
@@ -364,42 +381,32 @@ new Vue({
         data.vehicles = this.vehicles;
       }
 
+      let action = "storeTransferBetweenSameCompany";
+      if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 6) {
+        action = "storeDevolutionGuide";
+      } else if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13) {
+        action = "storeOthersGuide";
+      }
+
       const params = {
         id: this.idMov,
-        action: "storeTransferBetweenSameCompany",
+        action: action,
       };
       this.apiErros = [];
       createGuide(data, params)
         .then((response) => {
-          if (response?.success === true) {
-            swal.fire({
-              title: "",
-              type: "success",
-              text:
-                response?.message ||
-                "¡El formulario se ha guardado correctamente!",
-              showConfirmButton: false,
-              timer: 5000,
-            });
-            setTimeout(() => {
-              window.location.href = "guia-lista.php";
-            }, 5000);
-          } else if (response?.success === false) {
-            this.apiErros = response?.errors;
-            swal.fire({
-              title: "",
-              type: "info",
-              text: "Lo siento, pero los datos que has proporcionado no son válidos. Por favor, verifica la información e inténtalo nuevamente.",
-            });
-          } else {
-            swal.fire({
-              title: "",
-              type: "error",
-              text: "¡Ups! Parece que hay un problema con la API en este momento. Por favor, intenta nuevamente más tarde. Gracias por tu paciencia.",
-            });
-          }
-
-          console.log(response);
+          swal.fire({
+            title: "",
+            type: "success",
+            text:
+              response?.message ||
+              "¡El formulario se ha guardado correctamente!",
+            showConfirmButton: false,
+            timer: 5000,
+          });
+          setTimeout(() => {
+            window.location.href = "guia-lista.php";
+          }, 5000);
         })
         .catch((error) => {
           console.log(error?.response?.data);

@@ -276,7 +276,7 @@ function loadTbl_Inventario_Transacciones(datos){
                 orderable: false,
                 className: 'dt-body-center',
                 render: function(data, type, full, meta) {
-                    return '';
+                    return '<div class="field-checkbox"></div>';
                 }
             }
         ],

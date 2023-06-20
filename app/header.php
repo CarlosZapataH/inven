@@ -30,6 +30,34 @@ $version = "?".date("Y-m-d H:i:s");?>
     <link href="../assets/css/main.css<?=$version?>" rel="stylesheet">
     <link href="../assets/css/colors.css<?=$version?>" rel="stylesheet">
 </head>
+<style>
+    .selected .field-checkbox {
+        border-color: lightseagreen;
+        background-color: lightseagreen;
+    }
+
+    .selected .field-checkbox::before {
+        content: '';
+        width: 6px;
+        height: 12px;
+        position: absolute;
+        left: 6px;
+        top: 2px;
+        border-right: 2px solid white;
+        border-bottom: 2px solid white;
+        transform: rotate(45deg);
+    }
+
+    .field-checkbox {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        margin-top: 7px;
+        border: 1px solid darkgray;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
 <body class="app header-fixed left-sidebar-fixed" onload="sga.funcion.deshabilitaRetroceso()" style="overflow-x: hidden;">
 <div class="modal" id="ModalProgressBar_Load" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div class="modal" id="ModalAction_ContainerForm" data-backdrop="static" data-keyboard="false" role="dialog" style="display:none;"></div>
