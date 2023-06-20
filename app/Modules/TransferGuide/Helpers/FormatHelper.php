@@ -9,7 +9,7 @@ class FormatHelper{
 
 
         $transports = [];
-        if(ValidateHelper::validateProperty($data, ['transports'])){
+        if(isset($data['transports'])){
             if(count($data['transports']) > 0){
 
                 if($data['transport_modality'] == 1){
