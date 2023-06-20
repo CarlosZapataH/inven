@@ -111,14 +111,18 @@ class TransferGuideController{
                         if($transferGuideId){
                             $this->storeDetails($this->data['detail'], $transferGuideId);
                             $this->storeTransport($this->data['transports'], $transferGuideId);
-                            $this->storeVehicle($this->data['vehicles'], $transferGuideId);
+                            if($this->data['transport_modality'] == 2){
+                                $this->storeVehicle($this->data['vehicles'], $transferGuideId);
+                            }
                         }
                     }
                     else{
                         $this->transferGuideRepository->update($this->dataGuide);
                         $this->storeDetails($this->data['detail'], $this->data['id']);
                         $this->storeTransport($this->data['transports'], $this->data['id'], true);
-                        $this->storeVehicle($this->data['vehicles'], $this->data['id'], true);
+                        if($this->data['transport_modality'] == 2){
+                            $this->storeVehicle($this->data['vehicles'], $this->data['id'], true);
+                        }
                     }
 
                     $this->updateRelations();
@@ -270,12 +274,17 @@ class TransferGuideController{
 
         if(count($ids) > 0){
             $response = $this->transitMovementRepository->findWithDetails(implode(",", $ids));
-            if(count($response['data']) > 0){
-                if(count($response['start_store_id']) > 1){
-                    array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de partida');
+            if($response['data']){
+                if(count($response['data']) > 0){
+                    if(count($response['start_store_id']) > 1){
+                        array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de partida');
+                    }
+                    else if(count($response['end_store_id']) > 1){
+                        array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de llegada');
+                    }   
                 }
-                else if(count($response['end_store_id']) > 1){
-                    array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de llegada');
+                else{
+                    array_push($errors, 'No se encontraron registros de inventario');
                 }
             }
             else{
@@ -717,7 +726,7 @@ class TransferGuideController{
         if($update){
             $this->vehicleRepository->deleteBy('transfer_guide_id', $transferGuideId);
         }
-        
+        echo json_encode($data);
         foreach($data as $vehicle){
             $vehicle['transfer_guide_id'] = $transferGuideId;
             $vehicle['created_at'] = date("Y-m-d H:i:s");
