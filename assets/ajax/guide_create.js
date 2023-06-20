@@ -351,7 +351,7 @@ new Vue({
         data.transports = [
           {
             start_date: this.ent_TransportePublicoGRR?.at_FechaInicio,
-            document_type:
+            document_type_code:
               this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
             document:
               this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,

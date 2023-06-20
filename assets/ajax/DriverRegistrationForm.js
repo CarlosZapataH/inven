@@ -16,7 +16,7 @@ Vue.component("DriverRegistrationForm", {
   data() {
     return {
       en_ConductorGRR: {
-        document_type: 1,
+        document_type_code: 1,
         document: "",
         license: "",
         name: "",
@@ -50,7 +50,7 @@ Vue.component("DriverRegistrationForm", {
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
                         <label for="cdt_at_TipoDocumentoIdentidad">Tipo de Documento</label>
-                        <select v-model="en_ConductorGRR.document_type" v-validate="'required'" name="driver_document_type" class="form-control" id="cdt_at_TipoDocumentoIdentidad">
+                        <select v-model="en_ConductorGRR.document_type_code" v-validate="'required'" name="driver_document_type" class="form-control" id="cdt_at_TipoDocumentoIdentidad">
                             <option v-for="document in documentTypes" :key="document.id + '-documentCode'" :value="document.code">{{ document.description }}</option>
                         </select>
                         <span class="text-danger">{{ errors.first('driver_document_type') }}</span>
@@ -182,7 +182,7 @@ Vue.component("DriverRegistrationForm", {
       this.$validator.reset();
 
       this.en_ConductorGRR = {
-        document_type: 1,
+        document_type_code: 1,
         document: "",
         license: "",
         name: "",
