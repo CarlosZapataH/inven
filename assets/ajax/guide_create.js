@@ -332,8 +332,18 @@ new Vue({
           this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
         transport_modality: this.en_InformacionTransporteGRR?.at_Modalidad,
 
-        start_store: this.start_store,
-        end_store: this.end_store,
+        start_store: {
+          ...this.start_store,
+          document_type_code: this.getdocumentCodebyId(
+            this.start_store.document_type
+          ),
+        },
+        end_store: {
+          ...this.end_store,
+          document_type_code: this.getdocumentCodebyId(
+            this.end_store.document_type
+          ),
+        },
         detail,
       };
 

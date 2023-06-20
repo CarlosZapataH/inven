@@ -3431,8 +3431,11 @@ class InventarioController {
                         // <button type="button" class="btn btn-outline-danger btn-hover-transform fz-16" id="dataExportPDF_Guia" data-opt="1" data-id="' . $obj_fn->encrypt_decrypt("encrypt",$movimiento['id_movt']) . '" title="Generar"><i class="fa fa-file-pdf-o mr-7"></i> Guia</button>';
                     }
 
-                    $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Transito</span>';
-                    if($movimiento['estd_transito'] == "I"){ $estdTra = '<span class="alert btn-block bg-success text-white mb-0" style="padding:.25rem 1.2rem;">Ingresado</span>';}
+                    // $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Transito</span>';
+                    // if($movimiento['estd_transito'] == "I"){ $estdTra = '<span class="alert btn-block bg-success text-white mb-0" style="padding:.25rem 1.2rem;">Ingresado</span>';}
+
+                    $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Registrado</span>';
+                    if($movimiento['flag_available'] == "1"){ $estdTra = '<span class="alert btn-block bg-success text-white mb-0" style="padding:.25rem 1.2rem;">Disponible</span>';}
 
                     $txtSolicitado = "-.-";
                     if(!is_null($movimiento['solicitado_mov'])){$txtSolicitado = $movimiento['solicitado_mov'];}
@@ -3448,7 +3451,8 @@ class InventarioController {
                         4 => $almcenOrigen,    
                         5 => $almcenDestino,
                         6 => $estdTra,
-                        7 => $btnGuia
+                        7 => $btnGuia,
+                        8 => $movimiento['flag_available']
                     );
                     array_push($datos, $row);
                 }

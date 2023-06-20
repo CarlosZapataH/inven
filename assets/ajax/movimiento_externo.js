@@ -310,26 +310,44 @@ function loadTbl_Inventario_Transacciones(datos){
     });
 }
 
+function validStore(list = [], position, value) {
+  let result = true;
+  if (Array.isArray(list) && position && value) {
+    result = !list.some((e) => e[position] != value);
+  }
+  return result;
+}
+
+function validateStatus(list = []) {
+  let result = true;
+  if (Array.isArray(list)) {
+    result = !list.some((e) => e[8] == 0);
+  }
+  return result;
+}
+
 $(document).ready(function () {
   $("#openCosolidate").on("click", function () {
-    
     const baseUrl = "guia-crear.php?tipo=externo&";
     const ids = [];
     const seleccionados = Tbl_Reporte.rows({ selected: true }).data().toArray();
-    let isSameStore = true;
-    let destinationStore
+
+    let destinationStore;
+    let originStore;
     seleccionados.forEach((element, index) => {
       if (index == 0) {
+        originStore = element[4];
         destinationStore = element[5];
-      }
-      if (index != 0 && element[5] != destinationStore) {
-        isSameStore = false;
       }
       ids.push(element[7]);
     });
-    console.log("selects:", seleccionados);
-    console.log("ids:", ids);
-    if (ids.length && isSameStore) {
+
+    if (
+      ids.length &&
+      validStore(seleccionados, 4, originStore) &&
+      validStore(seleccionados, 5, destinationStore) &&
+      validateStatus(seleccionados)
+    ) {
       window.location.href = baseUrl + "idMovimiento=" + ids.join(",");
     } else {
       swal.fire({
