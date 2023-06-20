@@ -23,7 +23,7 @@ class UtilController{
     public function index(){
         try {
             $documentTypes = $this->documentTypeRepository->find();
-
+            header('Content-Type: application/json');
             echo json_encode([
                 'data' => [
                     'documentTypes' => $documentTypes,
