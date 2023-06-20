@@ -67,7 +67,6 @@ class TransferGuideController{
             $response['data'] = $data;
         } catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo $e->getMessage();
         }
 
         header('Content-Type: application/json');
@@ -145,6 +144,7 @@ class TransferGuideController{
                             ]);
                             $response['code'] = 200;
                             $response['success'] = true;
+                            $response['data']['id'] = $transferGuideId?$transferGuideId:$this->data['id'];
                         }
                         else{
                             $response['errors'] = $sendResponse['errors'];
@@ -250,7 +250,6 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
@@ -276,6 +275,14 @@ class TransferGuideController{
             $response = $this->transitMovementRepository->findWithDetails(implode(",", $ids));
             if($response['data']){
                 if(count($response['data']) > 0){
+                    if(!$response['start_store']){
+                        array_push($errors, 'No se encontró almacén de salida');
+                    }
+
+                    if(!$response['end_store']){
+                        array_push($errors, 'No se encontró almacén de llegada');
+                    }
+
                     if(count($response['start_store_id']) > 1){
                         array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de partida');
                     }
@@ -701,6 +708,8 @@ class TransferGuideController{
         $this->dataGuide['unit_measure'] = 'KGM';
         $this->dataGuide['email_principal'] = $this->data['end_store']['email_principal'];
         $this->dataGuide['email_secondary'] = $this->data['end_store']['email_secondary'];
+        $this->dataGuide['store_ini_id'] = $this->startStore['id'];
+        $this->dataGuide['store_des_id'] = $this->endStore['id'];
         if(isset($this->data['id'])){
             $this->dataGuide['updated_at'] = $data['updated_at'];
         }
@@ -726,7 +735,6 @@ class TransferGuideController{
         if($update){
             $this->vehicleRepository->deleteBy('transfer_guide_id', $transferGuideId);
         }
-        echo json_encode($data);
         foreach($data as $vehicle){
             $vehicle['transfer_guide_id'] = $transferGuideId;
             $vehicle['created_at'] = date("Y-m-d H:i:s");
@@ -903,7 +911,6 @@ class TransferGuideController{
                 ];
                 if($data['send']){
                     $tciService = new TCIService();
-                    echo json_encode($tciService);
                     $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreDevolutionGuide($movement, $data));
                     $response['data'] = $tciResponse['data'];
                     $response['message'] = $tciResponse['message'];
@@ -913,7 +920,6 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
@@ -951,7 +957,6 @@ class TransferGuideController{
                 ];
                 if($data['send']){
                     $tciService = new TCIService();
-                    echo json_encode($tciService);
                     $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreOthersGuide($movement, $data));
                     $response['data'] = $tciResponse['data'];
                     $response['message'] = $tciResponse['message'];
@@ -961,7 +966,6 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
@@ -997,7 +1001,6 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
@@ -1039,7 +1042,6 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
@@ -1079,7 +1081,6 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
-            echo json_encode($e->getMessage());
         }
 
         http_response_code($response['code']);
