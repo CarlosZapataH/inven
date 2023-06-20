@@ -76,7 +76,6 @@ class TCIService{
     private function getXMLContent($data){
         $xmlHelper = new XMLHelper($data, $this->namespace);
         $xmlContent = $xmlHelper->generateXML();
-        echo $xmlContent;
         return $xmlContent;
     }
 

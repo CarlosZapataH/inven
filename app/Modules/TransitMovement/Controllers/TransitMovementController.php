@@ -26,12 +26,9 @@ class TransitMovementController{
         try {
             $id = $_GET['id'];
             $datos = $this->transitMovementRepository->findWithDetails($id);
-            if($datos){
-                // $response['data'] = $datos['data'];
-                $response['data'] = $datos;
-                $response['success'] = true;
-                $response['message'] = 'Información obtenida exitosamente.';
-            }
+            $response['data'] = $datos ?? [];
+            $response['success'] = true;
+            $response['message'] = 'Información obtenida exitosamente.';
         } catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
             echo $e->getMessage();

@@ -235,4 +235,31 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
 
         return $query;
     }
+
+    public function getMaxSerieNumber($serie){
+        try{
+            $data = null;
+            $result = self::query("
+                SELECT MAX(number) as max_number
+                FROM transfers_guides
+                WHERE serie = '{$serie}'
+                ORDER BY max_number DESC
+                LIMIT 1
+            ");
+
+            if($result){
+                if(is_array($result)){
+                    if(count($result) > 0){
+                        $data = $result[0];
+                    }
+                }
+            }
+
+            return $data;
+        }
+        catch(Exception $e){
+
+        }
+        return null;
+    }
 }

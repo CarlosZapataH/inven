@@ -5,4 +5,5 @@ interface ITransitMovement extends ICommonRepository
 {
   public function findWithDetails($id);
   public function findOneWithDetails($id);
+  public function updateAvailable($id, $value);
 }
