@@ -128,17 +128,17 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </thead>
                         <tbody>
                             <tr v-for="(guide, index) in paginatedItems" :key="index + '-item-guide'">
-                                <td>{{guide.transfers_guides_serie + '-' + guide.transfers_guides_number}}</td>
-                                <td>{{guide.transfers_guides_date_issue}}</td>
-                                <td>{{guide.almacen_ini_titulo_alm}}</td>
-                                <td>{{guide.almacen_des_titulo_alm}}</td>
+                                <td>{{guide.serie + '-' + guide.number}}</td>
+                                <td>{{guide.date_issue}}</td>
+                                <td>{{guide.start_store.company.name}}</td>
+                                <td>{{guide.end_store.company.name}}</td>
                                 <td>
                                     <span :class="'d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;">
                                         {{guide.tci_response_description}}
                                     </span>
                                 </td>
                                 <td>
-                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id_movt" class="btn btn-primary btn-sm">Ver</a>
+                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm">Ver</a>
                                 </td>
                             </tr>
                         </tbody>
