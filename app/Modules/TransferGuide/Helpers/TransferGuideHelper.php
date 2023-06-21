@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../Repository/TransferGuideRepository.php';
-require_once __DIR__ . '/../../../Modules/Setting/Repository/SettingRepository.php';
+require_once __DIR__ . '/../../../Modules/Establishment/Repository/EstablishmentRepository.php';
 
 class TransferGuideHelper{
 
@@ -123,46 +123,34 @@ class TransferGuideHelper{
         return $response;
     }
 
-    public static function generateSerialNumber(){
+    public static function generateSerialNumber($establishmentId){
         $transferGuideRepository = new TransferGuideRepository();
-        $settingRepository = new SettingRepository();
+        $establishmentRepository = new EstablishmentRepository();
 
-        $settingsGuide = $settingRepository->findAllBy('group', 'gruides_between_company');
+        $establishment = $establishmentRepository->findBy('id', $establishmentId);
 
-        $serie = "T001";
-        $number = 1;
-        $lengthNumber = 4;
-        $completeCh = "000";
-
-        if($settingsGuide){
-            foreach($settingsGuide as $setting){
-                if($setting['name'] == 'serie'){
-                    $serie = $setting['value']; 
-                }
-                else if($setting['name'] == 'number'){
-                    $number = $setting['value']; 
-                }
-                else if($setting['name'] == 'number_length'){
-                    $lengthNumber = $setting['value']; 
-                }
-            }
-        }
+        $serie = $establishment['start_serie'];
+        $number = $establishment['start_number'];
+        $lengthNumber = $establishment['length_number'];
+        $completeCh = "";
         
         $findLastCode = $transferGuideRepository->getMaxSerieNumber($serie);
         if($findLastCode){
-            $completeCh = "";
             $number = ((int)$findLastCode['max_number']) + 1;
-
-            $lengthCurrent = strlen(strval($number));
-            if($lengthCurrent < $lengthNumber){
-                for($i = 0; $i < ($lengthNumber - $lengthCurrent); $i++){
-                    $completeCh .= "0";
-                }
+        }
+        
+        $lengthCurrent = strlen(strval($number));
+        if($lengthCurrent < $lengthNumber){
+            for($i = 0; $i < ($lengthNumber - $lengthCurrent); $i++){
+                $completeCh .= "0";
             }
         }
 
-        $newCode = $serie . '-' . $completeCh . $number;
-        echo $newCode;
+        $newCode = [
+            'serie' => $serie,
+            'number' => $completeCh . $number
+        ];
+        return $newCode;
     }
 
     public static function formatList($data){
@@ -222,6 +210,8 @@ class TransferGuideHelper{
                                 'id' => $row['almacen_ini_id'],
                                 'name' => $row['almacen_ini_titulo_alm'],
                                 'address' => $row['establishment_ini_address'],
+                                'establishment_id' => $row['establishment_ini_id'],
+                                'establishment_code' => $row['establishment_ini_code'],
                                 'company' => [
                                     'id' => $row['company_ini_id'],
                                     'name' => $row['company_ini_name'],
@@ -241,6 +231,10 @@ class TransferGuideHelper{
                                 'id' => $row['almacen_des_id'],
                                 'name' => $row['almacen_des_titulo_alm'],
                                 'address' => $row['establishment_des_address'],
+                                'establishment_id' => $row['establishment_des_id'],
+                                'establishment_code' => $row['establishment_des_code'],
+                                'email_principal' => $row['email_principal'],
+                                'email_secondary' => $row['email_secondary'],
                                 'company' => [
                                     'id' => $row['company_des_id'],
                                     'name' => $row['company_des_name'],
@@ -260,7 +254,7 @@ class TransferGuideHelper{
                                 [
                                     'id' => $row['transfer_guide_detail_id'],
                                     'name' => $row['inventory_name'],
-                                    'aditional_description' => $row['inventory_additional_description'],
+                                    'additional_description' => $row['inventory_additional_description'],
                                     'unit_measure' => $row['unit_measure_sunat'],
                                     'quantity' => $row['inventory_quantity'],
                                     'code' => $row['inventory_code']
@@ -279,13 +273,15 @@ class TransferGuideHelper{
                                     'last_name' => $row['transports_last_name']
                                 ]
                             ],
-                            'vehicles' => [
-                                [
-                                    'id' => $row['vehicles_id'],
-                                    'plate' => $row['vehicles_plate']
-                                ]
-                            ]
+                            'vehicles' => []
                         ];
+
+                        if($row['transport_modality'] == 2){
+                            array_push($newRow, [
+                                'id' => $row['vehicles_id'],
+                                'plate' => $row['vehicles_plate']
+                            ]);
+                        }
 
                         array_push($response, $newRow);
                     }
@@ -294,7 +290,7 @@ class TransferGuideHelper{
                             array_push($response[$iGuide]['details'], [
                                 'id' => $row['transfer_guide_detail_id'],
                                 'name' => $row['inventory_name'],
-                                'aditional_description' => $row['inventory_additional_description'],
+                                'additional_description' => $row['inventory_additional_description'],
                                 'unit_measure' => $row['unit_measure_sunat'],
                                 'quantity' => $row['inventory_quantity'],
                                 'code' => $row['inventory_code']
@@ -315,11 +311,13 @@ class TransferGuideHelper{
                             ]);
                         }
 
-                        if($iVehicle < 0){
-                            array_push($response[$iGuide]['vehicles'], [
-                                'id' => $row['vehicles_id'],
-                                'plate' => $row['vehicles_plate']
-                            ]);
+                        if($row['transport_modality'] == 2){
+                            if($iVehicle < 0){
+                                array_push($response[$iGuide]['vehicles'], [
+                                    'id' => $row['vehicles_id'],
+                                    'plate' => $row['vehicles_plate']
+                                ]);
+                            }
                         }
                     }
                 }

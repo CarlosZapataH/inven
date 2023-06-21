@@ -6,8 +6,6 @@ class FormatHelper{
     }
 
     public static function parseStoreTransitMovementGuide($data){
-
-
         $transports = [];
         if(isset($data['transports'])){
             if(count($data['transports']) > 0){
@@ -18,7 +16,7 @@ class FormatHelper{
                             'at_Modalidad' => "0".$data['transport_modality'],
                             'at_FechaInicio' => $data['transports'][0]['start_date'],
                             'ent_TransportePublicoGRR' => [
-                                'at_TipoDocumentoIdentidad' => $data['transports'][0]['document_type'],
+                                'at_TipoDocumentoIdentidad' => $data['transports'][0]['document_type_code'],
                                 'at_NumeroDocumentoIdentidad' => $data['transports'][0]['document'],
                                 'at_RazonSocial' => $data['transports'][0]['company_name'],
                                 'at_NumeroMTC' => $data['transports'][0]['mtc_number']
@@ -41,7 +39,7 @@ class FormatHelper{
                     foreach($data['transports'] as $transport){
                         array_push($transports['en_InformacionTransporteGRR']['ent_TransportePrivadoGRR']['l_ConductorGRR'], [
                             'en_ConductorGRR' => [
-                                'at_TipoDocumentoIdentidad' => $transport['document_type'],
+                                'at_TipoDocumentoIdentidad' => $transport['document_type_code'],
                                 'at_NumeroDocumentoIdentidad' => $transport['document'],
                                 'at_Licencia' => $transport['license'],
                                 'at_Nombres' => $transport['name'],
@@ -65,15 +63,15 @@ class FormatHelper{
 
         $bienes = [];
 
-        foreach($data['detail'] as $key => $item){
+        foreach($data['details'] as $key => $item){
             $newBien = [
-                'at_Cantidad' => $item['cant_mde'],
-                'at_UnidadMedida' => $item['um_sunat_code'] ?? 'SET',
-                'at_Descripcion' => $item['des_mde'],
-                'at_Codigo' => $item['cod_inv']
+                'at_Cantidad' => $item['quantity'],
+                'at_UnidadMedida' => $item['unit_measure'] ?? 'SET',
+                'at_Descripcion' => $item['name'],
+                'at_Codigo' => $item['code']
             ];
             if($item['additional_description']){
-                $newBien['additional_description'];
+                $newBien['additional_description'] = $item['additional_description'];
             }
             array_push($bienes, [
                 'en_BienesGRR' => $newBien
@@ -83,14 +81,14 @@ class FormatHelper{
         $result = [
             'ent_GuiaRemisionRemitente' => [
                 'ent_RemitenteGRR' => [
-                    'at_NumeroDocumentoIdentidad' => $data['start_store']['document'],
-                    'at_RazonSocial' => $data['start_store']['name'],
-                    'at_NombreComercial' => $data['start_store']['commercial_name']
+                    'at_NumeroDocumentoIdentidad' => $data['start_store']['company']['document'],
+                    'at_RazonSocial' => $data['start_store']['company']['name'],
+                    'at_NombreComercial' => $data['start_store']['company']['commercial_name']
                 ],
                 'ent_DestinatarioGRR' => [
-                    'at_TipoDocumentoIdentidad' => $data['end_store']['document_type'],
-                    'at_NumeroDocumentoIdentidad' => $data['end_store']['document'],
-                    'at_RazonSocial' => $data['end_store']['name'],
+                    'at_TipoDocumentoIdentidad' => $data['end_store']['company']['document_type_code'],
+                    'at_NumeroDocumentoIdentidad' => $data['end_store']['company']['document'],
+                    'at_RazonSocial' => $data['end_store']['company']['name'],
                     'ent_Correo' => [
                         'at_CorreoPrincipal' => $data['end_store']['email_principal'],
                         'aa_CorreoSecundario' => [
@@ -102,7 +100,7 @@ class FormatHelper{
                     'at_FechaEmision' => $data['date_issue'],
                     'at_Serie' => $data['serie'],
                     'at_Numero' => $data['number'],
-                    'at_Observacion' => $data[''],
+                    'at_Observacion' => $data['observations'],
                     'at_HoraEmision' => $data['time_issue'],
                     'ent_InformacionTrasladoGRR' => [
                         'at_CodigoMotivo' => '0'.$data['motive_code'],
@@ -113,16 +111,16 @@ class FormatHelper{
                         ],
                         'l_InformacionTransporteGRR' => $transports,
                         'ent_PuntoPartidaGRR' => [
-                            'at_Ubigeo' => $data['start_store']['ubigeo'],
+                            'at_Ubigeo' => $data['start_store']['district']['code'],
                             'at_DireccionCompleta' => $data['start_store']['address'],
-                            'at_CodigoEstablecimiento' => '0000',
-                            'at_NumeroDocumentoIdentidad' => $data['start_store']['document']
+                            'at_CodigoEstablecimiento' => $data['start_store']['establishment_code'],
+                            'at_NumeroDocumentoIdentidad' => $data['start_store']['company']['document']
                         ],
                         'ent_PuntoLlegadaGRR' => [
-                            'at_Ubigeo' => $data['end_store']['ubigeo'],
+                            'at_Ubigeo' => $data['end_store']['district']['code'],
                             'at_DireccionCompleta' => $data['end_store']['address'],
-                            'at_CodigoEstablecimiento' => '0003',
-                            'at_NumeroDocumentoIdentidad' => $data['end_store']['document']
+                            'at_CodigoEstablecimiento' => $data['end_store']['establishment_code'],
+                            'at_NumeroDocumentoIdentidad' => $data['end_store']['company']['document']
                         ],
                         'l_BienesGRR' => $bienes
                     ]

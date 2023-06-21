@@ -41,6 +41,7 @@ class TransferGuideController{
     private $dataStartCompany;
     private $dataEndCompany;
     private $detailsData;
+    private $newCode;
 
     public function __construct()
     {
@@ -74,8 +75,6 @@ class TransferGuideController{
     }
 
     public function show(){
-        TransferGuideHelper::generateSerialNumber();
-
         header('Content-Type: application/json');
         $response = [
             'data' => null,
@@ -259,6 +258,7 @@ class TransferGuideController{
     public function validateMovementsBetweenCompany(){
         $this->movements = [];
         $this->dataGuide = null;
+        $this->newCode = null;
         $errors = [];
         $ids = [];
         if(isset($this->data['detail'])){
@@ -305,6 +305,13 @@ class TransferGuideController{
             $this->endStore = $response['end_store'];
 
             $errors = $this->validateBetweenCompany();
+        }
+
+        if(count($errors) == 0){
+            $this->newCode = TransferGuideHelper::generateSerialNumber($this->startStore['establishment_id']);
+            if(!$this->newCode){
+                array_push($errors, 'No fue posible generar el número de serie de la guia.');
+            }
         }
         return $errors;
     }
@@ -710,10 +717,13 @@ class TransferGuideController{
         $this->dataGuide['email_secondary'] = $this->data['end_store']['email_secondary'];
         $this->dataGuide['store_ini_id'] = $this->startStore['id'];
         $this->dataGuide['store_des_id'] = $this->endStore['id'];
+        
         if(isset($this->data['id'])){
             $this->dataGuide['updated_at'] = $data['updated_at'];
         }
         else{
+            $this->dataGuide['serie'] = $this->newCode['serie'];
+            $this->dataGuide['number'] = $this->newCode['number'];
             $this->dataGuide['created_at'] = date("Y-m-d H:i:s");
         }
     }
@@ -794,7 +804,7 @@ class TransferGuideController{
         $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
         $response['data'] = $tciResponse['data'];
         $response['message'] = $tciResponse['message'];
-        $this->transferGuideRepository->update($movement['transfer_guide_id'], [
+        $this->transferGuideRepository->update($transferGuide['id'], [
             'flag_sent' => true,
             'sent_attempts' => $movement['sent_attempts'] + 1,
             'tci_send' => $tciResponse['content_send'],

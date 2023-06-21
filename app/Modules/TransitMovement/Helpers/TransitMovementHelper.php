@@ -27,6 +27,7 @@ class TransitMovementHelper{
                         'id' => $row['almacen_ini_id'],
                         'name' => $row['almacen_ini_titulo_alm'],
                         'address' => $row['establishment_ini_address'],
+                        'establishment_id' => $row['establishment_ini_id'],
                         'company' => [
                             'id' => $row['company_ini_id'],
                             'name' => $row['company_ini_name'],
@@ -51,6 +52,7 @@ class TransitMovementHelper{
                         'id' => $row['almacen_des_id'],
                         'name' => $row['almacen_des_titulo_alm'],
                         'address' => $row['establishment_des_address'],
+                        'establishment_id' => $row['establishment_des_id'],
                         'email_principal' => $row['transfers_guides_email_principal'],
                         'email_secondary' => $row['transfers_guides_email_secondary'],
                         'company' => [
