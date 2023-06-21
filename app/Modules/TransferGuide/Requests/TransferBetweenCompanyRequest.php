@@ -15,8 +15,6 @@ class TransferBetweenCompanyRequest extends CommonRequest
     private function validateGuideRules(){
         return [
             // en_BienesGRR
-            'serie' => [['required']],
-            'number' => [['required']],
             'date_issue' => [['required']],
             'time_issue' => [['required']],
             'total_witght' => [['required']],
