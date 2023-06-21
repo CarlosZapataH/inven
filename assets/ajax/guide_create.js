@@ -14,16 +14,14 @@ VeeValidate.Validator.extend("validationRuc", {
 
 new Vue({
   el: "#app",
+  mixins: [guideUtilsMixin],
   data: {
     start_store: {},
     end_store: {},
 
     ent_DatosGeneralesGRR: {
-      at_FechaEmision: "",
-      at_Serie: "", //T004
-      at_Numero: "", //445
+      at_FechaEmision: null,
       at_Observacion: "",
-      at_HoraEmision: "",
       at_CodigoMotivo: 4,
       description_transfer: null,
       new_description: null,
@@ -79,6 +77,7 @@ new Vue({
     this.getData();
     this.getDocumentType();
     this.getCompany();
+    this.ent_DatosGeneralesGRR.at_FechaEmision = this.getCurrentDate();
   },
   mounted() {},
   computed: {
@@ -321,12 +320,12 @@ new Vue({
         // ent_RemitenteGRR
         send: isSend,
 
-        serie: this.ent_DatosGeneralesGRR?.at_Serie,
-        number: this.ent_DatosGeneralesGRR?.at_Numero,
-        date_issue: this.ent_DatosGeneralesGRR?.at_FechaEmision,
-        time_issue: this.convertToExtendedFormat(
-          this.ent_DatosGeneralesGRR?.at_HoraEmision
-        ),
+        // serie: this.ent_DatosGeneralesGRR?.at_Serie,
+        // number: this.ent_DatosGeneralesGRR?.at_Numero,
+        // date_issue: this.ent_DatosGeneralesGRR?.at_FechaEmision,
+        // time_issue: this.convertToExtendedFormat(
+        //   this.ent_DatosGeneralesGRR?.at_HoraEmision
+        // ),
         observations: this.ent_DatosGeneralesGRR?.at_Observacion,
         total_witght:
           this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,

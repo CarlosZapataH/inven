@@ -58,6 +58,18 @@ function listCompany(params = {}) {
     });
 }
 
+function listUtil(params = {}) {
+  const url = urlBase + "/Util/Controllers/UtilController.php";
+  params.action = "index";
+  return axios
+    .get(url, { params })
+    .then((response) => response?.data)
+    .catch((error) => {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    });
+}
+
 function createCompany(data, params) {
   const url = urlBase + "/Company/Controllers/CompanyController.php";
   return axios

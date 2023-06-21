@@ -256,7 +256,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Serie - Número
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
@@ -269,19 +269,19 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <input v-model="ent_DatosGeneralesGRR.at_Numero" name="DG_Numero" v-validate="'required'" type="text" class="form-control" placeholder="">
                                     <span class="text-danger">{{ errors.first('DG_Numero') }}</span>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Fecha de Emisión
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DatosGeneralesGRR.at_FechaEmision" name="DG_Fecha_Emision" v-validate="'required'" type="date" class="form-control">
+                                    <input v-model="ent_DatosGeneralesGRR.at_FechaEmision" name="DG_Fecha_Emision" v-validate="'required'" type="date" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DG_Fecha_Emision') }}</span>
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Hora de Emisión
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
@@ -289,7 +289,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <input v-model="ent_DatosGeneralesGRR.at_HoraEmision" name="DG_Hora_Emision" v-validate="'required'" type="time" class="form-control">
                                     <span class="text-danger">{{ errors.first('DG_Hora_Emision') }}</span>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Observaciones</label>
@@ -846,5 +846,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/InputUbigeo.js<?= $version ?>"></script>
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
-    <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>
     <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
+    <script src="../assets/ajax/guide_utils_mixin.js<?= $version ?>"></script>
+    <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>
+    
