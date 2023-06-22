@@ -258,7 +258,6 @@ class TransferGuideController{
     public function validateMovementsBetweenCompany(){
         $this->movements = [];
         $this->dataGuide = null;
-        $this->newCode = null;
         $errors = [];
         $ids = [];
         if(isset($this->data['detail'])){
@@ -305,13 +304,6 @@ class TransferGuideController{
             $this->endStore = $response['end_store'];
 
             $errors = $this->validateBetweenCompany();
-        }
-
-        if(count($errors) == 0){
-            $this->newCode = TransferGuideHelper::generateSerialNumber($this->startStore['establishment_id']);
-            if(!$this->newCode){
-                array_push($errors, 'No fue posible generar el número de serie de la guia.');
-            }
         }
         return $errors;
     }
@@ -798,24 +790,40 @@ class TransferGuideController{
 
     private function sendTransitMovementGuide($id){
         $response = GlobalHelper::getGlobalResponse();
-        $transferGuide = $this->transferGuideRepository->findOneWithDetails($id);
-        $tciService = new TCIService();
-        // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
-        $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
-        $response['data'] = $tciResponse['data'];
-        $response['message'] = $tciResponse['message'];
-        $this->transferGuideRepository->update($transferGuide['id'], [
-            'flag_sent' => true,
-            'sent_attempts' => $movement['sent_attempts'] + 1,
-            'tci_send' => $tciResponse['content_send'],
-            'tci_response' => $tciResponse['original']
-        ]);
+        $this->newCode = TransferGuideHelper::generateSerialNumber($this->startStore['establishment_id']);
 
-        if($tciResponse['success']){
-            $response['success'] = true;
+        if(!$this->newCode){
+            $response['errors'] = ['No fue posible generar el número de serie de la guia.'];
         }
         else{
-            $response['errors'] = [$tciResponse['message']];
+            $transferGuide = $this->transferGuideRepository->findOneWithDetails($id);
+            $tciService = new TCIService();
+            // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
+            $transferGuide['serie'] = $this->newCode['serie'];
+            $transferGuide['number'] = $this->newCode['number'];
+            $transferGuide['date_issue'] = date("Y-m-d");
+            $transferGuide['time_issue'] = date("H:i:s");
+            $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
+            $response['data'] = $tciResponse['data'];
+            $response['message'] = $tciResponse['message'];
+    
+            $this->transferGuideRepository->update($transferGuide['id'], [
+                'flag_sent' => true,
+                'sent_attempts' => $movement['sent_attempts'] + 1,
+                'tci_send' => $tciResponse['content_send'],
+                'tci_response' => $tciResponse['original'],
+                'date_issue' => $transferGuide['date_issue'],
+                'time_issue' => $transferGuide['time_issue'],
+                'serie' => $transferGuide['serie'],
+                'number' => (int)$transferGuide['number']
+            ]);
+    
+            if($tciResponse['success']){
+                $response['success'] = true;
+            }
+            else{
+                $response['errors'] = [$tciResponse['message']];
+            }
         }
 
         return $response;

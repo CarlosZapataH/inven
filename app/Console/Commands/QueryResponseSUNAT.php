@@ -13,7 +13,7 @@ function queryResponseSUNAT(){
             $tciResponse = $tciService->queryResponseSUNAT([
                 'ent_ConsultarRespuesta' => [
                     'at_NumeroDocumentoIdentidad' => $documentEmisor,
-                    'at_CantidadConsultar' => 50
+                    'at_CantidadConsultar' => 100
                 ]
             ]);
             
