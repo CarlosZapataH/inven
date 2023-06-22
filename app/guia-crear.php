@@ -281,15 +281,15 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
 
-                            <!-- <div class="form-group row">
+                            <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Hora de Emisión
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DatosGeneralesGRR.at_HoraEmision" name="DG_Hora_Emision" v-validate="'required'" type="time" class="form-control">
+                                    <input v-model="ent_DatosGeneralesGRR.at_HoraEmision" name="DG_Hora_Emision" v-validate="'required'" type="time" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DG_Hora_Emision') }}</span>
                                 </div>
-                            </div> -->
+                            </div>
 
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Observaciones</label>
@@ -635,10 +635,12 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     <div class="row">
                         <div class="col-12">
                             <div v-for="(group, groupIndex) in apiErros" :key="groupIndex + '-errGroup'">
-                                <!-- <div v-for="(msm, msmIndex) in group" :key="msmIndex + '-errMsm'" class="alert alert-warning" role="alert">
-                                    {{ msm }}
-                                </div> -->
-                                <div class="alert alert-warning" role="alert">
+                                <div v-if="Array.isArray(group)">
+                                    <div v-for="(msm, msmIndex) in group" :key="msmIndex + '-errMsm'" class="alert alert-warning" role="alert">
+                                        {{ msm }}
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning" role="alert" v-else>
                                     {{group}}
                                 </div>
                             </div>
@@ -849,4 +851,3 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_utils_mixin.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>
-    

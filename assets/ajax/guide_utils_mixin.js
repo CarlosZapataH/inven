@@ -30,6 +30,21 @@ var guideUtilsMixin = {
       let formattedDate = year + "-" + month + "-" + day;
       return formattedDate;
     },
+
+    getCurrentTime() {
+      var date = new Date();
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var seconds = date.getSeconds();
+
+      hours = hours < 10 ? "0" + hours : hours;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+
+      var formattedTime = hours + ":" + minutes + ":" + seconds;
+
+      return formattedTime;
+    },
   },
   created: function () {
     this.getUtil();

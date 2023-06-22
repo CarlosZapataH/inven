@@ -21,6 +21,7 @@ new Vue({
 
     ent_DatosGeneralesGRR: {
       at_FechaEmision: null,
+      at_HoraEmision: "12:00:00",
       at_Observacion: "",
       at_CodigoMotivo: 4,
       description_transfer: null,
@@ -78,6 +79,7 @@ new Vue({
     this.getDocumentType();
     this.getCompany();
     this.ent_DatosGeneralesGRR.at_FechaEmision = this.getCurrentDate();
+    this.ent_DatosGeneralesGRR.at_HoraEmision = this.getCurrentTime();
   },
   mounted() {},
   computed: {
@@ -323,9 +325,7 @@ new Vue({
         // serie: this.ent_DatosGeneralesGRR?.at_Serie,
         // number: this.ent_DatosGeneralesGRR?.at_Numero,
         // date_issue: this.ent_DatosGeneralesGRR?.at_FechaEmision,
-        // time_issue: this.convertToExtendedFormat(
-        //   this.ent_DatosGeneralesGRR?.at_HoraEmision
-        // ),
+        // time_issue: this.ent_DatosGeneralesGRR?.at_HoraEmision,
         observations: this.ent_DatosGeneralesGRR?.at_Observacion,
         total_witght:
           this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
