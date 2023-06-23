@@ -19,11 +19,10 @@ new Vue({
     start_store: {},
     end_store: {},
 
-    ent_DatosGeneralesGRR: {
+    generalData: {
       at_FechaEmision: null,
-      at_HoraEmision: "12:00:00",
       at_Observacion: "",
-      at_CodigoMotivo: 4,
+      motive: 4,
       description_transfer: null,
       new_description: null,
       ent_InformacionPesoBrutoGRR: {
@@ -59,12 +58,11 @@ new Vue({
 
     drivers: [],
     vehicles: [],
-
     movement: null,
     movementDetail: [],
-    documentTypes: [],
     apiErros: [],
     companies: [],
+    loadingSave: false,
   },
   // validations: {
   //   ent_RemitenteGRR: {
@@ -76,10 +74,8 @@ new Vue({
   // },
   created() {
     this.getData();
-    this.getDocumentType();
     this.getCompany();
-    this.ent_DatosGeneralesGRR.at_FechaEmision = this.getCurrentDate();
-    this.ent_DatosGeneralesGRR.at_HoraEmision = this.getCurrentTime();
+    this.generalData.at_FechaEmision = this.getCurrentDate();
   },
   mounted() {},
   computed: {
@@ -94,7 +90,7 @@ new Vue({
       return queryValue;
     },
     dateIssued: function () {
-      const date = this.ent_DatosGeneralesGRR?.at_FechaEmision;
+      const date = this.generalData?.at_FechaEmision;
       return this.addDay(date);
     },
     recipientHasCompany() {
@@ -178,13 +174,6 @@ new Vue({
       });
     },
 
-    getDocumentType() {
-      const params = { action: "index" };
-      listDocumentType(params).then((response) => {
-        this.documentTypes = response?.data || [];
-      });
-    },
-
     convertTimeFormat(fullTime) {
       if (fullTime) {
         const [hour, minutes] = fullTime.split(":");
@@ -251,8 +240,8 @@ new Vue({
       }
       this.movementDetail = arrAssets;
 
-      // this.ent_DatosGeneralesGRR = {
-      //   ...this.ent_DatosGeneralesGRR,
+      // this.generalData = {
+      //   ...this.generalData,
       //   at_FechaEmision: movement?.fecha_emision || null,
       //   at_Serie: movement?.serie || null, //T004
       //   at_Numero: movement?.numero || null, //445
@@ -319,18 +308,11 @@ new Vue({
         return { ...item, unit_measure_sunat: item?.unit_measure };
       });
       const data = {
-        // ent_RemitenteGRR
         send: isSend,
-
-        // serie: this.ent_DatosGeneralesGRR?.at_Serie,
-        // number: this.ent_DatosGeneralesGRR?.at_Numero,
-        // date_issue: this.ent_DatosGeneralesGRR?.at_FechaEmision,
-        // time_issue: this.ent_DatosGeneralesGRR?.at_HoraEmision,
-        observations: this.ent_DatosGeneralesGRR?.at_Observacion,
-        total_witght:
-          this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
-        total_quantity:
-          this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
+        motive: this.generalData?.motive,
+        observations: this.generalData?.at_Observacion,
+        total_witght: this.generalData?.total_witght,
+        total_quantity: this.generalData?.total_quantity,
         transport_modality: this.en_InformacionTransporteGRR?.at_Modalidad,
 
         start_store: {
@@ -349,16 +331,15 @@ new Vue({
       };
 
       if (
-        this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13 &&
-        this.ent_DatosGeneralesGRR.description_transfer == "NEW"
+        this.generalData.motive == 13 &&
+        this.generalData.description_transfer == "NEW"
       ) {
-        data.description_transfer = this.ent_DatosGeneralesGRR.new_description;
-      } else if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13) {
-        data.description_transfer =
-          this.ent_DatosGeneralesGRR.description_transfer;
+        data.description_transfer = this.generalData.new_description;
+      } else if (this.generalData.motive == 13) {
+        data.description_transfer = this.generalData.description_transfer;
       }
 
-      if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13) {
+      if (this.generalData.motive == 13) {
         data.supplier = this.supplier;
         data.buyer = this.buyer;
       }
@@ -381,9 +362,9 @@ new Vue({
       }
 
       let action = "storeTransferBetweenSameCompany";
-      if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 6) {
+      if (this.generalData.motive == 6) {
         action = "storeDevolutionGuide";
-      } else if (this.ent_DatosGeneralesGRR.at_CodigoMotivo == 13) {
+      } else if (this.generalData.motive == 13) {
         action = "storeOthersGuide";
       }
 
@@ -392,6 +373,7 @@ new Vue({
         action: action,
       };
       this.apiErros = [];
+      this.loadingSave = true;
       createGuide(data, params)
         .then((response) => {
           swal.fire({
@@ -415,6 +397,9 @@ new Vue({
             type: "error",
             text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
           });
+        })
+        .finally(() => {
+          this.loadingSave = false;
         });
     },
   },

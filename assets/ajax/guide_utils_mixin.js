@@ -1,7 +1,7 @@
 var guideUtilsMixin = {
   data: function () {
     return {
-      documentTypesX: [],
+      documentTypes: [],
       modalities: [],
       motives: [],
     };
@@ -9,7 +9,7 @@ var guideUtilsMixin = {
   methods: {
     getUtil() {
       listUtil().then((response) => {
-        this.documentTypesX = response?.data?.documentTypes || [];
+        this.documentTypes = response?.data?.documentTypes || [];
         this.modalities = response?.data?.modalities || [];
         this.motives = response?.data?.motives || [];
       });

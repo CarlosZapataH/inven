@@ -133,7 +133,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <td>{{guide.start_store.company.name}}</td>
                                 <td>{{guide.end_store.company.name}}</td>
                                 <td>
-                                    <span :class="'d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;">
+                                    <span :class="'py-2 d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;">
                                         {{guide.tci_response_description}}
                                     </span>
                                 </td>
