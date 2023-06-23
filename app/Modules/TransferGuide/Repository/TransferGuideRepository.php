@@ -418,7 +418,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
         try{
             $data = null;
             $result = self::query("
-                SELECT MAX(number) as max_number
+                SELECT MAX(CAST(`number` AS SIGNED)) as max_number
                 FROM transfers_guides
                 WHERE serie = '{$serie}'
                 ORDER BY max_number DESC

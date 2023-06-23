@@ -68,6 +68,10 @@ class CommonRequest
                     return false;
                 }
 
+            case 'nullable':
+                $this->addToValidData($field, $fieldStructure, (empty($value)?null:$value));
+                return true;
+
             case 'email':
                 if (filter_var($value, FILTER_VALIDATE_EMAIL) !== false) {
                     $this->addToValidData($field, $fieldStructure, $value);
@@ -120,12 +124,17 @@ class CommonRequest
     {
         $currentData = &$this->validData;
 
-        foreach ($fieldStructure as $fieldPart) {
-            if (!isset($currentData[$fieldPart])) {
-                $currentData[$fieldPart] = [];
+        if($fieldStructure){
+            foreach ($fieldStructure as $fieldPart) {
+                if (!isset($currentData[$fieldPart])) {
+                    $currentData[$fieldPart] = [];
+                }
+    
+                $currentData = &$currentData[$fieldPart];
             }
-
-            $currentData = &$currentData[$fieldPart];
+        }
+        else{
+            $currentData = &$currentData[$field];
         }
 
         $currentData = $value;

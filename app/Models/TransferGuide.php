@@ -2,6 +2,10 @@
 class TransferGuide {
     const TABLE_NAME = 'transfers_guides';
 
+    const BETWEENCOMPANY = "04";
+    const DEVOLUTION = "06";
+    const OTHER = "13";
+
     private $id;
     private $serie;
     private $number;

@@ -126,7 +126,6 @@ class TransferGuideHelper{
     public static function generateSerialNumber($establishmentId){
         $transferGuideRepository = new TransferGuideRepository();
         $establishmentRepository = new EstablishmentRepository();
-
         $establishment = $establishmentRepository->findBy('id', $establishmentId);
 
         $serie = $establishment['start_serie'];
@@ -136,7 +135,9 @@ class TransferGuideHelper{
         
         $findLastCode = $transferGuideRepository->getMaxSerieNumber($serie);
         if($findLastCode){
-            $number = ((int)$findLastCode['max_number']) + 1;
+            if($findLastCode['max_number']){
+                $number = ((int)$findLastCode['max_number']) + 1;
+            }
         }
         
         $lengthCurrent = strlen(strval($number));

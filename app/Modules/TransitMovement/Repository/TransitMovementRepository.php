@@ -10,14 +10,25 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
         parent::__construct(TransitMovement::class);
     }
 
-    public function findWithDetails($id){
+    public function findWithDetails($id, $available){
         try{
             $data = null;
             $query = self::getQueryDefault();
+            $queryCondition = "";
             if($id != ''){
-                $query .= " WHERE movimientos_transito.id_movt IN({$id}) AND flag_available = 1";
+                $queryCondition = " WHERE movimientos_transito.id_movt IN({$id})";
             }
-            $result = self::query($query);
+            if($available){
+                if($queryCondition == ''){
+                    $queryCondition = " WHERE ";
+                }
+                else{
+                    $queryCondition .= " AND ";
+                }
+                $queryCondition .= " flag_available = 1";
+            }
+            
+            $result = self::query($query.$queryCondition);
 
             if($result){
                 if(is_array($result)){
