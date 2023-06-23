@@ -19,6 +19,7 @@ require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../Helpers/XMLHelper.php';
 require_once __DIR__ . '/../Services/TCIService.php';
 require_once __DIR__ . '/../../../Helpers/GlobalHelper.php';
+require_once __DIR__ . '/../Validation/ValidationTransferGuide.php';
 $controller = new TransferGuideController();
 call_user_func(array($controller,$action));
 
@@ -31,8 +32,8 @@ class TransferGuideController{
     private $companyRepository;
     private $storeRepository;
     private $transferGuideDetailRepository;
+    private $validationTransferGuide;
 
-    private $data;
     private $movements;
     private $startStore;
     private $endStore;
@@ -42,6 +43,9 @@ class TransferGuideController{
     private $dataEndCompany;
     private $detailsData;
     private $newCode;
+
+    private $data;
+    private $id;
 
     public function __construct()
     {
@@ -95,55 +99,32 @@ class TransferGuideController{
         echo json_encode($response);
     }
 
-    public function storeTransferBetweenSameCompany(){
+    public function store(){
         header('Content-Type: application/json');
+        
         $response = GlobalHelper::getGlobalResponse();
         // try {
-            $this->data = GlobalHelper::getPostData();
+            $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
-                $errors = $this->validateMovementsBetweenCompany();
-                if(count($errors) == 0){ 
-                    $this->completeGuide();
-                    if(!ValidateHelper::validateProperty($this->data, ['id'])){
-                        $transferGuideId = $this->transferGuideRepository->store($this->dataGuide);
-                        if($transferGuideId){
-                            $this->storeDetails($this->data['detail'], $transferGuideId);
-                            $this->storeTransport($this->data['transports'], $transferGuideId);
-                            if($this->data['transport_modality'] == 2){
-                                $this->storeVehicle($this->data['vehicles'], $transferGuideId);
-                            }
-                        }
-                    }
-                    else{
-                        $this->transferGuideRepository->update($this->dataGuide);
-                        $this->storeDetails($this->data['detail'], $this->data['id']);
-                        $this->storeTransport($this->data['transports'], $this->data['id'], true);
-                        if($this->data['transport_modality'] == 2){
-                            $this->storeVehicle($this->data['vehicles'], $this->data['id'], true);
-                        }
-                    }
-
+                $this->validationTransferGuide = new ValidationTransferGuide($data);
+                $this->data = $this->validationTransferGuide->validate();
+                if(!$this->data['errors']){
+                    $this->data = $this->data['data'];
+                    $this->storeData();
                     $this->updateRelations();
-
-                    $send = false;
-                    if(isset($this->data['send'])){
-                        if($this->data['send'] == 1){
-                            $send = true;
-                        }
-                    }
-
-                    if($send){
-                        $sendResponse = $this->sendTransitMovementGuide($transferGuideId?$transferGuideId:$this->data['id']);
+                    
+                    if($this->data['send']){
+                        $sendResponse = $this->sendTransitMovementGuide($this->id, $this->data['startStore']['establishment_id']);
                         $response['data'] = $sendResponse['data'];
                         $response['message'] = $sendResponse['message'];
                         if($sendResponse['success']){
-                            $this->transferGuideRepository->update(($transferGuideId?$transferGuideId:$this->data['id']), [
+                            $this->transferGuideRepository->update($this->id, [
                                 'hash_code' => $response['data']['at_CodigoHash'],
                                 'xml_name' => $response['data']['at_NombreXML']
                             ]);
                             $response['code'] = 200;
                             $response['success'] = true;
-                            $response['data']['id'] = $transferGuideId?$transferGuideId:$this->data['id'];
+                            $response['data']['id'] = $this->id;
                         }
                         else{
                             $response['errors'] = $sendResponse['errors'];
@@ -152,15 +133,15 @@ class TransferGuideController{
                     else{
                         $response['code'] = 200;
                         $response['success'] = true;
-                        $response['message'] = 'Información '. ($transferGuideId?'registrada':'actualizada') . ' exitosamente.';
+                        $response['message'] = 'Información '. ($this->id?'registrada':'actualizada') . ' exitosamente.';
                         $response['data'] = [
-                            'transfer_guide_id' => ($transferGuideId?$transferGuideId:$this->data['id'])
+                            'transfer_guide_id' => ($this->id)
                         ];
                     }
                 }
                 else{
                     $response['success'] = false;
-                    $response['errors'] = $errors;
+                    $response['errors'] = $this->data['errors'];
                 }
             } 
         // } 
@@ -171,592 +152,61 @@ class TransferGuideController{
 
         http_response_code($response['code']);
         echo json_encode($response);
+        
     }
 
-    public function storeTransitMovementGuide2(){
-        header('Content-Type: application/json');
-        $response = GlobalHelper::getGlobalResponse();
-        try {
-            $data = GlobalHelper::getPostData();
-            if (json_last_error() === JSON_ERROR_NONE){
-                $id = (int)$_GET['id'];
-                $movement = $this->transitMovementRepository->findOneWithDetails($id);
-                
-                if($movement){
-                    $rules = $this->getRulesTransitMovementGuide($movement);
-                    $validated = $this->validatedData($data, $rules);
-                    
-                    if($validated['success']){
-                        $transferGuideId = null;
-
-                        if(!ValidateHelper::validateProperty($movement, ['transfer_guide_id'])){
-                            $validated['data']['created_at'] = date("Y-m-d H:i:s");
-                            $transferGuideId = $this->transferGuideRepository->store($this->groupStoreTransitMovementGuide($movement, $validated['data']));
-                            $this->storeTransport($data['modalidad_transporte'], $validated['data'], $transferGuideId);
-                            $this->storeVehicle($validated['data'], $transferGuideId);
-                        }
-                        else{
-                            $validated['data']['updated_at'] = date("Y-m-d H:i:s");
-                            $this->transferGuideRepository->update($movement['transfer_guide_id'], $this->groupStoreTransitMovementGuide($movement, $validated['data']));
-                            $this->storeTransport($data['modalidad_transporte'], $validated['data'], $movement['transfer_guide_id'], true);
-                            $this->storeVehicle($validated['data'], $movement['transfer_guide_id'], true);
-                        }
-
-                        $this->updateRelations($movement, $validated['data']);
-
-                        $send = false;
-                        if(isset($data['send'])){
-                            if($data['send'] == 1){
-                                $send = true;
-                            }
-                        }
-
-                        if($send){
-                            $sendResponse = $this->sendTransitMovementGuide($id, $validated['data']);
-                            $response['data'] = $sendResponse['data'];
-                            $response['message'] = $sendResponse['message'];
-                            if($sendResponse['success']){
-                                $this->transferGuideRepository->update(($transferGuideId?$transferGuideId:$movement['transfer_guide_id']), [
-                                    'hash_code' => $response['data']['at_CodigoHash'],
-                                    'xml_name' => $response['data']['at_NombreXML']
-                                ]);
-                                $response['code'] = 200;
-                                $response['success'] = true;
-                            }
-                            else{
-                                $response['errors'] = $sendResponse['errors'];
-                            }
-                        }
-                        else{
-                            $response['code'] = 200;
-                            $response['success'] = true;
-                            $response['message'] = 'Información '. ($transferGuideId?'registrada':'actualizada') . ' exitosamente.';
-                            $response['data'] = [
-                                'transfer_guide_id' => ($transferGuideId?$transferGuideId:$movement['transfer_guide_id'])
-                            ];
-                        }
-                    }
-                    else{
-                        $response['success'] = false;
-                        $response['errors'] = $validated['errors'];
-                    }
-                }
-                else{
-                    $response['success'] = false;
-                    $response['errors'] = 'Registro no encontrado';
-                }
-            } 
-        } 
-        catch (PDOException $e) {
-            Session::setAttribute("error", $e->getMessage());
-        }
-
-        http_response_code($response['code']);
-        echo json_encode($response);
-    }
-
-    public function validateMovementsBetweenCompany(){
-        $this->movements = [];
-        $this->dataGuide = null;
-        $errors = [];
-        $ids = [];
-        if(isset($this->data['detail'])){
-            if(is_array($this->data['detail'])){
-                foreach($this->data['detail'] as $detail){
-                    if(!in_array($detail['movement_id'], $ids)){
-                        array_push($ids, $detail['movement_id']);
-                    }
-                }
-            }
-        }
-
-        if(count($ids) > 0){
-            $response = $this->transitMovementRepository->findWithDetails(implode(",", $ids));
-            if($response['data']){
-                if(count($response['data']) > 0){
-                    if(!$response['start_store']){
-                        array_push($errors, 'No se encontró almacén de salida');
-                    }
-
-                    if(!$response['end_store']){
-                        array_push($errors, 'No se encontró almacén de llegada');
-                    }
-
-                    if(count($response['start_store_id']) > 1){
-                        array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de partida');
-                    }
-                    else if(count($response['end_store_id']) > 1){
-                        array_push($errors, 'Todos los elementos deben pertenecer al mismo almacén de llegada');
-                    }   
-                }
-                else{
-                    array_push($errors, 'No se encontraron registros de inventario');
-                }
-            }
-            else{
-                array_push($errors, 'No se encontraron registros de inventario');
-            }
-        }
-
-        if(count($errors) == 0){
-            $this->movements = $response['data'];
-            $this->startStore = $response['start_store'];
-            $this->endStore = $response['end_store'];
-
-            $errors = $this->validateBetweenCompany();
-        }
-        return $errors;
-    }
-
-    public function validateBetweenCompany(){
-        $errors = [];
-
-        // GRUIDE
-        $validateGuide = $this->validateGuideBetweenCompany();
-
-        if($validateGuide['errors']){
-            $errors = array_merge($errors, $validateGuide['errors']);
+    private function storeData(){
+        if($this->data['guide']['id']){
+            $this->transferGuideRepository->update($this->data['guide']['id'], $this->data['guide']);
+            $this->id = $this->data['guide']['id'];
         }
         else{
-            $this->dataGuide = $validateGuide['data'];
+            $this->id = $this->transferGuideRepository->store($this->data['guide']);
         }
 
-        // EMAILS STORE
-        $validateEmailsStoreCompany = $this->validateEmailsStoreCompany();
-
-        if($validateEmailsStoreCompany['errors']){
-            $errors = array_merge($errors, $validateEmailsStoreCompany['errors']);
+        if($this->id){
+            $this->storeDetails();
+            $this->storeTransport();
+            if($this->data['guide']['transport_modality'] == 2){
+                $this->storeVehicle();
+            }
         }
-
-        // START STORE COMPANY
-        $validateStartStoreCompany = $this->validateStartStoreCompany();
-
-        if($validateStartStoreCompany['errors']){
-            $errors = array_merge($errors, $validateStartStoreCompany['errors']);
-        }
-        else{
-            $this->dataStartCompany = $validateStartStoreCompany['data'];
-        }
-
-        // END STORE COMPANY
-        $validateEndStoreCompany = $this->validateEndStoreCompany();
-
-        if($validateEndStoreCompany['errors']){
-            $errors = array_merge($errors, $validateEndStoreCompany['errors']);
-        }
-        else{
-            $this->dataEndCompany = $validateEndStoreCompany['data'];
-        }
-
-        // BETWEEN COMPANY
-        $validateSameCompany = $this->validateSameCompany();
-
-        if($validateSameCompany['errors']){
-            $errors = array_merge($errors, $validateSameCompany['errors']);
-        }
-
-        // DETAILS
-        $validateDetails = $this->validateDetails();
-
-        if($validateDetails['errors']){
-            $errors = array_merge($errors, $validateDetails['errors']);
-        }
-
-        // TRANSPORT
-        $validateTransport = $this->validatedTransport();
-
-        if($validateTransport['errors']){
-            $errors = array_merge($errors, $validateTransport['errors']);
-        }
-
-        // VEHICLE
-        $validateVehicle = $this->validateVehicle();
-
-        if($validateVehicle['errors']){
-            $errors = array_merge($errors, $validateVehicle['errors']);
-        }
-
-        // VEHICLE
-        /* $validateExistStartCompany = $this->validateExistStartCompany();
-
-        if($validateExistStartCompany['errors']){
-            $errors = array_merge($errors, $validateExistStartCompany['errors']);
-        }
-
-        $validateExistEndCompany = $this->validateExistEndCompany();
-
-        if($validateExistEndCompany['errors']){
-            $errors = array_merge($errors, $validateExistEndCompany['errors']);
-        } */
-
-        return $errors;
     }
 
-    public function validateEmailsStoreCompany(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-            
-        if(!ValidateHelper::validateProperty($this->data, ['end_store'])){
-            $result['errors'] = ['La informacion de la empresa del almacén de llegada es obligatoria.'];
-        }
-        else{
-            if(!ValidateHelper::validateProperty($this->data['end_store'], ['email_principal'])){
-                $result['errors'] = ['El correo electrónico del almacén de llegada es obligatorio.'];
-            }
-
-            if(!ValidateHelper::validateProperty($this->data['end_store'], ['email_secondary'])){
-                $message  = 'El correo electrónico del almacén de llegada es obligatorio.';
-                if($result['errors']){
-                    array_push($result['errors'], $message);
-                }
-                else{
-                    $result['errors'] = [$message];
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    public function validateGuideBetweenCompany(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-        $validator = new TransferBetweenCompanyRequest();
-
-        if ($validator->validateGuide($this->data)) {
-            $result['data'] = $validator->getValidData();
-            $result['success'] = true;
-        } 
-        else {
-            $result['errors'] = $validator->getErrors();
-        }
-
-        return $result;
-    }
-
-    public function validateStartStoreCompany(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-
-        if(!$this->startStore){
-            if(ValidateHelper::validateProperty($this->data, ['start_store.company_id'])){
-                $result['errors'] = ['La informacion de la empresa del almacén de partida es obligatoria.'];
-            }
-        }
-
-        return $result;
-    }
-
-    public function validateEndStoreCompany(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-
-        if(!$this->endStore){
-            if(!ValidateHelper::validateProperty($this->data, ['end_store.company_id'])){
-                $result['errors'] = ['La informacion de la empresa del almacén de llegada es obligatoria.'];
-            }
-        }
-
-        return $result;
-    }
-
-    public function validateSameCompany(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-
-        $startStoreCompanyId = null;
-        $endStoreCompanyId = null;
-
-        if($this->startStore){
-            if(ValidateHelper::validateProperty($this->startStore, ['company.id'])){
-                $startStoreCompanyId = $this->startStore['company']['id'];
-            }
-        }
-
-        if(!$startStoreCompanyId){
-            if(ValidateHelper::validateProperty($this->data, ['start_store.company_id'])){
-                $startStoreCompanyId = $this->data['start_store']['company_id'];
-            }
-        }
-
-        if($this->endStore){
-            if(ValidateHelper::validateProperty($this->endStore, ['company.id'])){
-                $endStoreCompanyId = $this->endStore['company']['id'];
-            }
-        }
-
-        if(!$endStoreCompanyId){
-            if(ValidateHelper::validateProperty($this->data, ['end_store.company_id'])){
-                $endStoreCompanyId = $this->data['end_store']['company_id'];
-            }
-        }
-
-        if($startStoreCompanyId && $endStoreCompanyId && $startStoreCompanyId != $endStoreCompanyId){
-            $result['errors'] = ['El remitente y destinatario debe ser el mismo.'];
-        }
-
-        return $result;
-    }
-
-    private function getRulesCompany(){
-        $rules = [];
-
-        // ent_RemitenteGRR
-        if(!$this->startStore){
-            $rules = [
-                'name' => [['required']],
-                'commercial_name' => [['required']],
-                'document_type_id' => [['required']],
-                'document' => [['required']]
-            ];
-        }
-        else{
-            if(!ValidateHelper::validateProperty($this->startStore, ['company.name'])){ 
-                $rules['name'] = [['required']];
-            }
-            if(!ValidateHelper::validateProperty($this->startStore, ['company.commercial_name'])){
-                $rules['commercial_name'] = [['required']];
-            }
-            if(!ValidateHelper::validateProperty($this->startStore, ['company.document_type_id'])){
-                $rules['document_type_id'] = [['required']];
-            }
-            if(!ValidateHelper::validateProperty($this->startStore, ['company.document'])){
-                $rules['document'] = [['required']];
-            }
+    private function storeDetails(){
+        if($this->data['guide']['id']){
+            $this->transferGuideDetailRepository->deleteBy('transfer_guide_id', $this->id);
         }
         
-        return $rules;
-    }
-
-    private function isCompleteStartCompany(){
-        $completed = true;
-
-        if(!$this->startStore){
-            $completed = false;
-        }
-        else{
-            if(
-                !ValidateHelper::validateProperty($this->startStore, ['company.name']) || 
-                !ValidateHelper::validateProperty($this->startStore, ['company.commercial_name']) || 
-                !ValidateHelper::validateProperty($this->startStore, ['company.document_type_id']) || 
-                !ValidateHelper::validateProperty($this->startStore, ['company.document'])
-            ){
-                $completed = false;
-            }
-        }
-
-        return $completed;
-
-    }
-
-    private function isCompleteEndCompany(){
-        $completed = true;
-
-        if(!$this->endStore){
-            $completed = false;
-        }
-        else{
-            if(
-                !ValidateHelper::validateProperty($this->endStore, ['company.name']) || 
-                !ValidateHelper::validateProperty($this->endStore, ['company.commercial_name']) || 
-                !ValidateHelper::validateProperty($this->endStore, ['company.document_type_id']) || 
-                !ValidateHelper::validateProperty($this->endStore, ['company.document'])
-            ){
-                $completed = false;
-            }
-        }
-
-        return $completed;
-
-    }
-
-    private function validateDetails(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-
-        if(!isset($this->data['detail'])){
-            $result['errors'] = ['Los items de inventario son obligatorios'];
-        }
-        else if(!is_array($this->data['detail'])){
-            $result['errors'] = ['Los items de inventario deben ser una lista'];
-        }
-        else if(count($this->data['detail']) == 0){
-            $result['errors'] = ['Los items de inventario deben ser mayor a 0'];
-        }
-        else{
-            foreach($this->data['detail'] as $row){
-                $validator = new TransferBetweenCompanyRequest();
-                $status = $validator->validateDetail($row);
-                if (!$status) {
-                    $result['success'] = false;
-                    $result['errors'] = $validator->getErrors();
-                    break;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    private function validatedTransport(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-
-        if(!isset($this->data['transports'])){
-            $result['errors'] = ['El transporte es obligatorio'];
-        }
-        else if(!is_array($this->data['transports'])){
-            $result['errors'] = ['El transporte debe ser una lista'];
-        }
-        else if(count($this->data['transports']) == 0){
-            $result['errors'] = ['El transporte debe ser mayor a 0'];
-        }
-        else{
-            $modality = null;
-            if(isset($this->data['transport_modality'])){
-                $modality = $this->data['transport_modality'];
-            }
-            
-            if($modality){
-                foreach($this->data['transports'] as $row){
-                    $validator = new TransferBetweenCompanyRequest();
-                    $status = null;
-                    if($modality == 1){
-                        $status = $validator->validateStoreTransportPublic($row);
-                    }
-                    else if($modality == 2){
-                        $status = $validator->validateStoreTransportPrivate($row);
-                    }
-
-                    if (!$status) {
-                        $result['success'] = false;
-                        $result['errors'] = $validator->getErrors();
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    public function validateVehicle(){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-
-        if(isset($this->data['transport_modality'])){
-           if($this->data['transport_modality'] == 2){
-               if(!isset($this->data['vehicles'])){
-                   $result['errors'] = ['El vehículo es obligatorio'];
-               }
-               else if(!is_array($this->data['detail'])){
-                   $result['errors'] = ['El vehículo debe ser una lista'];
-               }
-               else if(count($this->data['vehicles']) == 0){
-                   $result['errors'] = ['El vehículo debe ser mayor a 0'];
-               }
-               else{
-                   foreach($this->data['vehicles'] as $row){
-                       $validator = new TransferBetweenCompanyRequest();
-                       $status = $validator->validateStoreVehicle($row);
-                       if (!$status) {
-                           $result['success'] = false;
-                           $result['errors'] = $validator->getErrors();
-                           break;
-                       }
-                   }
-               }
-           } 
-        }
-
-        return $result;
-    }
-
-    public function validateExistEndCompany(){
-
-    }
-
-    private function completeGuide(){
-        $this->dataGuide['observations'] = isset($this->data['observations'])?$this->data['observations']:null;
-        $this->dataGuide['motive_code'] = '04';
-        $this->dataGuide['motive_description'] = 'Traslado entre establecimientos de la misma empresa';
-        $this->dataGuide['unit_measure'] = 'KGM';
-        $this->dataGuide['email_principal'] = $this->data['end_store']['email_principal'];
-        $this->dataGuide['email_secondary'] = $this->data['end_store']['email_secondary'];
-        $this->dataGuide['store_ini_id'] = $this->startStore['id'];
-        $this->dataGuide['store_des_id'] = $this->endStore['id'];
-        
-        if(isset($this->data['id'])){
-            $this->dataGuide['updated_at'] = $data['updated_at'];
-        }
-        else{
-            $this->dataGuide['serie'] = $this->newCode['serie'];
-            $this->dataGuide['number'] = $this->newCode['number'];
-            $this->dataGuide['created_at'] = date("Y-m-d H:i:s");
+        for($i = 0; $i < count($this->data['detail']); $i++){
+            $this->data['detail'][$i]['transfer_guide_id'] = $this->id;
+            $this->data['detail'][$i]['updated_at'] = date("Y-m-d H:i:s");
+            $this->transferGuideDetailRepository->store($this->data['detail'][$i]);
         }
     }
 
-    private function storeTransport($data, $transferGuideId, $update = false){
-        if($update){
-            $this->transportRepository->deleteBy('transfer_guide_id', $transferGuideId);
+    private function storeTransport(){
+        if($this->data['guide']['id']){
+            $this->transportRepository->deleteBy('transfer_guide_id', $this->id);
         }
 
-        foreach($data as $transport){
-            $transport['modality'] = $this->data['transport_modality'];
-            $transport['transfer_guide_id'] = $transferGuideId;
-            $transport['created_at'] = date("Y-m-d H:i:s");
-            $this->transportRepository->store($transport);
+        for($i = 0; $i < count($this->data['transports']); $i++){
+            $this->data['transports'][$i]['modality'] = $this->data['guide']['transport_modality'];
+            $this->data['transports'][$i]['transfer_guide_id'] = $this->id;
+            $this->data['transports'][$i]['created_at'] = date("Y-m-d H:i:s");
+            $this->transportRepository->store($this->data['transports'][$i]);
         }
     }
 
-    private function storeVehicle($data, $transferGuideId, $update = false){
-        if($update){
-            $this->vehicleRepository->deleteBy('transfer_guide_id', $transferGuideId);
+    private function storeVehicle(){
+        if($this->data['guide']['id']){
+            $this->vehicleRepository->deleteBy('transfer_guide_id', $this->id);
         }
-        foreach($data as $vehicle){
-            $vehicle['transfer_guide_id'] = $transferGuideId;
-            $vehicle['created_at'] = date("Y-m-d H:i:s");
-            $this->vehicleRepository->store($vehicle);
-        }
-    }
 
-    private function storeDetails($data, $transferGuideId){
-        $this->transferGuideDetailRepository->deleteBy('transfer_guide_id', $transferGuideId);
-        
-        foreach($data as $detail){
-            $item = [
-                'transfer_guide_id' => $transferGuideId,
-                'movement_id' => $detail['movement_id'],
-                'movement_detail_id' => $detail['movement_detail_id'],
-                'inventory_id' => $detail['inventory_id'],
-                'additional_description' => isset($detail['additional_description'])?$detail['additional_description']:null,
-                'unit_measure_sunat' => $detail['unit_measure_sunat'],
-            ];
-            $this->transferGuideDetailRepository->store($item);
+        for($i = 0; $i < count($this->data['vehicles']); $i++){
+            $this->data['vehicles'][$i]['transfer_guide_id'] = $this->id;
+            $this->data['vehicles'][$i]['created_at'] = date("Y-m-d H:i:s");
+            $this->vehicleRepository->store($this->data['vehicles'][$i]);
         }
     }
 
@@ -768,7 +218,7 @@ class TransferGuideController{
 
     private function updateAvailableMovement(){
         $movementsId = [];
-        foreach($this->movements as $movement){
+        foreach($this->data['movements'] as $movement){
             if(!in_array($movement['id'], $movementsId)){
                 array_push($movementsId, $movement['id']);
             }
@@ -777,59 +227,80 @@ class TransferGuideController{
     }
 
     private function completeStoreIni(){
-        if(!ValidateHelper::validateProperty($this->startStore, ['company.id'])){
-            $this->storeRepository->updateBy('id_alm', $this->data['start_store']['id'], [ 'company_id' => $this->data['start_store']['company_id']]);
+        if($this->data['startStore']['update']){
+            $this->storeRepository->updateBy('id_alm', $this->data['startStore']['id'], [ 'company_id' => $this->data['startStore']['company_id']]);
         }
     }
 
     private function completeStoreDes(){
-        if(!ValidateHelper::validateProperty($this->endStore, ['company.id'])){
-            $this->storeRepository->updateBy('id_alm', $this->data['end_store']['id'], [ 'company_id' => $this->data['end_store']['company_id']]);
+        if($this->data['endStore']['update']){
+            $this->storeRepository->updateBy('id_alm', $this->data['endStore']['id'], [ 'company_id' => $this->data['endStore']['company_id']]);
         }
     }
 
-    private function sendTransitMovementGuide($id){
+    private function sendTransitMovementGuide($id, $establishmentId){
         $response = GlobalHelper::getGlobalResponse();
-        $this->newCode = TransferGuideHelper::generateSerialNumber($this->startStore['establishment_id']);
-
-        if(!$this->newCode){
-            $response['errors'] = ['No fue posible generar el número de serie de la guia.'];
-        }
-        else{
-            $transferGuide = $this->transferGuideRepository->findOneWithDetails($id);
-            $tciService = new TCIService();
-            // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
-            $transferGuide['serie'] = $this->newCode['serie'];
-            $transferGuide['number'] = $this->newCode['number'];
-            $transferGuide['date_issue'] = date("Y-m-d");
-            $transferGuide['time_issue'] = date("H:i:s");
-            $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
-            $response['data'] = $tciResponse['data'];
-            $response['message'] = $tciResponse['message'];
+        $this->newCode = null;
+        $transferGuide = $this->transferGuideRepository->findOneWithDetails($id);
+;
+        if($transferGuide){
+            if(!$transferGuide['serie']){
+                $this->newCode = TransferGuideHelper::generateSerialNumber($establishmentId);
+            }
     
-            $this->transferGuideRepository->update($transferGuide['id'], [
-                'flag_sent' => true,
-                'sent_attempts' => $movement['sent_attempts'] + 1,
-                'tci_send' => $tciResponse['content_send'],
-                'tci_response' => $tciResponse['original'],
-                'date_issue' => $transferGuide['date_issue'],
-                'time_issue' => $transferGuide['time_issue'],
-                'serie' => $transferGuide['serie'],
-                'number' => (int)$transferGuide['number']
-            ]);
-    
-            if($tciResponse['success']){
-                $response['success'] = true;
+            if(!$transferGuide['serie'] && !$this->newCode){
+                $response['errors'] = ['guide' => 'No fue posible generar el número de serie de la guia.'];
             }
             else{
-                $response['errors'] = [$tciResponse['message']];
+                $tciService = new TCIService();
+                // echo json_encode(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
+                if(!$transferGuide['serie']){
+                    $transferGuide['serie'] = $this->newCode['serie'];
+                    $transferGuide['number'] = $this->newCode['number'];
+                    $transferGuide['date_issue'] = date("Y-m-d");
+                    $transferGuide['time_issue'] = date("H:i:s");
+                }
+                
+                $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
+                $response['data'] = $tciResponse['data'];
+                $response['message'] = $tciResponse['message'];
+        
+                $this->transferGuideRepository->update($transferGuide['id'], [
+                    'flag_sent' => true,
+                    'sent_attempts' => $movement['sent_attempts'] + 1,
+                    'tci_send' => $tciResponse['content_send'],
+                    'tci_response' => $tciResponse['original'],
+                    'date_issue' => $transferGuide['date_issue'],
+                    'time_issue' => $transferGuide['time_issue'],
+                    'serie' => $transferGuide['serie'],
+                    'number' => (int)$transferGuide['number']
+                ]);
+        
+                if($tciResponse['success']){
+                    $response['success'] = true;
+                }
+                else{
+                    $response['errors'] = [$tciResponse['message']];
+                }
             }
+        }
+        else{
+            $response['errors'] = ['guide' => 'No se encontró guia'];
         }
 
         return $response;
     }
 
 
+    
+
+    
+
+    
+
+    
+
+    
 
 
 
@@ -846,57 +317,9 @@ class TransferGuideController{
 
 
 
-    private function validatedTransportPrivate($data){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-        foreach($data as $row){
-            $validator = new TransitMovementGuideRequest();
-            $status = $validator->validateStoreTransportPrivate($row);
-            if ($status) {
-                if(!$result['data']){
-                    $result['data'] = [];
-                }
-                array_push($result['data'], $validator->getValidData());
-                $result['success'] = true;
-            } 
-            else {
-                $result['success'] = false;
-                $result['errors'] = $validator->getErrors();
-                break;
-            }
-        }
 
-        return $result;
-    }
 
-    public function validatedVehicle($data){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-        foreach($data as $row){
-            $validator = new TransitMovementGuideRequest();
-            $status = $validator->validateStoreVehicle($row);
-            if ($status) {
-                if(!$result['data']){
-                    $result['data'] = [];
-                }
-                array_push($result['data'], $validator->getValidData());
-                $result['success'] = true;
-            } 
-            else {
-                $result['success'] = false;
-                $result['errors'] = $validator->getErrors();
-                break;
-            }
-        }
-
-        return $result;
-    }
+    
 
     public function storeDevolutionGuide(){
         header('Content-Type: application/json');

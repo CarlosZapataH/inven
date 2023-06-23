@@ -25,7 +25,7 @@ class TransitMovementController{
         ];
         try {
             $id = $_GET['id'];
-            $datos = $this->transitMovementRepository->findWithDetails($id);
+            $datos = $this->transitMovementRepository->findWithDetails($id, false);
             $response['data'] = $datos ?? [];
             $response['success'] = true;
             $response['message'] = 'Información obtenida exitosamente.';

@@ -4,23 +4,41 @@ require_once __DIR__ . '/../../Common/Requests/CommonRequest.php';
 class TransferBetweenCompanyRequest extends CommonRequest
 {
     // GUIDE
-    public function validateGuide($data)
+    public function validateGuide($data, $send)
     {
-        $rules = self::validateGuideRules();
+        $rules = self::validateGuideRules($send);
         $messages = self::validateGuideMessages();
 
         return $this->validate($data, $rules, $messages);
     }
 
-    private function validateGuideRules(){
-        return [
-            // en_BienesGRR
-            // 'date_issue' => [['required']],
-            // 'time_issue' => [['required']],
-            'total_witght' => [['required']],
-            'total_quantity' => [['required']],
-            'transport_modality' => [['required']]
-        ];
+    private function validateGuideRules($send){
+        if($send){
+            return [
+                'id' => [['nullable']],
+                'name' => [['required']],
+                'detail' => [['array']],
+                'motive_code' => [['required']],
+                'observations' => [['nullable']],
+                'total_witght' => [['required']],
+                'total_quantity' => [['required']],
+                'transport_modality' => [['required']],
+                'motive_description' => [['nullable']]
+            ];
+        }
+        else{
+            return [
+                'id' => [['nullable']],
+                'name' => [['required']],
+                'detail' => [['array']],
+                'motive_code' => [['required']],
+                'observations' => [['nullable']],
+                'total_witght' => [['nullable']],
+                'total_quantity' => [['nullable']],
+                'transport_modality' => [['nullable']],
+                'motive_description' => [['nullable']]
+            ];
+        }
     }
 
     private function validateGuideMessages(){
@@ -89,7 +107,8 @@ class TransferBetweenCompanyRequest extends CommonRequest
             'movement_id' => [['required']],
             'movement_detail_id' => [['required']],
             'inventory_id' => [['required']],
-            'unit_measure_sunat' => [['required']]
+            'unit_measure_sunat' => [['required']],
+            'additional_description' => [['nullable']]
         ];
     }
 
@@ -312,17 +331,17 @@ class TransferBetweenCompanyRequest extends CommonRequest
         return $this->validate($data, $rules, $messages);
     }
 
-    public function validateStoreTransportPublic($data)
+    public function validateStoreTransportPublic($data, $send)
     {
-        $rules = self::validateStoreRulesTransportPublic();
+        $rules = self::validateStoreRulesTransportPublic($send);
         $messages = self::validateStoreMessagesTransportPublic();
 
         return $this->validate($data, $rules, $messages);
     }
 
-    public function validateStoreTransportPrivate($data)
+    public function validateStoreTransportPrivate($data, $send)
     {
-        $rules = self::validateStoreRulesTransportPrivate();
+        $rules = self::validateStoreRulesTransportPrivate($send);
         $messages = self::validateStoreMessagesTransportPrivate();
 
         return $this->validate($data, $rules, $messages);
@@ -365,15 +384,27 @@ class TransferBetweenCompanyRequest extends CommonRequest
     }
 
     // TRANSPORT PUBLIC
-    private function validateStoreRulesTransportPublic(){
-        return [
-            // en_BienesGRR
-            'start_date' => [['required']],
-            'document_type_code' => [['required']],
-            'document' => [['required']],
-            'company_name' => [['required']],
-            'mtc_number' => [['required']]
-        ];
+    private function validateStoreRulesTransportPublic($send){
+        if($send){
+            return [
+                // en_BienesGRR
+                'start_date' => [['required']],
+                'document_type_code' => [['required']],
+                'document' => [['required']],
+                'company_name' => [['required']],
+                'mtc_number' => [['required']]
+            ];
+        }
+        else{
+            return [
+                // en_BienesGRR
+                'start_date' => [['nullable']],
+                'document_type_code' => [['nullable']],
+                'document' => [['required']],
+                'company_name' => [['nullable']],
+                'mtc_number' => [['nullable']]
+            ];
+        }
     }
 
     private function validateStoreMessagesTransportPublic(){
@@ -398,16 +429,27 @@ class TransferBetweenCompanyRequest extends CommonRequest
     }
 
     // TRANSPORT PRIVATE
-    private function validateStoreRulesTransportPrivate(){
-        return [
-            // en_BienesGRR
-            'start_date' => [['required']],
-            'document_type_code' => [['required']],
-            'document' => [['required']],
-            'license' => [['required']],
-            'name' => [['required']],
-            'last_name' => [['required']]
-        ];
+    private function validateStoreRulesTransportPrivate($send){
+        if($send){
+            return [
+                'start_date' => [['required']],
+                'document_type_code' => [['required']],
+                'document' => [['required']],
+                'license' => [['required']],
+                'name' => [['required']],
+                'last_name' => [['required']]
+            ];
+        }
+        else{
+            return [
+                'start_date' => [['nullable']],
+                'document_type_code' => [['nullable']],
+                'document' => [['required']],
+                'license' => [['nullable']],
+                'name' => [['nullable']],
+                'last_name' => [['nullable']]
+            ];
+        }
     }
 
     private function validateStoreMessagesTransportPrivate(){
