@@ -648,7 +648,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     <div class="row justify-content-end">
                         <div class="col-auto">
                             <div class="mb-10">
-                                <button type="button" class="btn btn-primary" @click="submitForm(false)" :disabled="loadingSave">Guardar Guía</button>
+                                <!-- <button type="button" class="btn btn-primary" @click="submitForm(false)" :disabled="loadingSave">Guardar Guía</button> -->
                                 <button type="button" class="btn btn-success" @click="submitForm(true)" :disabled="loadingSave">Guardar y Enviar</button>
                             </div>
                         </div>
