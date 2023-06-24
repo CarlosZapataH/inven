@@ -98,81 +98,112 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
             <div class="row justify-content-center">
 
                 <div class="col-12 col-lg-10" v-if="movement">
-                    <div class="card">
+                    <div class="card" id="section_origin">
                         <div class="card-header">
                             Datos del Remitente
                         </div>
                         <div class="card-body">
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="!senderHasCompany">
+                                <label class="col-sm-3 col-form-label">Compañia
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <div class="d-flex">
+                                        <select v-model="start_store.company_id" name="DES_company" v-validate="'required'" class="form-control">
+                                            <option v-for="company in companies" :key="company.id + '-DESdocumentCode'" :value="company.id">{{ company.name + ' - ' + company.document }}</option>
+                                        </select>
+                                        <company-registration-modal v-model="start_store.company_id" :document-types="documentTypes" @company-registered="getCompany" />
+                                    </div>
+
+                                    <span class="text-danger">{{ errors.first('DES_company') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" v-if="senderHasCompany">
                                 <label class="col-sm-3 col-form-label">Tipo de documento
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="ent_RemitenteGRR.document_type" name="RM_TipoDocumento" v-validate="'required'" class="form-control">
-                                        <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
+                                    <select v-model="start_store.document_type" name="RM_TipoDocumento" v-validate="'required'" class="form-control" disabled>
+                                        <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.id">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="senderHasCompany">
                                 <label for="at_NumeroDocumentoIdentidad" class="col-sm-3 col-form-label">Documento
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.document" name="RM_Numero_Documento_Identidad" v-validate="'required|alpha_dash|length:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad">
+                                    <input v-model="start_store.document" name="RM_Numero_Documento_Identidad" v-validate="'required|alpha_dash|length:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad" disabled>
                                     <span class="text-danger">{{ errors.first('RM_Numero_Documento_Identidad') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="senderHasCompany">
                                 <label for="rm_at_RazonSocial" class="col-sm-3 col-form-label">Razón social
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.name" name="RM_Razon_Social" v-validate="'required'" type="text" class="form-control" id="rm_at_RazonSocial">
+                                    <input v-model="start_store.name" name="RM_Razon_Social" v-validate="'required'" type="text" class="form-control" id="rm_at_RazonSocial" disabled>
                                     <span class="text-danger">{{ errors.first('RM_Razon_Social') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="senderHasCompany">
                                 <label for="at_NombreComercial" class="col-sm-3 col-form-label">Nombre comercial</label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_RemitenteGRR.commercial_name" name="RM_Nombre_Comercial" type="text" class="form-control" id="at_NombreComercial">
+                                    <input v-model="start_store.commercial_name" name="RM_Nombre_Comercial" type="text" class="form-control" id="at_NombreComercial" disabled>
                                     <span class="text-danger">{{ errors.first('RM_Nombre_Comercial') }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_detination">
                         <div class="card-header">
                             Datos del Destinatario
                         </div>
                         <div class="card-body">
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="!recipientHasCompany">
+                                <label class="col-sm-3 col-form-label">Compañia
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <div class="d-flex">
+                                        <select v-model="end_store.company_id" name="DES_company" v-validate="'required'" class="form-control">
+                                            <option v-for="company in companies" :key="company.id + '-DESdocumentCode'" :value="company.id">{{ company.name + ' - ' + company.document }}</option>
+                                        </select>
+                                        <company-registration-modal v-model="end_store.company_id" :document-types="documentTypes" @company-registered="getCompany" />
+                                    </div>
+
+                                    <span class="text-danger">{{ errors.first('DES_company') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" v-if="recipientHasCompany">
                                 <label class="col-sm-3 col-form-label">Tipo de documento
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="ent_DestinatarioGRR.at_TipoDocumentoIdentidad" name="DES_TipoDocumento" v-validate="'required'" class="form-control">
-                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.code">{{ document.description }}</option>
+                                    <select v-model="end_store.document_type" name="DES_TipoDocumento" v-validate="'required'" class="form-control" disabled>
+                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.id">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="recipientHasCompany">
                                 <label class="col-sm-3 col-form-label">Número de Documento
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DestinatarioGRR.at_NumeroDocumentoIdentidad" name="DES_Numero_Documento_Identidad" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="end_store.document" name="DES_Numero_Documento_Identidad" v-validate="'required'" type="text" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DES_Numero_Documento_Identidad') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <div class="form-group row" v-if="recipientHasCompany">
                                 <label class="col-sm-3 col-form-label">Razón social
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DestinatarioGRR.at_RazonSocial" name="DES_Razon_Social" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="end_store.name" name="DES_Razon_Social" v-validate="'required'" type="text" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DES_Razon_Social') }}</span>
                                 </div>
                             </div>
@@ -181,68 +212,96 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DestinatarioGRR.at_CorreoPrincipal" name="DES_Correo_Principal" v-validate="'required|email'" type="email" class="form-control">
+                                    <input v-model="end_store.email_principal" name="DES_Correo_Principal" v-validate="'required|email'" type="email" class="form-control">
                                     <span class="text-danger">{{ errors.first('DES_Correo_Principal') }}</span>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Correo Secundario</label>
+                                <label class="col-sm-3 col-form-label">Correo Secundario
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DestinatarioGRR.aa_CorreoSecundario" name="DES_Correo_Secundario" type="email" class="form-control">
+                                    <input v-model="end_store.email_secondary" name="DES_Correo_Secundario" v-validate="'required|email'" type="email" class="form-control">
                                     <span class="text-danger">{{ errors.first('DES_Correo_Secundario') }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_general">
                         <div class="card-header">
                             Datos Generales - Tipo y Motivo de Traslado
                         </div>
                         <div class="card-body">
 
                             <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Nombre de la guía
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input v-model="generalData.name" name="GD_name" v-validate="'required'" type="text" class="form-control">
+                                    <span class="text-danger">{{ errors.first('GD_name') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label for="at_CodigoMotivo" class="col-sm-3 col-form-label">Tipo de Traslado
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="ent_DatosGeneralesGRR.at_CodigoMotivo" id="at_CodigoMotivo" class="form-control">
-                                        <option :value="4" selected>Traslado entre establecimientos de la misma empresa</option>
+                                    <select v-model="generalData.motive" v-validate="'required'" name="at_CodigoMotivo" id="at_CodigoMotivo" class="form-control">
+                                        <option v-for="(motive, index) in motives" :key="index + '-motive'" :value="motive.code">{{ motive.description }}</option>
+                                        <!-- <option :value="4" selected>Traslado entre establecimientos de la misma empresa</option>
                                         <option :value="6">Devolución</option>
-                                        <option :value="13">Otros</option>
+                                        <option :value="13">Otros</option> -->
                                     </select>
+                                    <span class="text-danger">{{ errors.first('at_CodigoMotivo') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row" v-if="ent_DatosGeneralesGRR.at_CodigoMotivo == 13">
-                                <label for="at_DescripcionMotivo" class="col-sm-3 col-form-label">Motivo de Traslado
+                            <div class="form-group row" v-if="generalData.motive == 13">
+                                <label class="col-sm-3 col-form-label">Descripción del Motivo
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DatosGeneralesGRR.at_DescripcionMotivo" type="text" class="form-control" id="at_DescripcionMotivo">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <select v-model="generalData.description_transfer" name="description" v-validate="'required'" class="form-control">
+                                                <option v-for="(submotive, index) in submotives" :key="index + '-submotives'" :value="submotive.value">{{ submotive.description }}</option>
+                                                <option value="NEW">Escribir nueva descripción</option>
+                                            </select>
+                                            <span class="text-danger">{{ errors.first('description') }}</span>
+                                        </div>
+                                        <div class="col-sm-6" v-if="generalData.description_transfer == 'NEW'">
+                                            <input v-model="generalData.new_description" name="new_motive" v-validate="'required'" type="text" class="form-control" placeholder="">
+                                            <span class="text-danger">{{ errors.first('new_motive') }}</span>
+                                        </div>
+                                    </div>
+                                    <!-- <input v-model="generalData.at_DescripcionMotivo" type="text" class="form-control" id="at_DescripcionMotivo"> -->
+
                                 </div>
                             </div>
 
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Serie - Número
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-2">
-                                    <input v-model="ent_DatosGeneralesGRR.at_Serie" name="DG_Serie" v-validate="'required'" type="text" class="form-control" placeholder="">
+                                    <input v-model="generalData.at_Serie" name="DG_Serie" v-validate="'required'" type="text" class="form-control" placeholder="">
                                     <span class="text-danger">{{ errors.first('DG_Serie') }}</span>
                                 </div>
                                 <span>-</span>
                                 <div class="col-sm-3">
-                                    <input v-model="ent_DatosGeneralesGRR.at_Numero" name="DG_Numero" v-validate="'required'" type="text" class="form-control" placeholder="">
+                                    <input v-model="generalData.at_Numero" name="DG_Numero" v-validate="'required'" type="text" class="form-control" placeholder="">
                                     <span class="text-danger">{{ errors.first('DG_Numero') }}</span>
                                 </div>
-                            </div>
+                            </div> -->
 
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Fecha de Emisión
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DatosGeneralesGRR.at_FechaEmision" name="DG_Fecha_Emision" v-validate="'required'" type="date" class="form-control">
+                                    <input v-model="generalData.at_FechaEmision" name="DG_Fecha_Emision" v-validate="'required'" type="date" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DG_Fecha_Emision') }}</span>
                                 </div>
                             </div>
@@ -252,21 +311,95 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DatosGeneralesGRR.at_HoraEmision" name="DG_Hora_Emision" v-validate="'required'" type="time" class="form-control">
+                                    <input v-model="generalData.at_HoraEmision" name="DG_Hora_Emision" v-validate="'required'" type="time" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DG_Hora_Emision') }}</span>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Observaciones</label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_DatosGeneralesGRR.at_Observacion" name="DG_Observacion" type="text" class="form-control">
+                                    <input v-model="generalData.observations" name="DG_Observacion" type="text" class="form-control">
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" v-if="generalData.motive == 13" id="section_supplier">
+                        <div class="card-header">
+                            Datos del Proveedor
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Tipo de documento
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <select v-model="supplier.document_type" name="supplier_document_type" v-validate="'required'" class="form-control">
+                                        <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
+                                    </select>
+                                    <span class="text-danger">{{ errors.first('supplier_document_type') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="supplier_document" class="col-sm-3 col-form-label">Documento
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input v-model="supplier.document" name="supplier_document" v-validate="'required|alpha_dash'" type="text" class="form-control" id="supplier_document">
+                                    <span class="text-danger">{{ errors.first('supplier_document') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="supplier_name" class="col-sm-3 col-form-label">Razón social
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input v-model="supplier.name" name="supplier_name" v-validate="'required'" type="text" class="form-control" id="supplier_name">
+                                    <span class="text-danger">{{ errors.first('supplier_name') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" v-if="generalData.motive == 13" id="section_buyer">
+                        <div class="card-header">
+                            Datos del Comprador
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Tipo de documento
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <select v-model="buyer.document_type" name="buyer_document_type" v-validate="'required'" class="form-control">
+                                        <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
+                                    </select>
+                                    <span class="text-danger">{{ errors.first('buyer_document_type') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="buyer_document" class="col-sm-3 col-form-label">Documento
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input v-model="buyer.document" name="buyer_document" v-validate="'required|alpha_dash|length:11'" type="text" class="form-control" id="buyer_document">
+                                    <span class="text-danger">{{ errors.first('buyer_document') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="buyer_name" class="col-sm-3 col-form-label">Razón social
+                                    <span class="text-danger font-weight-bold">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input v-model="buyer.name" name="buyer_name" v-validate="'required'" type="text" class="form-control" id="buyer_name">
+                                    <span class="text-danger">{{ errors.first('buyer_name') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="section_transports">
                         <div class="card-header"> Datos del Transporte </div>
                         <div class="card-body">
                             <div class="form-group row">
@@ -380,20 +513,20 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_ubication">
                         <div class="card-header">
                             Ubicaciones
                         </div>
                         <div class="card-body">
                             <h6>Punto de Partida</h6>
                             <br>
-                            <input-ubigeo v-model="ent_PuntoPartidaGRR.at_Ubigeo" initial-name="PP" ref="ppUbigeoSelects"></input-ubigeo>
+                            <input-ubigeo v-model="start_store.ubigeo" initial-name="PP" ref="ppUbigeoSelects"></input-ubigeo>
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Ubigeo
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_PuntoPartidaGRR.at_Ubigeo" name="PP_Ubigeo" v-validate="'required'" type="text" class="form-control" disabled>
+                                    <input v-model="start_store.ubigeo" name="PP_Ubigeo" v-validate="'required'" type="text" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('PP_Ubigeo') }}</span>
                                 </div>
                             </div>
@@ -402,11 +535,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_PuntoPartidaGRR.at_DireccionCompleta" name="PP_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="start_store.address" name="PP_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
                                     <span class="text-danger">{{ errors.first('PP_Direccion_Completa') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label for="pp_at_CodigoEstablecimiento" class="col-sm-3 col-form-label">Codigo Establecimiento</label>
                                 <div class="col-sm-9">
                                     <input v-model="ent_PuntoPartidaGRR.at_CodigoEstablecimiento" type="text" class="form-control" id="pp_at_CodigoEstablecimiento">
@@ -417,19 +550,19 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <div class="col-sm-9">
                                     <input v-model="ent_PuntoPartidaGRR.at_NumeroDocumentoIdentidad" type="text" class="form-control" id="pp_at_NumeroDocumentoIdentidad">
                                 </div>
-                            </div>
+                            </div> -->
 
                             <hr>
 
                             <h6 class="mb-4">Punto de Llegada</h6>
                             <br>
-                            <input-ubigeo v-model="ent_PuntoLlegadaGRR.at_Ubigeo" initial-name="PL" ref="plUbigeoSelects"></input-ubigeo>
+                            <input-ubigeo v-model="end_store.ubigeo" initial-name="PL" ref="plUbigeoSelects"></input-ubigeo>
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Ubigeo
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_PuntoLlegadaGRR.at_Ubigeo" name="PL_Ubigeo" v-validate="'required'" type="text" class="form-control" disabled>
+                                    <input v-model="end_store.ubigeo" name="PL_Ubigeo" v-validate="'required'" type="text" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('PL_Ubigeo') }}</span>
                                 </div>
                             </div>
@@ -438,11 +571,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="ent_PuntoLlegadaGRR.at_DireccionCompleta" name="PL_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="end_store.address" name="PL_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
                                     <span class="text-danger">{{ errors.first('PL_Direccion_Completa') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row">
+                            <!-- <div class="form-group row">
                                 <label for="pl_at_CodigoEstablecimiento" class="col-sm-3 col-form-label">Codigo Establecimiento</label>
                                 <div class="col-sm-9">
                                     <input v-model="ent_PuntoLlegadaGRR.at_CodigoEstablecimiento" type="text" class="form-control" id="pl_at_CodigoEstablecimiento">
@@ -453,11 +586,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <div class="col-sm-9">
                                     <input v-model="ent_PuntoLlegadaGRR.at_NumeroDocumentoIdentidad" type="text" class="form-control" id="pl_at_NumeroDocumentoIdentidad">
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card" id="section_states">
                         <div class="card-header">
                             Bienes
                         </div>
@@ -471,15 +604,20 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <th>Descripción</th>
                                             <th>Unid.Med.</th>
                                             <th>Cantidad</th>
+                                            <th>Descripción</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="(item, index) in movementDetail" :key="index + '-movementDetail'">
                                             <td>{{index + 1}}</td>
-                                            <td>{{item.cod_inv}}</td>
-                                            <td>{{item.des_mde}}</td>
-                                            <td>{{item.um_mde}}</td>
-                                            <td>{{item.cant_mde}}</td>
+                                            <td>{{item.code}}</td>
+                                            <td>{{item.name}}</td>
+                                            <td>{{item.unit_measure}}</td>
+                                            <td>{{item.quantity}}</td>
+                                            <td>
+                                                <textarea v-model="item.additional_description" class="form-control" rows="1"></textarea>
+                                                <!-- <input  type="text" > -->
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -494,7 +632,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <div class="form-group row">
                                         <label for="dg_at_UnidadMedida" class="col-12 col-md-6 col-xl-4 col-form-label">Unidad de Medida</label>
                                         <div class="col-12 col-md-6 col-xl-8">
-                                            <input v-model="ent_DatosGeneralesGRR.ent_InformacionPesoBrutoGRR.at_UnidadMedida" id="dg_at_UnidadMedida" type="text" class="form-control" disabled>
+                                            <input v-model="generalData.unit_measure" id="dg_at_UnidadMedida" type="text" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -502,7 +640,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <span class="text-danger font-weight-bold">*</span>
                                         </label>
                                         <div class="col-12 col-md-6 col-xl-8">
-                                            <input v-model="ent_DatosGeneralesGRR.ent_InformacionPesoBrutoGRR.at_Peso" name="PB_Peso" v-validate="'required'" id="dg_at_Peso" type="text" class="form-control">
+                                            <input v-model="generalData.total_witght" name="PB_Peso" v-validate="'required'" id="dg_at_Peso" type="text" class="form-control">
                                             <span class="text-danger">{{ errors.first('PB_Peso') }}</span>
                                         </div>
                                     </div>
@@ -511,7 +649,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <span class="text-danger font-weight-bold">*</span>
                                         </label>
                                         <div class="col-12 col-md-6 col-xl-8">
-                                            <input v-model="ent_DatosGeneralesGRR.ent_InformacionPesoBrutoGRR.at_Cantidad" name="PB_Cantidad" v-validate="'required'" id="dg_at_Cantidad" type="text" class="form-control">
+                                            <input v-model="generalData.total_quantity" name="PB_Cantidad" v-validate="'required'" id="dg_at_Cantidad" type="text" class="form-control">
                                             <span class="text-danger">{{ errors.first('PB_Cantidad') }}</span>
                                         </div>
                                     </div>
@@ -522,17 +660,22 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     <div class="row">
                         <div class="col-12">
                             <div v-for="(group, groupIndex) in apiErros" :key="groupIndex + '-errGroup'">
-                                <div v-for="(msm, msmIndex) in group" :key="msmIndex + '-errMsm'" class="alert alert-warning" role="alert">
-                                    {{ msm }}
+                                <div v-if="Array.isArray(group)">
+                                    <div v-for="(msm, msmIndex) in group" :key="msmIndex + '-errMsm'" class="alert alert-warning" role="alert">
+                                        {{ msm }}
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning" role="alert" v-else>
+                                    {{group}}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row justify-content-end">
+                    <div class="row justify-content-end" v-if="movement?.tci_response_description != 'Aceptado'">
                         <div class="col-auto">
                             <div class="mb-10">
-                                <button type="button" class="btn btn-primary" @click="submitForm(false)">Guardar Guía</button>
-                                <button type="button" class="btn btn-success" @click="submitForm(true)">Guardar y Enviar</button>
+                                <button type="button" class="btn btn-primary" @click="submitForm(false)" :disabled="loadingSave">Guardar Guía</button>
+                                <button type="button" class="btn btn-success" @click="submitForm(true)" :disabled="loadingSave">Guardar y Enviar</button>
                             </div>
                         </div>
                     </div>
@@ -730,4 +873,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/InputUbigeo.js<?= $version ?>"></script>
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
+    <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
+    <script src="../assets/ajax/guide_utils_mixin.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_edit.js<?= $version ?>"></script>

@@ -3,6 +3,8 @@ VeeValidate.Validator.localize("es", {
   messages: {
     required: "Este campo es obligatorio",
     email: "El campo de correo electrónico no es válido",
+    date: "El campo debe tener un formato válido",
+    date_format: "El campo debe tener un formato válido",
   },
 });
 
@@ -14,52 +16,25 @@ VeeValidate.Validator.extend("validationRuc", {
 
 new Vue({
   el: "#app",
+  mixins: [guideUtilsMixin],
   data: {
-    ent_RemitenteGRR: {
-      at_TipoDocumentoIdentidad: 4,
-      at_NumeroDocumentoIdentidad: "",
-      at_RazonSocial: "",
-      at_NombreComercial: "",
-    },
+    start_store: {},
+    end_store: {},
 
-    ent_DestinatarioGRR: {
-      at_TipoDocumentoIdentidad: 4,
-      at_NumeroDocumentoIdentidad: null,
-      at_RazonSocial: "",
-      at_CorreoPrincipal: "",
-      aa_CorreoSecundario: "",
-    },
-
-    ent_DatosGeneralesGRR: {
-      at_FechaEmision: "",
-      at_Serie: "", //T004
-      at_Numero: "", //445
-      at_Observacion: "",
-      at_HoraEmision: "",
-      at_CodigoMotivo: 4,
-      ent_InformacionPesoBrutoGRR: {
-        at_Peso: "",
-        at_UnidadMedida: "KGM",
-        at_Cantidad: "",
-      },
+    generalData: {
+      name: null,
+      at_FechaEmision: null,
+      observations: "",
+      motive: 4,
+      description_transfer: null,
+      new_description: null,
+      unit_measure: null,
+      total_witght: null,
+      total_quantity: null,
     },
 
     en_InformacionTransporteGRR: {
       at_Modalidad: 1,
-    },
-
-    ent_PuntoPartidaGRR: {
-      at_Ubigeo: "",
-      at_DireccionCompleta: "",
-      at_CodigoEstablecimiento: "",
-      at_NumeroDocumentoIdentidad: "",
-    },
-
-    ent_PuntoLlegadaGRR: {
-      at_Ubigeo: "",
-      at_DireccionCompleta: "",
-      at_CodigoEstablecimiento: "",
-      at_NumeroDocumentoIdentidad: "",
     },
 
     ent_TransportePublicoGRR: {
@@ -70,13 +45,25 @@ new Vue({
       at_NumeroMTC: "",
     },
 
+    supplier: {
+      document_type: 6,
+      document: "",
+      name: "",
+    },
+
+    buyer: {
+      document_type: 6,
+      document: "",
+      name: "",
+    },
+
     drivers: [],
     vehicles: [],
-
     movement: null,
     movementDetail: [],
-    documentTypes: [],
     apiErros: [],
+    companies: [],
+    loadingSave: false,
   },
   // validations: {
   //   ent_RemitenteGRR: {
@@ -88,11 +75,12 @@ new Vue({
   // },
   created() {
     this.getData();
-    this.getDocumentType();
+    this.getCompany();
+    this.generalData.at_FechaEmision = this.getCurrentDate();
   },
   mounted() {},
   computed: {
-    idMov: function () {
+    idGuide: function () {
       const urlParams = new URLSearchParams(window.location.search);
       const queryValue = urlParams.get("idMovimiento");
       return queryValue;
@@ -103,8 +91,20 @@ new Vue({
       return queryValue;
     },
     dateIssued: function () {
-      const date = this.ent_DatosGeneralesGRR?.at_FechaEmision;
+      const date = this.generalData?.at_FechaEmision;
       return this.addDay(date);
+    },
+    recipientHasCompany() {
+      return !!this.movement?.end_store?.company?.id;
+    },
+    recipientHasUbigeo() {
+      return !!this.movement?.end_store?.district?.id;
+    },
+    senderHasCompany() {
+      return !!this.movement?.start_store?.company?.id;
+    },
+    senderHasUbigeo() {
+      return !!this.movement?.start_store?.district?.id;
     },
   },
   methods: {
@@ -146,34 +146,16 @@ new Vue({
     },
 
     getData() {
-      let urlBase =
-        "Modules/TransitMovement/Controllers/TransitMovementController.php";
-      let action = "getTransitMovement";
-      if (this.typeMov == "interno") {
-        urlBase = "Modules/Movement/Controllers/MovementController.php";
-        action = "getMovement";
-      }
-      axios
-        .get(urlBase, {
-          params: {
-            action: action,
-            id: this.idMov,
-          },
-        })
-        .then((response) => {
-          this.movement = response?.data?.data || {};
-          this.movementDetail = response?.data?.data?.detalle || [];
-          this.setData();
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      readGuide({ id: this.idGuide }).then((response) => {
+        this.movement = response?.data || {};
+        console.log(this.movement);
+        this.setData();
+      });
     },
 
-    getDocumentType() {
-      const params = { action: "index" };
-      listDocumentType(params).then((response) => {
-        this.documentTypes = response?.data || [];
+    getCompany() {
+      listCompany().then((response) => {
+        this.companies = response?.data || [];
       });
     },
 
@@ -203,70 +185,64 @@ new Vue({
 
     setData() {
       const movement = { ...this.movement };
-      console.log(movement);
+      const detailsList = movement?.data || {};
+      const start_store = movement?.start_store || {};
+      const end_store = movement?.end_store || {};
+      const transports = movement?.transports || null;
 
-      const remitente = movement?.almacen_partida?.company || {};
-      const destinatario = movement?.almacen_destino?.company || {};
-      const puntoPartida = movement?.almacen_partida || {};
-      const puntoLlegada = movement?.almacen_destino;
-      const transports = movement?.transports;
-
-      this.ent_RemitenteGRR = {
-        ...this.ent_RemitenteGRR,
-        document: remitente?.document,
-        document_type: remitente?.document_type_code || null,
-        name: remitente?.name,
-        commercial_name: remitente?.commercial_name,
+      this.start_store = {
+        name: start_store?.company?.name,
+        commercial_name: start_store?.company?.commercial_name,
+        address: start_store?.address,
+        ubigeo: start_store?.district?.code,
+        company_id: start_store?.company?.id,
+        document: start_store?.company?.document,
+        document_type: start_store?.company?.document_type_id,
       };
 
-      this.ent_DestinatarioGRR = {
-        at_TipoDocumentoIdentidad: destinatario?.document_type_code || null,
-        at_NumeroDocumentoIdentidad: destinatario.document,
-        at_RazonSocial: destinatario.name,
-        at_CorreoPrincipal: puntoLlegada?.email_principal || null,
-        aa_CorreoSecundario: puntoLlegada?.email_secondary || null,
+      this.end_store = {
+        name: end_store?.company?.name,
+        address: end_store?.address,
+        email_principal: end_store?.email_principal,
+        email_secondary: end_store?.email_secondary,
+        ubigeo: end_store?.district?.code,
+        company_id: end_store?.company?.id,
+        document: end_store?.company?.document,
+        document_type: end_store?.company?.document_type_id,
       };
 
-      this.ent_PuntoPartidaGRR = {
-        at_Ubigeo: puntoPartida?.district?.code || "",
-        at_DireccionCompleta: puntoPartida?.direccion_alm,
-        at_CodigoEstablecimiento: null,
-        at_NumeroDocumentoIdentidad: null,
+      this.generalData = {
+        ...this.generalData,
+        name: movement?.name || null,
+        observations: movement.observations,
+
+        total_witght: movement?.total_witght || null,
+        unit_measure: movement?.unit_measure || "KGM",
+        total_quantity: movement?.total_quantity || null,
       };
 
-      this.ent_PuntoLlegadaGRR = {
-        at_Ubigeo: puntoLlegada?.district?.code || "",
-        at_DireccionCompleta: puntoLlegada?.direccion_alm,
-        at_CodigoEstablecimiento: null,
-        at_NumeroDocumentoIdentidad: null,
-      };
+      if (Array.isArray(detailsList)) {
+        arrAssets = detailsList.reduce((acc, item) => {
+          if (Array.isArray(item?.detail)) {
+            acc.push(...item.detail);
+          }
+          return acc;
+        }, []);
+      }
+      this.movementDetail = movement?.details || [];
 
-      this.ent_DatosGeneralesGRR = {
-        ...this.ent_DatosGeneralesGRR,
-        at_FechaEmision: movement?.fecha_emision || null,
-        at_Serie: movement?.serie || null, //T004
-        at_Numero: movement?.numero || null, //445
-        at_Observacion: movement?.observacion || null,
-        at_HoraEmision: this.convertTimeFormat(movement?.hora_emision) || null,
-        at_CodigoMotivo: movement?.motive_code,
-        ent_InformacionPesoBrutoGRR: {
-          at_Peso: movement?.peso || null,
-          at_UnidadMedida: "KGM",
-          at_Cantidad: movement?.cantidad || null,
-        },
+      this.en_InformacionTransporteGRR = {
+        at_Modalidad: movement.transport_modality,
       };
 
       if (
         Array.isArray(transports) &&
         transports.length > 0 &&
-        transports[0].modality == 1
+        movement.transport_modality == 1
       ) {
-        this.en_InformacionTransporteGRR = {
-          at_Modalidad: transports[0].modality,
-        };
         this.ent_TransportePublicoGRR = {
           at_FechaInicio: transports[0].start_date,
-          at_TipoDocumentoIdentidad: transports[0].document_type,
+          at_TipoDocumentoIdentidad: transports[0].document_type_code,
           at_NumeroDocumentoIdentidad: transports[0].document,
           at_RazonSocial: transports[0].company_name,
           at_NumeroMTC: transports[0].mtc_number,
@@ -274,12 +250,8 @@ new Vue({
       } else if (
         Array.isArray(transports) &&
         transports.length > 0 &&
-        transports[0].modality == 2
+        movement.transport_modality == 2
       ) {
-        this.en_InformacionTransporteGRR = {
-          at_Modalidad: transports[0].modality,
-          at_FechaInicio: transports[0].start_date,
-        };
         this.drivers = movement?.transports || [];
         this.vehicles = movement?.vehicles || [];
       }
@@ -305,53 +277,48 @@ new Vue({
     },
 
     sendGuide(isSend) {
+      const detail = this.movementDetail.map((item) => {
+        return { ...item, unit_measure_sunat: item?.unit_measure };
+      });
       const data = {
-        // ent_RemitenteGRR
         send: isSend,
-        almacen_partida: {
-          document_type_id: this.ent_RemitenteGRR?.document_type,
-          document: this.ent_RemitenteGRR?.document,
-          name: this.ent_RemitenteGRR?.name,
-          commercial_name: this.ent_RemitenteGRR?.commercial_name,
-          // ent_PuntoPartidaGRR
-          ubigeo: this.ent_PuntoPartidaGRR?.at_Ubigeo,
-          address: this.ent_PuntoPartidaGRR?.at_DireccionCompleta,
+        name: this.generalData?.name || null,
+        motive_code: this.generalData?.motive,
+        observations: this.generalData?.observations || null,
+        total_witght: this.generalData?.total_witght,
+        total_quantity: this.generalData?.total_quantity,
+        transport_modality: this.en_InformacionTransporteGRR?.at_Modalidad,
+
+        start_store: {
+          company_id: this.start_store.company_id,
         },
-        // ent_DestinatarioGRR
-        almacen_destino: {
-          document_type_id: this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad,
-          document_type_code: this.getdocumentIdbyCode(
-            this.ent_DestinatarioGRR?.at_TipoDocumentoIdentidad
-          ),
-          document: this.ent_DestinatarioGRR?.at_NumeroDocumentoIdentidad,
-          name: this.ent_DestinatarioGRR?.at_RazonSocial,
-          email_principal: this.ent_DestinatarioGRR?.at_CorreoPrincipal,
-          email_secondary: this.ent_DestinatarioGRR?.aa_CorreoSecundario,
-          // ent_PuntoPartidaGRR
-          ubigeo: this.ent_PuntoLlegadaGRR?.at_Ubigeo,
-          address: this.ent_PuntoLlegadaGRR?.at_DireccionCompleta,
+        end_store: {
+          company_id: this.end_store?.company_id,
+          email_principal: this.end_store?.email_principal,
+          email_secondary: this.end_store?.email_secondary,
         },
-        // ent_DatosGeneralesGRR
-        fecha_emision: this.ent_DatosGeneralesGRR?.at_FechaEmision,
-        serie: this.ent_DatosGeneralesGRR?.at_Serie,
-        numero: this.ent_DatosGeneralesGRR?.at_Numero,
-        observacion: this.ent_DatosGeneralesGRR?.at_Observacion,
-        hora_emision: this.convertToExtendedFormat(
-          this.ent_DatosGeneralesGRR?.at_HoraEmision
-        ),
-        // ent_InformacionTrasladoGRR
-        // // ent_InformacionPesoBrutoGRR
-        peso: this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Peso,
-        cantidad:
-          this.ent_DatosGeneralesGRR?.ent_InformacionPesoBrutoGRR?.at_Cantidad,
-        modalidad_transporte: this.en_InformacionTransporteGRR?.at_Modalidad,
+        detail,
       };
+
+      if (
+        this.generalData.motive == 13 &&
+        this.generalData.description_transfer == "NEW"
+      ) {
+        data.description_transfer = this.generalData.new_description;
+      } else if (this.generalData.motive == 13) {
+        data.description_transfer = this.generalData.description_transfer;
+      }
+
+      if (this.generalData.motive == 13) {
+        data.supplier = this.supplier;
+        data.buyer = this.buyer;
+      }
 
       if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
         data.transports = [
           {
             start_date: this.ent_TransportePublicoGRR?.at_FechaInicio,
-            document_type:
+            document_type_code:
               this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
             document:
               this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
@@ -364,39 +331,33 @@ new Vue({
         data.vehicles = this.vehicles;
       }
 
-      const params = { id: this.idMov };
+      let action = "store";
+      if (this.generalData.motive == 6) {
+        action = "storeDevolutionGuide";
+      } else if (this.generalData.motive == 13) {
+        action = "storeOthersGuide";
+      }
+
+      const params = {
+        id: this.idGuide,
+        action: action,
+      };
       this.apiErros = [];
+      this.loadingSave = true;
       createGuide(data, params)
         .then((response) => {
-          if (response?.success === true) {
-            swal.fire({
-              title: "",
-              type: "success",
-              text:
-                response?.message ||
-                "¡El formulario se ha guardado correctamente!",
-              showConfirmButton: false,
-              timer: 5000,
-            });
-            setTimeout(() => {
-              window.location.href = "guia-lista.php";
-            }, 5000);
-          } else if (response?.success === false) {
-            this.apiErros = response?.errors;
-            swal.fire({
-              title: "",
-              type: "info",
-              text: "Lo siento, pero los datos que has proporcionado no son válidos. Por favor, verifica la información e inténtalo nuevamente.",
-            });
-          } else {
-            swal.fire({
-              title: "",
-              type: "error",
-              text: "¡Ups! Parece que hay un problema con la API en este momento. Por favor, intenta nuevamente más tarde. Gracias por tu paciencia.",
-            });
-          }
-
-          console.log(response);
+          swal.fire({
+            title: "",
+            type: "success",
+            text:
+              response?.message ||
+              "¡El formulario se ha guardado correctamente!",
+            showConfirmButton: false,
+            timer: 5000,
+          });
+          setTimeout(() => {
+            window.location.href = "guia-lista.php";
+          }, 5000);
         })
         .catch((error) => {
           console.log(error?.response?.data);
@@ -406,6 +367,9 @@ new Vue({
             type: "error",
             text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
           });
+        })
+        .finally(() => {
+          this.loadingSave = false;
         });
     },
   },

@@ -128,7 +128,9 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </thead>
                         <tbody>
                             <tr v-for="(guide, index) in paginatedItems" :key="index + '-item-guide'">
-                                <td>{{guide.serie + '-' + guide.number}}</td>
+                                <td>
+                                    <span v-if="guide?.serie && guide?.number">{{guide.serie + '-' + guide.number}}</span>
+                                </td>
                                 <td>{{guide.date_issue}}</td>
                                 <td>{{guide.start_store.company.name}}</td>
                                 <td>{{guide.end_store.company.name}}</td>
@@ -138,7 +140,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     </span>
                                 </td>
                                 <td>
-                                    <!-- <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm">Ver</a> -->
+                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm">Ver</a>
                                 </td>
                             </tr>
                         </tbody>

@@ -46,6 +46,19 @@ function listGuide(params = {}) {
     });
 }
 
+function readGuide(params = {}) {
+  const url =
+    urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
+  params.action = "show";
+  return axios
+    .get(url, { params })
+    .then((response) => response?.data)
+    .catch((error) => {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    });
+}
+
 function listCompany(params = {}) {
   const url = urlBase + "/Company/Controllers/CompanyController.php";
   params.action = "index";

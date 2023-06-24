@@ -3,6 +3,8 @@ VeeValidate.Validator.localize("es", {
   messages: {
     required: "Este campo es obligatorio",
     email: "El campo de correo electrónico no es válido",
+    date: "El campo debe tener un formato válido",
+    date_format: "El campo debe tener un formato válido",
   },
 });
 
@@ -20,8 +22,9 @@ new Vue({
     end_store: {},
 
     generalData: {
+      name: null,
       at_FechaEmision: null,
-      at_Observacion: "",
+      observations: "",
       motive: 4,
       description_transfer: null,
       new_description: null,
@@ -203,9 +206,6 @@ new Vue({
       const detailsList = movement?.data || {};
       const start_store = movement?.start_store || {};
       const end_store = movement?.end_store || {};
-      //const transports = movement?.transports;
-
-      console.log(start_store);
 
       this.start_store = {
         name: start_store?.company?.name,
@@ -245,7 +245,7 @@ new Vue({
       //   at_FechaEmision: movement?.fecha_emision || null,
       //   at_Serie: movement?.serie || null, //T004
       //   at_Numero: movement?.numero || null, //445
-      //   at_Observacion: movement?.observacion || null,
+      //   observations: movement?.observacion || null,
       //   at_HoraEmision: this.convertTimeFormat(movement?.hora_emision) || null,
       //   at_CodigoMotivo: movement?.motive_code,
       //   ent_InformacionPesoBrutoGRR: {
@@ -309,23 +309,20 @@ new Vue({
       });
       const data = {
         send: isSend,
-        motive: this.generalData?.motive,
-        observations: this.generalData?.at_Observacion,
+        name: this.generalData?.name || null,
+        motive_code: this.generalData?.motive,
+        observations: this.generalData?.observations || null,
         total_witght: this.generalData?.total_witght,
         total_quantity: this.generalData?.total_quantity,
         transport_modality: this.en_InformacionTransporteGRR?.at_Modalidad,
 
         start_store: {
-          ...this.start_store,
-          document_type_code: this.getdocumentCodebyId(
-            this.start_store.document_type
-          ),
+          company_id: this.start_store.company_id,
         },
         end_store: {
-          ...this.end_store,
-          document_type_code: this.getdocumentCodebyId(
-            this.end_store.document_type
-          ),
+          company_id: this.end_store?.company_id,
+          email_principal: this.end_store?.email_principal,
+          email_secondary: this.end_store?.email_secondary,
         },
         detail,
       };
@@ -361,7 +358,7 @@ new Vue({
         data.vehicles = this.vehicles;
       }
 
-      let action = "storeTransferBetweenSameCompany";
+      let action = "store";
       if (this.generalData.motive == 6) {
         action = "storeDevolutionGuide";
       } else if (this.generalData.motive == 13) {
