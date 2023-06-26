@@ -331,16 +331,9 @@ new Vue({
         data.vehicles = this.vehicles;
       }
 
-      let action = "store";
-      if (this.generalData.motive == 6) {
-        action = "storeDevolutionGuide";
-      } else if (this.generalData.motive == 13) {
-        action = "storeOthersGuide";
-      }
-
       const params = {
         id: this.idGuide,
-        action: action,
+        action: "store",
       };
       this.apiErros = [];
       this.loadingSave = true;
