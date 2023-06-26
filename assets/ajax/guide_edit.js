@@ -46,13 +46,13 @@ new Vue({
     },
 
     provider: {
-      document_type: 6,
+      document_type_code: 6,
       document: "",
       name: "",
     },
 
     buyer: {
-      document_type: 6,
+      document_type_code: 6,
       document: "",
       name: "",
     },
@@ -190,6 +190,11 @@ new Vue({
       const end_store = movement?.end_store || {};
       const transports = movement?.transports || null;
 
+      console.log(
+        "esxite submotivo: ",
+        this.isMotiveInSubmotives(movement?.motive_description)
+      );
+
       this.start_store = {
         name: start_store?.company?.name,
         commercial_name: start_store?.company?.commercial_name,
@@ -216,12 +221,17 @@ new Vue({
         name: movement?.name || null,
         observations: movement.observations,
         motive: movement?.motive_code,
-        description_transfer: movement?.motive_description,
-
         total_witght: movement?.total_witght || null,
         unit_measure: movement?.unit_measure || "KGM",
         total_quantity: movement?.total_quantity || null,
       };
+
+      if (this.isMotiveInSubmotives(movement?.motive_description)) {
+        this.generalData.description_transfer = movement?.motive_description;
+      } else {
+        this.generalData.description_transfer = "NEW";
+        this.generalData.new_description = movement?.motive_description || null;
+      }
 
       this.provider = movement?.provider || this.provider;
       this.buyer = movement?.buyer || this.buyer;
@@ -354,7 +364,8 @@ new Vue({
             timer: 5000,
           });
           setTimeout(() => {
-            window.location.href = "guia-lista.php";
+            //window.location.href = "guia-lista.php";
+            location.reload();
           }, 5000);
         })
         .catch((error) => {

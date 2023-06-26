@@ -281,41 +281,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
 
-                            <!-- <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Serie - Número
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
-                                <div class="col-sm-2">
-                                    <input v-model="generalData.at_Serie" name="DG_Serie" v-validate="'required'" type="text" class="form-control" placeholder="">
-                                    <span class="text-danger">{{ errors.first('DG_Serie') }}</span>
-                                </div>
-                                <span>-</span>
-                                <div class="col-sm-3">
-                                    <input v-model="generalData.at_Numero" name="DG_Numero" v-validate="'required'" type="text" class="form-control" placeholder="">
-                                    <span class="text-danger">{{ errors.first('DG_Numero') }}</span>
-                                </div>
-                            </div> -->
-
-                            <!-- <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Fecha de Emisión
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
-                                <div class="col-sm-9">
-                                    <input v-model="generalData.at_FechaEmision" name="DG_Fecha_Emision" v-validate="'required'" type="date" class="form-control" disabled>
-                                    <span class="text-danger">{{ errors.first('DG_Fecha_Emision') }}</span>
-                                </div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Hora de Emisión
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
-                                <div class="col-sm-9">
-                                    <input v-model="generalData.at_HoraEmision" name="DG_Hora_Emision" v-validate="'required'" type="time" class="form-control" disabled>
-                                    <span class="text-danger">{{ errors.first('DG_Hora_Emision') }}</span>
-                                </div>
-                            </div> -->
-
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Observaciones</label>
                                 <div class="col-sm-9">
@@ -335,7 +300,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="provider.document_type" name="supplier_document_type" v-validate="'required'" class="form-control">
+                                    <select v-model="provider.document_type_code" name="supplier_document_type" v-validate="'required'" class="form-control">
                                         <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('supplier_document_type') }}</span>
@@ -372,7 +337,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="buyer.document_type" name="buyer_document_type" v-validate="'required'" class="form-control">
+                                    <select v-model="buyer.document_type_code" name="buyer_document_type" v-validate="'required'" class="form-control">
                                         <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('buyer_document_type') }}</span>

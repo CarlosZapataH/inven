@@ -45,6 +45,10 @@ var guideUtilsMixin = {
 
       return formattedTime;
     },
+
+    isMotiveInSubmotives(submotive) {
+      return this.submotives.some((obj) => obj?.value == submotive);
+    },
   },
   created: function () {
     this.getUtil();
