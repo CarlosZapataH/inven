@@ -191,6 +191,7 @@ class TransferGuideHelper{
                     if($iGuide < 0){
                         $newRow = [
                             'id' => $row['id'],
+                            'name' => $row['name'],
                             'serie' => $row['serie'],
                             'number' => $row['number'],
                             'date_issue' => $row['date_issue'],

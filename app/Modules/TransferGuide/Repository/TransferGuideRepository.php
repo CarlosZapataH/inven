@@ -82,6 +82,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             $query = '
                     SELECT 
                         transfers_guides.id,
+                        transfers_guides.name,
                         transfers_guides.serie,
                         transfers_guides.number,
                         transfers_guides.date_issue,
@@ -338,6 +339,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
         $query = '
             SELECT 
                 transfers_guides.id,
+                transfers_guides.name,
                 transfers_guides.serie,
                 transfers_guides.number,
                 transfers_guides.date_issue,
