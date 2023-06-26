@@ -305,15 +305,19 @@ class TransferGuideController{
             $this->providerRepository->deleteBy('transfer_guide_id', $this->id);
         }
 
-        $this->providerRepository->store($this->data['provider']);
+        if($this->data['provider']){
+            $this->providerRepository->store($this->data['provider']);
+        }
     }
 
-    private function buyerProvider(){
+    private function storeBuyer(){
         if($this->data['guide']['id']){
             $this->buyerRepository->deleteBy('transfer_guide_id', $this->id);
         }
 
-        $this->buyerRepository->store($this->data['buyer']);
+        if($this->data['buyer']){
+            $this->buyerRepository->store($this->data['buyer']);
+        }
     }
 
 
