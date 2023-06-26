@@ -335,7 +335,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="supplier.document_type" name="supplier_document_type" v-validate="'required'" class="form-control">
+                                    <select v-model="provider.document_type_code" name="supplier_document_type" v-validate="'required'" class="form-control">
                                         <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('supplier_document_type') }}</span>
@@ -346,7 +346,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="supplier.document" name="supplier_document" v-validate="'required|alpha_dash'" type="text" class="form-control" id="supplier_document">
+                                    <input v-model="provider.document" name="supplier_document" v-validate="'required|alpha_dash'" type="text" class="form-control" id="supplier_document">
                                     <span class="text-danger">{{ errors.first('supplier_document') }}</span>
                                 </div>
                             </div>
@@ -355,7 +355,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="supplier.name" name="supplier_name" v-validate="'required'" type="text" class="form-control" id="supplier_name">
+                                    <input v-model="provider.name" name="supplier_name" v-validate="'required'" type="text" class="form-control" id="supplier_name">
                                     <span class="text-danger">{{ errors.first('supplier_name') }}</span>
                                 </div>
                             </div>
@@ -372,7 +372,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <select v-model="buyer.document_type" name="buyer_document_type" v-validate="'required'" class="form-control">
+                                    <select v-model="buyer.document_type_code" name="buyer_document_type" v-validate="'required'" class="form-control">
                                         <option v-for="document in documentTypes" :key="document.id + '-RMdocumentCode'" :value="document.code">{{ document.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('buyer_document_type') }}</span>

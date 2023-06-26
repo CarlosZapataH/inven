@@ -47,14 +47,14 @@ new Vue({
       at_NumeroMTC: "",
     },
 
-    supplier: {
-      document_type: 6,
+    provider: {
+      document_type_code: 6,
       document: "",
       name: "",
     },
 
     buyer: {
-      document_type: 6,
+      document_type_code: 6,
       document: "",
       name: "",
     },
@@ -331,13 +331,13 @@ new Vue({
         this.generalData.motive == 13 &&
         this.generalData.description_transfer == "NEW"
       ) {
-        data.description_transfer = this.generalData.new_description;
+        data.motive_description = this.generalData.new_description;
       } else if (this.generalData.motive == 13) {
-        data.description_transfer = this.generalData.description_transfer;
+        data.motive_description = this.generalData.description_transfer;
       }
 
       if (this.generalData.motive == 13) {
-        data.supplier = this.supplier;
+        data.provider = this.provider;
         data.buyer = this.buyer;
       }
 

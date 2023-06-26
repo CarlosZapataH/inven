@@ -45,7 +45,7 @@ new Vue({
       at_NumeroMTC: "",
     },
 
-    supplier: {
+    provider: {
       document_type: 6,
       document: "",
       name: "",
@@ -223,6 +223,9 @@ new Vue({
         total_quantity: movement?.total_quantity || null,
       };
 
+      this.provider = movement?.provider || this.provider;
+      this.buyer = movement?.buyer || this.buyer;
+
       if (Array.isArray(detailsList)) {
         arrAssets = detailsList.reduce((acc, item) => {
           if (Array.isArray(item?.detail)) {
@@ -307,13 +310,13 @@ new Vue({
         this.generalData.motive == 13 &&
         this.generalData.description_transfer == "NEW"
       ) {
-        data.description_transfer = this.generalData.new_description;
+        data.motive_description = this.generalData.new_description;
       } else if (this.generalData.motive == 13) {
-        data.description_transfer = this.generalData.description_transfer;
+        data.motive_description = this.generalData.description_transfer;
       }
 
       if (this.generalData.motive == 13) {
-        data.supplier = this.supplier;
+        data.provider = this.provider;
         data.buyer = this.buyer;
       }
 
