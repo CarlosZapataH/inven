@@ -215,6 +215,8 @@ new Vue({
         ...this.generalData,
         name: movement?.name || null,
         observations: movement.observations,
+        motive: movement?.motive_code,
+        description_transfer: movement?.motive_description,
 
         total_witght: movement?.total_witght || null,
         unit_measure: movement?.unit_measure || "KGM",
@@ -281,6 +283,7 @@ new Vue({
         return { ...item, unit_measure_sunat: item?.unit_measure };
       });
       const data = {
+        id: this.idGuide,
         send: isSend,
         name: this.generalData?.name || null,
         motive_code: this.generalData?.motive,
@@ -332,7 +335,6 @@ new Vue({
       }
 
       const params = {
-        id: this.idGuide,
         action: "store",
       };
       this.apiErros = [];

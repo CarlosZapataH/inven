@@ -120,6 +120,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             <tr>
                                 <th>Código</th>
                                 <th>Fecha</th>
+                                <th>Nombre</th>
                                 <th>Remitente</th>
                                 <th>Destinatario</th>
                                 <th>Estado</th>
@@ -132,6 +133,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span v-if="guide?.serie && guide?.number">{{guide.serie + '-' + guide.number}}</span>
                                 </td>
                                 <td>{{guide.date_issue}}</td>
+                                <td>{{guide.name}}</td>
                                 <td>{{guide.start_store.company.name}}</td>
                                 <td>{{guide.end_store.company.name}}</td>
                                 <td>
