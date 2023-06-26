@@ -259,7 +259,10 @@ class TransferGuideHelper{
                                     'additional_description' => $row['inventory_additional_description'],
                                     'unit_measure' => $row['unit_measure_sunat'],
                                     'quantity' => $row['inventory_quantity'],
-                                    'code' => $row['inventory_code']
+                                    'code' => $row['inventory_code'],
+                                    'movement_id' => $row['movement_id'],
+                                    'movement_detail_id' => $row['movement_detail_id'],
+                                    'inventory_id' => $row['inventory_id']
                                 ]
                             ],
                             'transports' => [],
@@ -318,7 +321,10 @@ class TransferGuideHelper{
                                 'additional_description' => $row['inventory_additional_description'],
                                 'unit_measure' => $row['unit_measure_sunat'],
                                 'quantity' => $row['inventory_quantity'],
-                                'code' => $row['inventory_code']
+                                'code' => $row['inventory_code'],
+                                'movement_id' => $row['movement_id'],
+                                'movement_detail_id' => $row['movement_detail_id'],
+                                'inventory_id' => $row['inventory_id']
                             ]);
                         }
 
