@@ -143,7 +143,7 @@ class ValidationTransferGuide{
             }
         }
         
-        $avalialble = $this->guida['id']?false:true;
+        $avalialble = $this->guide['id']?false:true;
         $response = $this->transitMovementRepository->findWithDetails(implode(",", $ids), $avalialble);
         
         if($response['data']){
