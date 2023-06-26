@@ -306,6 +306,7 @@ class TransferGuideController{
         }
 
         if($this->data['provider']){
+            $this->data['provider']['transfer_guide_id'] = $this->id;
             $this->providerRepository->store($this->data['provider']);
         }
     }
@@ -316,6 +317,7 @@ class TransferGuideController{
         }
 
         if($this->data['buyer']){
+            $this->data['buyer']['transfer_guide_id'] = $this->id;
             $this->buyerRepository->store($this->data['buyer']);
         }
     }
