@@ -14,12 +14,15 @@ require_once __DIR__ . '/../../Vehicle/Repository/VehicleRepository.php';
 require_once __DIR__ . '/../../TransferGuideDetail/Repository/TransferGuideDetailRepository.php';
 require_once __DIR__ . '/../../Company/Repository/CompanyRepository.php';
 require_once __DIR__ . '/../../Store/Repository/StoreRepository.php';
+require_once __DIR__ . '/../../Provider/Repository/ProviderRepository.php';
+require_once __DIR__ . '/../../Buyer/Repository/BuyerRepository.php';
 require_once __DIR__ . '/../Helpers/FormatHelper.php';
 require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../Helpers/XMLHelper.php';
 require_once __DIR__ . '/../Services/TCIService.php';
 require_once __DIR__ . '/../../../Helpers/GlobalHelper.php';
 require_once __DIR__ . '/../Validation/ValidationTransferGuide.php';
+require_once __DIR__ . '/../../../Models/TransferGuide.php';
 $controller = new TransferGuideController();
 call_user_func(array($controller,$action));
 
@@ -30,13 +33,11 @@ class TransferGuideController{
     private $transportRepository;
     private $vehicleRepository;
     private $companyRepository;
+    private $providerRepository;
+    private $buyerRepository;
     private $storeRepository;
     private $transferGuideDetailRepository;
     private $validationTransferGuide;
-
-    private $movements;
-    private $startStore;
-    private $endStore;
 
     private $dataGuide;
     private $dataStartCompany;
@@ -55,6 +56,8 @@ class TransferGuideController{
         $this->vehicleRepository = new VehicleRepository();
         $this->companyRepository = new CompanyRepository();
         $this->storeRepository = new StoreRepository();
+        $this->providerRepository = new ProviderRepository();
+        $this->buyerRepository = new BuyerRepository();
         $this->transferGuideDetailRepository = new TransferGuideDetailRepository();
     }
 
@@ -167,8 +170,14 @@ class TransferGuideController{
         if($this->id){
             $this->storeDetails();
             $this->storeTransport();
+
             if($this->data['guide']['transport_modality'] == 2){
                 $this->storeVehicle();
+            }
+
+            if($this->data['guide']['motive_code'] == TransferGuide::OTHER){
+                $this->storeProvider();
+                $this->storeBuyer();
             }
         }
     }
@@ -242,7 +251,7 @@ class TransferGuideController{
         $response = GlobalHelper::getGlobalResponse();
         $this->newCode = null;
         $transferGuide = $this->transferGuideRepository->findOneWithDetails($id);
-;
+
         if($transferGuide){
             if(!$transferGuide['serie']){
                 $this->newCode = TransferGuideHelper::generateSerialNumber($establishmentId);
@@ -289,6 +298,22 @@ class TransferGuideController{
         }
 
         return $response;
+    }
+
+    private function storeProvider(){
+        if($this->data['guide']['id']){
+            $this->providerRepository->deleteBy('transfer_guide_id', $this->id);
+        }
+
+        $this->providerRepository->store($this->data['provider']);
+    }
+
+    private function buyerProvider(){
+        if($this->data['guide']['id']){
+            $this->buyerRepository->deleteBy('transfer_guide_id', $this->id);
+        }
+
+        $this->buyerRepository->store($this->data['buyer']);
     }
 
 

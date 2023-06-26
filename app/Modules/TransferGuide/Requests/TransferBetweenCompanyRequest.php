@@ -4,17 +4,18 @@ require_once __DIR__ . '/../../Common/Requests/CommonRequest.php';
 class TransferBetweenCompanyRequest extends CommonRequest
 {
     // GUIDE
-    public function validateGuide($data, $send)
+    public function validateGuide($data, $send, $requireDescription)
     {
-        $rules = self::validateGuideRules($send);
+        $rules = self::validateGuideRules($send, $requireDescription);
         $messages = self::validateGuideMessages();
 
         return $this->validate($data, $rules, $messages);
     }
 
-    private function validateGuideRules($send){
+    private function validateGuideRules($send, $requireDescription){
+        $rules = [];
         if($send){
-            return [
+            $rules = [
                 'id' => [['nullable']],
                 'name' => [['required']],
                 'detail' => [['array']],
@@ -22,12 +23,11 @@ class TransferBetweenCompanyRequest extends CommonRequest
                 'observations' => [['nullable']],
                 'total_witght' => [['required']],
                 'total_quantity' => [['required']],
-                'transport_modality' => [['required']],
-                'motive_description' => [['nullable']]
+                'transport_modality' => [['required']]
             ];
         }
         else{
-            return [
+            $rules = [
                 'id' => [['nullable']],
                 'name' => [['required']],
                 'detail' => [['array']],
@@ -35,10 +35,15 @@ class TransferBetweenCompanyRequest extends CommonRequest
                 'observations' => [['nullable']],
                 'total_witght' => [['nullable']],
                 'total_quantity' => [['nullable']],
-                'transport_modality' => [['nullable']],
-                'motive_description' => [['nullable']]
+                'transport_modality' => [['nullable']]
             ];
         }
+
+        if($requireDescription){
+            $rules['motive_description'] = [['required']];
+        }
+
+        return $rules;
     }
 
     private function validateGuideMessages(){
@@ -129,21 +134,6 @@ class TransferBetweenCompanyRequest extends CommonRequest
             ]
         ];
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public function validateStore($data, $rulesAdd)
     {
@@ -489,6 +479,86 @@ class TransferBetweenCompanyRequest extends CommonRequest
             // en_BienesGRR
             'plate' => [
                 'required' => 'La placa de transporte es obligatoria.',
+            ]
+        ];
+    }
+
+    // PROVIDER
+    public function validateProvider($data, $send)
+    {
+        $rules = self::validateProviderRules($send);
+        $messages = self::validateProviderMessages();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
+    private function validateProviderRules(){
+        if($send){
+            return  [
+                'document_type_code' => [['required']],
+                'document' => [['required']],
+                'name' => [['required']]
+            ];
+        }
+        else{
+            return  [
+                'document_type_code' => [['nullable']],
+                'document' => [['nullable']],
+                'name' => [['required']]
+            ];
+        }
+    }
+
+    private function validateProviderMessages(){
+        return [
+            'document_type_code' => [
+                'required' => 'El tipo de documento del proveedor es obligatorio.',
+            ],
+            'document' => [
+                'required' => 'El documento del proveedor es obligatorio.',
+            ],
+            'name' => [
+                'required' => 'El nombre del proveedor es obligatorio.',
+            ]
+        ];
+    }
+
+    // BUYER
+    public function validateBuyer($data, $send)
+    {
+        $rules = self::validateBuyerRules($send);
+        $messages = self::validateBuyerMessages();
+
+        return $this->validate($data, $rules, $messages);
+    }
+
+    private function validateBuyerRules($send){
+        if($send){
+            return  [
+                'document_type_code' => [['required']],
+                'document' => [['required']],
+                'name' => [['required']]
+            ];
+        }
+        else{
+            return  [
+                'document_type_code' => [['nullable']],
+                'document' => [['nullable']],
+                'name' => [['required']]
+            ];
+        }
+    }
+
+    private function validateBuyerMessages(){
+        return [
+            'document_type_code' => [
+                'required' => 'El tipo de documento del comprador es obligatorio.',
+            ],
+            'document' => [
+                'required' => 'El documento del comprador es obligatorio.',
+            ],
+            'name' => [
+                'required' => 'El nombre del comprador es obligatorio.',
             ]
         ];
     }

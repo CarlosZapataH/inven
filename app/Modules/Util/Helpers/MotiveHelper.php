@@ -6,8 +6,8 @@ class MotiveHelper{
 
     private static function values(){
         return [
-            ['code' => '4', 'description' => 'Traslado entre establecimientos de la misma empresa', 'submotives' => null],
-            ['code' => '6', 'description' => 'Devolución', 'submotives' => null],
+            ['code' => '04', 'description' => 'Traslado entre establecimientos de la misma empresa', 'submotives' => null],
+            ['code' => '06', 'description' => 'Devolución', 'submotives' => null],
             ['code' => '13', 'description' => 'Otros', 'submotives' => [
                 [
                     "value" => "Traslado de muestras de aceite para análisis", "description" => "Traslado de muestras de aceite para análisis"

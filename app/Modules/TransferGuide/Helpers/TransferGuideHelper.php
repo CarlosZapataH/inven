@@ -163,6 +163,7 @@ class TransferGuideHelper{
                     $iTransport = -1;
                     $iDetail = -1;
                     $iVehicle = -1;
+
                     foreach($response as $keyResponse => $itemResponse){
                         if($itemResponse['id'] == $row['id']){
                             $iGuide = $keyResponse;
@@ -258,30 +259,56 @@ class TransferGuideHelper{
                                     'additional_description' => $row['inventory_additional_description'],
                                     'unit_measure' => $row['unit_measure_sunat'],
                                     'quantity' => $row['inventory_quantity'],
-                                    'code' => $row['inventory_code']
+                                    'code' => $row['inventory_code'],
+                                    'movement_id' => $row['movement_id'],
+                                    'movement_detail_id' => $row['movement_detail_id'],
+                                    'inventory_id' => $row['inventory_id']
                                 ]
                             ],
-                            'transports' => [
-                                [
-                                    'id' => $row['transports_id'],
-                                    'document_type_code' => $row['transports_document_type_code'],
-                                    'document' => $row['transports_document'],
-                                    'start_date' => $row['transports_start_date'],
-                                    'company_name' => $row['transports_company_name'],
-                                    'mtc_number' => $row['transports_mtc_number'],
-                                    'license' => $row['transports_license'],
-                                    'name' => $row['transports_name'],
-                                    'last_name' => $row['transports_last_name']
-                                ]
-                            ],
-                            'vehicles' => []
+                            'transports' => [],
+                            'vehicles' => [],
+                            'provider' => null,
+                            'buyer' => null
                         ];
 
-                        if($row['transport_modality'] == 2){
-                            array_push($newRow, [
-                                'id' => $row['vehicles_id'],
-                                'plate' => $row['vehicles_plate']
+                        if($row['transports_id']){
+                            array_push($newRow['transports'], [
+                                'id' => $row['transports_id'],
+                                'document_type_code' => $row['transports_document_type_code'],
+                                'document' => $row['transports_document'],
+                                'start_date' => $row['transports_start_date'],
+                                'company_name' => $row['transports_company_name'],
+                                'mtc_number' => $row['transports_mtc_number'],
+                                'license' => $row['transports_license'],
+                                'name' => $row['transports_name'],
+                                'last_name' => $row['transports_last_name']
                             ]);
+                        }
+
+
+                        if($row['transport_modality'] == 2){
+                            if($row['vehicles_id']){
+                                array_push($newRow['vehicles'], [
+                                    'id' => $row['vehicles_id'],
+                                    'plate' => $row['vehicles_plate']
+                                ]);
+                            }
+                        }
+
+                        if($row['providers_id']){
+                            $newRow['provider'] = [
+                                'document_type_code' => $row['providers_document_type_code'],
+                                'document' => $row['providers_document'],
+                                'name' => $row['providers_name']
+                            ];
+                        }
+
+                        if($row['buyers_id']){
+                            $newRow['buyer'] = [
+                                'document_type_code' => $row['buyers_document_type_code'],
+                                'document' => $row['buyers_document'],
+                                'name' => $row['buyers_name']
+                            ];
                         }
 
                         array_push($response, $newRow);
@@ -294,7 +321,10 @@ class TransferGuideHelper{
                                 'additional_description' => $row['inventory_additional_description'],
                                 'unit_measure' => $row['unit_measure_sunat'],
                                 'quantity' => $row['inventory_quantity'],
-                                'code' => $row['inventory_code']
+                                'code' => $row['inventory_code'],
+                                'movement_id' => $row['movement_id'],
+                                'movement_detail_id' => $row['movement_detail_id'],
+                                'inventory_id' => $row['inventory_id']
                             ]);
                         }
 

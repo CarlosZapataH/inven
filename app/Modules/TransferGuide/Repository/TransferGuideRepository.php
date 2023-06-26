@@ -133,6 +133,9 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                         establishment_des.id as establishment_des_id,
                         establishment_des.code as establishment_des_code,
                         establishment_des.address as establishment_des_address,
+                        movimientos_transito_detalle.id_mtde as movement_detail_id,
+                        movimientos_transito_detalle.id_movt as movement_id,
+                        movimientos_transito_detalle.id_inv as inventory_id,
                         movimientos_transito_detalle.des_mde as inventory_name,
                         movimientos_transito_detalle.cant_mde as inventory_quantity,
                         movimientos_transito_detalle.cod_mde as inventory_code,
@@ -149,7 +152,15 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                         transports.name as transports_name,
                         transports.last_name as transports_last_name,
                         vehicles.id as vehicles_id,
-                        vehicles.plate as vehicles_plate
+                        vehicles.plate as vehicles_plate,
+                        providers.id as providers_id,
+                        providers.document_type_code as providers_document_type_code,
+                        providers.document as providers_document,
+                        providers.name as providers_name,
+                        buyers.id as buyers_id,
+                        buyers.document_type_code as buyers_document_type_code,
+                        buyers.document as buyers_document,
+                        buyers.name as buyers_name
                 FROM transfers_guides
                 INNER JOIN transfer_guide_detail ON transfer_guide_detail.transfer_guide_id = transfers_guides.id
                 INNER JOIN movimientos_transito_detalle ON movimientos_transito_detalle.id_mtde = transfer_guide_detail.movement_detail_id
@@ -166,6 +177,8 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 LEFT JOIN inventario ON inventario.id_inv = transfer_guide_detail.inventory_id
                 LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
                 LEFT JOIN vehicles ON vehicles.transfer_guide_id = transfers_guides.id
+                LEFT JOIN providers ON providers.transfer_guide_id = transfers_guides.id
+                LEFT JOIN buyers ON buyers.transfer_guide_id = transfers_guides.id
             ';
             $conditions = '';
 
@@ -376,9 +389,12 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 establishment_des.id as establishment_des_id,
                 establishment_des.code as establishment_des_code,
                 establishment_des.address as establishment_des_address,
+                movimientos_transito_detalle.id_mtde as movement_detail_id,
                 movimientos_transito_detalle.des_mde as inventory_name,
                 movimientos_transito_detalle.cant_mde as inventory_quantity,
                 movimientos_transito_detalle.cod_mde as inventory_code,
+                movimientos_transito_detalle.id_movt as movement_id,
+                movimientos_transito_detalle.id_inv as inventory_id,
                 transfer_guide_detail.id as transfer_guide_detail_id,
                 transfer_guide_detail.additional_description as inventory_additional_description,
                 transfer_guide_detail.unit_measure_sunat,
@@ -392,7 +408,15 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transports.name as transports_name,
                 transports.last_name as transports_last_name,
                 vehicles.id as vehicles_id,
-                vehicles.plate as vehicles_plate
+                vehicles.plate as vehicles_plate,
+                providers.id as providers_id,
+                providers.document_type_code as providers_document_type_code,
+                providers.document as providers_document,
+                providers.name as providers_name,
+                buyers.id as buyers_id,
+                buyers.document_type_code as buyers_document_type_code,
+                buyers.document as buyers_document,
+                buyers.name as buyers_name
             FROM transfers_guides
             INNER JOIN transfer_guide_detail ON transfer_guide_detail.transfer_guide_id = transfers_guides.id
             INNER JOIN movimientos_transito_detalle ON movimientos_transito_detalle.id_mtde = transfer_guide_detail.movement_detail_id
@@ -409,6 +433,8 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             LEFT JOIN inventario ON inventario.id_inv = transfer_guide_detail.inventory_id
             LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
             LEFT JOIN vehicles ON vehicles.transfer_guide_id = transfers_guides.id
+            LEFT JOIN providers ON providers.transfer_guide_id = transfers_guides.id
+            LEFT JOIN buyers ON buyers.transfer_guide_id = transfers_guides.id
         ';
 
         return $query;
