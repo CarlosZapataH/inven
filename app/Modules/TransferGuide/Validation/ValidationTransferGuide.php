@@ -337,18 +337,13 @@ class ValidationTransferGuide{
 
     private function validateProviver(){
         if($this->data['motive_code'] == TransferGuide::OTHER){
-            if($this->send && !isset($this->data['provider'])){
-                $this->addErrors(['provider' => 'El proveedor es obligatorio']);
-            }
-            else{
-                if(isset($this->data['provider'])){
-                    $validator = new TransferBetweenCompanyRequest();
-                    if ($validator->validateProvider($this->data['provider'], $this->send)) {
-                        $this->provider = $validator->getValidData();
-                    } 
-                    else {
-                        $this->addErrors($validator->getErrors());
-                    }
+            if(isset($this->data['provider'])){
+                $validator = new TransferBetweenCompanyRequest();
+                if ($validator->validateProvider($this->data['provider'], $this->send)) {
+                    $this->provider = $validator->getValidData();
+                } 
+                else {
+                    $this->addErrors($validator->getErrors());
                 }
             }
         }
@@ -356,18 +351,13 @@ class ValidationTransferGuide{
 
     private function validateBuyer(){
         if($this->data['motive_code'] == TransferGuide::OTHER){
-            if($this->send && !isset($this->data['buyer'])){
-                $this->addErrors(['buyer' => 'El comprador es obligatorio']);
-            }
-            else{
-                if(isset($this->data['buyer'])){
-                    $validator = new TransferBetweenCompanyRequest();
-                    if ($validator->validateBuyer($this->data['buyer'], $this->send)) {
-                        $this->buyer = $validator->getValidData();
-                    } 
-                    else {
-                        $this->addErrors($validator->getErrors());
-                    }
+            if(isset($this->data['buyer'])){
+                $validator = new TransferBetweenCompanyRequest();
+                if ($validator->validateBuyer($this->data['buyer'], $this->send)) {
+                    $this->buyer = $validator->getValidData();
+                } 
+                else {
+                    $this->addErrors($validator->getErrors());
                 }
             }
         }
