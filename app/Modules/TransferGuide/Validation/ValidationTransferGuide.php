@@ -16,6 +16,8 @@ class ValidationTransferGuide{
     private $details;
     private $transports;
     private $vehicles;
+    private $provider;
+    private $buyer;
     
     private $transitMovementRepository;
 
@@ -29,6 +31,8 @@ class ValidationTransferGuide{
         $this->send = false;
         $this->transports = [];
         $this->vehicles = [];
+        $this->provider = null;
+        $this->buyer = null;
         $this->transitMovementRepository = new TransitMovementRepository();
 
         if(isset($this->data['send'])){
@@ -55,7 +59,9 @@ class ValidationTransferGuide{
             'transports' => $this->transports,
             'vehicles' => $this->vehicles,
             'detail' => $this->details,
-            'movements' => $this->movements
+            'movements' => $this->movements,
+            'provider' => $this->provider,
+            'buyer' => $this->buyer
         ];
         return $this->response;
     }
@@ -82,11 +88,27 @@ class ValidationTransferGuide{
         if(!$this->response['errors']){
             $this->validateVehicle();
         }
+
+        if(!$this->response['errors']){
+            $this->validateProviver();
+        }
+
+        if(!$this->response['errors']){
+            $this->validateBuyer();
+        }
     }
 
     private function validateGuide(){
+        $requireDescription = false;
+
+        if(ValidateHelper::validateProperty($this->data, ['motive_code'])){
+            if($this->data['motive_code'] == TransferGuide::OTHER){
+                $requireDescription = true;
+            }
+        }
+
         $validator = new TransferBetweenCompanyRequest();
-        if ($validator->validateGuide($this->data, $this->send)) {
+        if ($validator->validateGuide($this->data, $this->send, $requireDescription)) {
             $this->guide = $validator->getValidData();
         } 
         else {
@@ -311,5 +333,29 @@ class ValidationTransferGuide{
 
     private function addErrors($errors){
         $this->response['errors'] = $this->response['errors']?array_merge($this->response['errors'], $errors):$errors;
+    }
+
+    private function validateProviver(){
+        if($this->data['motive_code'] == TransferGuide::OTHER){
+            $validator = new TransferBetweenCompanyRequest();
+            if ($validator->validateProvider($this->data, $this->send)) {
+                $this->provider = $validator->getValidData();
+            } 
+            else {
+                $this->addErrors($validator->getErrors());
+            }
+        }
+    }
+
+    private function validateBuyer(){
+        if($this->data['motive_code'] == TransferGuide::OTHER){
+            $validator = new TransferBetweenCompanyRequest();
+            if ($validator->validateBuyer($this->data, $this->send)) {
+                $this->buyer = $validator->getValidData();
+            } 
+            else {
+                $this->addErrors($validator->getErrors());
+            }
+        }
     }
 }

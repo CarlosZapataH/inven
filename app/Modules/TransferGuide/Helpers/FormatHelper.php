@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/ValidateHelper.php';
+require_once __DIR__ . '/../../../Models/TransferGuide.php';
 
 class FormatHelper{
     public function __construct() {
@@ -78,6 +79,42 @@ class FormatHelper{
             ]);
         }
 
+        $storeIni = [
+            'at_Ubigeo' => $data['start_store']['district']['code'],
+            'at_DireccionCompleta' => $data['start_store']['address']
+        ];
+
+        $storeEnd = [
+            'at_Ubigeo' => $data['end_store']['district']['code'],
+            'at_DireccionCompleta' => $data['end_store']['address']
+        ];
+
+        if($data['motive_code'] == TransferGuide::BETWEENCOMPANY){
+            $storeIni['at_CodigoEstablecimiento'] = $data['start_store']['establishment_code'];
+            $storeIni['at_NumeroDocumentoIdentidad'] = $data['start_store']['company']['document'];
+
+            $storeEnd['at_CodigoEstablecimiento'] = $data['end_store']['establishment_code'];
+            $storeEnd['at_NumeroDocumentoIdentidad'] = $data['end_store']['company']['document'];
+        }
+
+        $transportInformation = [
+            'at_CodigoMotivo' => $data['motive_code'],
+            'ent_InformacionPesoBrutoGRR' => [
+                'at_Peso' => $data['total_witght'],
+                'at_UnidadMedida' => 'KGM',
+                'at_Cantidad' => $data['total_quantity'],
+            ],
+            'l_InformacionTransporteGRR' => $transports,
+            'ent_PuntoPartidaGRR' => $storeIni,
+            'ent_PuntoLlegadaGRR' => $storeEnd,
+            'l_BienesGRR' => $bienes
+        ];
+
+        if($data['motive_code'] == TransferGuide::OTHER){
+            $transportInformation['at_DescripcionMotivo'] = $data['motive_description'];
+        }
+
+
         $result = [
             'ent_GuiaRemisionRemitente' => [
                 'ent_RemitenteGRR' => [
@@ -102,28 +139,7 @@ class FormatHelper{
                     'at_Numero' => $data['number'],
                     'at_Observacion' => $data['observations'],
                     'at_HoraEmision' => $data['time_issue'],
-                    'ent_InformacionTrasladoGRR' => [
-                        'at_CodigoMotivo' => '0'.$data['motive_code'],
-                        'ent_InformacionPesoBrutoGRR' => [
-                            'at_Peso' => $data['total_witght'],
-                            'at_UnidadMedida' => 'KGM',
-                            'at_Cantidad' => $data['total_quantity'],
-                        ],
-                        'l_InformacionTransporteGRR' => $transports,
-                        'ent_PuntoPartidaGRR' => [
-                            'at_Ubigeo' => $data['start_store']['district']['code'],
-                            'at_DireccionCompleta' => $data['start_store']['address'],
-                            'at_CodigoEstablecimiento' => $data['start_store']['establishment_code'],
-                            'at_NumeroDocumentoIdentidad' => $data['start_store']['company']['document']
-                        ],
-                        'ent_PuntoLlegadaGRR' => [
-                            'at_Ubigeo' => $data['end_store']['district']['code'],
-                            'at_DireccionCompleta' => $data['end_store']['address'],
-                            'at_CodigoEstablecimiento' => $data['end_store']['establishment_code'],
-                            'at_NumeroDocumentoIdentidad' => $data['end_store']['company']['document']
-                        ],
-                        'l_BienesGRR' => $bienes
-                    ]
+                    'ent_InformacionTrasladoGRR' => $transportInformation
                 ],
                 'at_ControlOtorgamiento' => 1
             ]
