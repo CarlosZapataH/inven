@@ -190,11 +190,6 @@ new Vue({
       const end_store = movement?.end_store || {};
       const transports = movement?.transports || null;
 
-      console.log(
-        "esxite submotivo: ",
-        this.isMotiveInSubmotives(movement?.motive_description)
-      );
-
       this.start_store = {
         name: start_store?.company?.name,
         commercial_name: start_store?.company?.commercial_name,
