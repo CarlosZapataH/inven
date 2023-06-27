@@ -110,10 +110,28 @@ class FormatHelper{
             'l_BienesGRR' => $bienes
         ];
 
+        $provider = null;
+        $buyer = null;
+
         if($data['motive_code'] == TransferGuide::OTHER){
             $transportInformation['at_DescripcionMotivo'] = $data['motive_description'];
-        }
 
+            if(isset($data['provider'])){
+                $provider = [
+                    'at_TipoDocumentoIdentidad' => $data['provider']['document_type_code'],
+                    'at_NumeroDocumentoIdentidad' => $data['provider']['document'],
+                    'at_RazonSocial' => $data['provider']['name']
+                ];
+            }
+
+            if(isset($data['buyer'])){
+                $buyer = [
+                    'at_TipoDocumentoIdentidad' => $data['buyer']['document_type_code'],
+                    'at_NumeroDocumentoIdentidad' => $data['buyer']['document'],
+                    'at_RazonSocial' => $data['buyer']['name']
+                ];
+            }
+        }
 
         $result = [
             'ent_GuiaRemisionRemitente' => [
@@ -133,17 +151,27 @@ class FormatHelper{
                         ]
                     ]
                 ],
-                'ent_DatosGeneralesGRR' => [
-                    'at_FechaEmision' => $data['date_issue'],
-                    'at_Serie' => $data['serie'],
-                    'at_Numero' => $data['number'],
-                    'at_Observacion' => $data['observations'],
-                    'at_HoraEmision' => $data['time_issue'],
-                    'ent_InformacionTrasladoGRR' => $transportInformation
-                ],
-                'at_ControlOtorgamiento' => 1
             ]
         ];
+
+        if($provider){
+            $result['ent_GuiaRemisionRemitente']['ent_ProveedorGRR'] = $provider;
+        }
+
+        if($buyer){
+            $result['ent_GuiaRemisionRemitente']['ent_CompradorGRR'] = $buyer;
+        }
+        
+        $result['ent_GuiaRemisionRemitente']['ent_DatosGeneralesGRR'] = [
+            'at_FechaEmision' => $data['date_issue'],
+            'at_Serie' => $data['serie'],
+            'at_Numero' => $data['number'],
+            'at_Observacion' => $data['observations'],
+            'at_HoraEmision' => $data['time_issue'],
+            'ent_InformacionTrasladoGRR' => $transportInformation
+        ];
+
+        $result['ent_GuiaRemisionRemitente']['at_ControlOtorgamiento'] = 1;
 
         return $result;
     }
