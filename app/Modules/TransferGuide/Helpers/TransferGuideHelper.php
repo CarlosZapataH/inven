@@ -312,6 +312,16 @@ class TransferGuideHelper{
                             ];
                         }
 
+                        $tciMessages = [];
+                        if($row['tci_confirm_status_response']){
+                            $parseMessages = json_decode($row['tci_confirm_status_response'], true);
+                            if($parseMessages){
+                                if(isset($parseMessages['messages'])){
+                                    $newRow['tci_messages'] = $parseMessages['messages'];
+                                }
+                            }
+                        }
+
                         array_push($response, $newRow);
                     }
                     else{
