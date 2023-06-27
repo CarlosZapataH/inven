@@ -137,14 +137,14 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <td>{{guide.start_store.company.name}}</td>
                                 <td>{{guide.end_store.company.name}}</td>
                                 <td>
-                                    <span :class="'py-2 d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;" v-if="guide.tci_response_description">
+                                    <span :class="'m-1 py-2 d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;" v-if="guide.tci_response_description">
                                         {{guide.tci_response_description}}
                                     </span>
-                                    <span v-if="guide?.flag_sent == 0" class="py-2 d-block badge badge-info">Borrador</span>
+                                    <span v-if="guide?.flag_sent == 0" class="py-2 d-block badge badge-info m-1">Borrador</span>
                                 </td>
                                 <td>
-                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm">Ver</a>
-                                    <button class="btn btn-primary btn-sm" @click="listenBtnDownload(guide)" v-if="guide.tci_response_description == 'Aceptado'">
+                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm m-1">Ver</a>
+                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide)" v-if="guide.tci_response_description == 'Aceptado'">
                                         Descargar GRE
                                     </button>
                                 </td>
