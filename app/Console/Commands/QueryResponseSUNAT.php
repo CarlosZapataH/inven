@@ -60,11 +60,11 @@ function queryResponseSUNAT(){
                         }
                     }
                 }
-                echo json_encode($documents);
+                // echo json_encode($documents);
             }
     } 
     catch (PDOException $e) {
-        echo json_encode($e->getMessage());
+        // echo json_encode($e->getMessage());
     }
 }
 
