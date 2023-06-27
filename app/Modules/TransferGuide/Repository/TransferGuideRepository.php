@@ -383,9 +383,13 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 u_est_ini.id_ubigeo as u_est_ini_id_ubigeo,
                 u_est_ini.nombre_ubigeo as u_est_ini_nombre_ubigeo,
                 u_est_ini.codigo_inei as u_est_ini_codigo_inei,
+                province_ini.nombre_ubigeo as province_ini_name,
+                department_ini.nombre_ubigeo as department_ini_name,
                 u_est_des.id_ubigeo as u_est_des_id_ubigeo,
                 u_est_des.nombre_ubigeo as u_est_des_nombre_ubigeo,
                 u_est_des.codigo_inei as u_est_des_codigo_inei,
+                province_des.nombre_ubigeo as province_des_name,
+                department_des.nombre_ubigeo as department_des_name,
                 establishment_ini.id as establishment_ini_id,
                 establishment_ini.code as establishment_ini_code,
                 establishment_ini.address as establishment_ini_address,
@@ -432,7 +436,11 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             LEFT JOIN document_types as document_types_ini ON document_types_ini.id = company_ini.document_type_id
             LEFT JOIN document_types as document_types_des ON document_types_des.id = company_des.document_type_id
             LEFT JOIN ubigeo as u_est_ini ON u_est_ini.id_ubigeo = establishment_ini.ubigeo_id
+            LEFT JOIN ubigeo as province_ini ON province_ini.id_ubigeo = u_est_ini.id_padre_ubigeo
+            LEFT JOIN ubigeo as department_ini ON department_ini.id_ubigeo = province_ini.id_padre_ubigeo
             LEFT JOIN ubigeo as u_est_des ON u_est_des.id_ubigeo = establishment_des.ubigeo_id
+            LEFT JOIN ubigeo as province_des ON province_des.id_ubigeo = u_est_des.id_padre_ubigeo
+            LEFT JOIN ubigeo as department_des ON department_des.id_ubigeo = province_des.id_padre_ubigeo
             LEFT JOIN inventario ON inventario.id_inv = transfer_guide_detail.inventory_id
             LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
             LEFT JOIN vehicles ON vehicles.transfer_guide_id = transfers_guides.id

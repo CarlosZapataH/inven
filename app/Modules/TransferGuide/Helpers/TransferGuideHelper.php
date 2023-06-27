@@ -213,6 +213,7 @@ class TransferGuideHelper{
                                 'id' => $row['almacen_ini_id'],
                                 'name' => $row['almacen_ini_titulo_alm'],
                                 'address' => $row['establishment_ini_address'],
+                                'address_complete' => "{$row['establishment_ini_address']} - {$row['department_ini_name']} - {$row['province_ini_name']} - {$row['u_est_ini_nombre_ubigeo']}",
                                 'establishment_id' => $row['establishment_ini_id'],
                                 'establishment_code' => $row['establishment_ini_code'],
                                 'company' => [
@@ -227,13 +228,16 @@ class TransferGuideHelper{
                                 'district' => [
                                     'id' => $row['u_est_ini_id_ubigeo'],
                                     'name' => $row['u_est_ini_nombre_ubigeo'],
-                                    'code' => $row['u_est_ini_codigo_inei']
+                                    'code' => $row['u_est_ini_codigo_inei'],
+                                    'province' => $row['province_ini_name'],
+                                    'department' => $row['department_ini_name']
                                 ],
                             ],
                             'end_store' => [
                                 'id' => $row['almacen_des_id'],
                                 'name' => $row['almacen_des_titulo_alm'],
                                 'address' => $row['establishment_des_address'],
+                                'address_complete' => "{$row['establishment_des_address']} - {$row['department_des_name']} - {$row['province_des_name']} - {$row['u_est_des_nombre_ubigeo']}",
                                 'establishment_id' => $row['establishment_des_id'],
                                 'establishment_code' => $row['establishment_des_code'],
                                 'email_principal' => $row['email_principal'],
@@ -250,7 +254,9 @@ class TransferGuideHelper{
                                 'district' => [
                                     'id' => $row['u_est_des_id_ubigeo'],
                                     'name' => $row['u_est_des_nombre_ubigeo'],
-                                    'code' => $row['u_est_des_codigo_inei']
+                                    'code' => $row['u_est_des_codigo_inei'],
+                                    'province' => $row['province_des_name'],
+                                    'department' => $row['department_des_name']
                                 ],
                             ],
                             'details' => [
