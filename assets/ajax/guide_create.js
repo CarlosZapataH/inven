@@ -66,6 +66,8 @@ new Vue({
     apiErros: [],
     companies: [],
     loadingSave: false,
+    toggleProvider: false,
+    togglebuyer: false,
   },
   // validations: {
   //   ent_RemitenteGRR: {
@@ -119,6 +121,7 @@ new Vue({
         if (result == false) {
           isCompleted = false;
           alertMsm = "Completar formulario correctamente";
+          console.log(this.errors)
         } else if (
           this.en_InformacionTransporteGRR.at_Modalidad == 2 &&
           this.drivers.length == 0

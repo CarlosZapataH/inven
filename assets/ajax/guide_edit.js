@@ -64,6 +64,8 @@ new Vue({
     apiErros: [],
     companies: [],
     loadingSave: false,
+    toggleProvider: false,
+    togglebuyer: false,
   },
   // validations: {
   //   ent_RemitenteGRR: {

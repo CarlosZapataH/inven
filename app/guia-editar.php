@@ -292,9 +292,19 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
                     <div class="card" v-if="generalData.motive == 13" id="section_supplier">
                         <div class="card-header">
-                            Datos del Proveedor
+                            <div class="d-flex justify-content-between">
+                                <div>Datos del Proveedor</div>
+                                <div>
+                                    <button class="btn btn-primary" @click="toggleProvider = true" v-if="toggleProvider == false">
+                                        Agregar Proveedor
+                                    </button>
+                                    <button class="btn btn-primary" @click="toggleProvider = false" v-if="toggleProvider == true">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" v-if="toggleProvider == true">
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Tipo de documento
                                     <span class="text-danger font-weight-bold">*</span>
@@ -329,9 +339,19 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
                     <div class="card" v-if="generalData.motive == 13" id="section_buyer">
                         <div class="card-header">
-                            Datos del Comprador
+                            <div class="d-flex justify-content-between">
+                                <div>Datos del Comprador</div>
+                                <div>
+                                    <button class="btn btn-primary" @click="togglebuyer = true" v-if="togglebuyer == false">
+                                        Agregar Comprador
+                                    </button>
+                                    <button class="btn btn-primary" @click="togglebuyer = false" v-if="togglebuyer == true">
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" v-if="togglebuyer == true">
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Tipo de documento
                                     <span class="text-danger font-weight-bold">*</span>
