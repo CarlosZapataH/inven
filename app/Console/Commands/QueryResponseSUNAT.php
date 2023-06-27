@@ -60,7 +60,8 @@ function queryResponseSUNAT(){
                         }
                     }
                 }
-                // echo json_encode($documents);
+                echo json_encode("QUERY DOCUMENTS");
+                echo json_encode($documents);
             }
     } 
     catch (PDOException $e) {
