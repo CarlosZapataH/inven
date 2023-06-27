@@ -32,6 +32,29 @@ new Vue({
   },
 
   methods: {
+    downloadFile(base64Data) {
+      console.log(base64Data);
+      // const link = document.createElement("a");
+      // link.href = "data:application/octet-stream;base64," + base64Data;
+      // link.download = "archivo.descargar"; // Cambia el nombre del archivo según tus necesidades
+      // link.click();
+    },
+
+    listenBtnDownload(guideId) {
+      //downloadGuide
+      downloadGuide({ id: guideId })
+        .then((response) => {
+          this.downloadFile(response);
+        })
+        .catch((error) => {
+          swal.fire({
+            title: "",
+            type: "error",
+            text: "Lo sentimos, Inténtalo de nuevo más tarde. Disculpa las molestias.",
+          });
+        });
+    },
+
     listenFilter() {
       this.filters.q = this.filters.q || null;
       this.getGuides();
