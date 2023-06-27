@@ -66,6 +66,17 @@ class TCIService{
         ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | ConsultarRI_GRR
+    |--------------------------------------------------------------------------
+    */
+    public function queryPdf($data){
+        return self::sendAction('ConsultarRI_GRR', [
+            'ConsultarRI_GRR' => $data
+        ]);
+    }
+
     private function getHeaders($action){
         return [
             'Content-Type: text/xml;charset=UTF-8',

@@ -211,6 +211,23 @@ class FormatHelper{
 
         return $documents;
     }
+    
+    public static function parseDownloadPDF($data){
+        $result = [
+            'ent_ConsultarRI' => [
+                'at_NumeroDocumentoIdentidad' => $data['start_store']['company']['document'],
+                'ent_Comprobante' => [
+                    'at_Serie' => $data['serie'],
+                    'at_Numero' => $data['number']
+                ]
+            ]
+        ];
+
+        return $result;
+    }
+
+
+
 
     public static function parseStoreDevolutionGuide($movement, $data = []){
         $remitenteDocumento = ValidateHelper::validateProperty($data, ['almacen_partida.document'])

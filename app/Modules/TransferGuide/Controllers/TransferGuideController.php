@@ -39,14 +39,10 @@ class TransferGuideController{
     private $transferGuideDetailRepository;
     private $validationTransferGuide;
 
-    private $dataGuide;
-    private $dataStartCompany;
-    private $dataEndCompany;
-    private $detailsData;
-    private $newCode;
-
+    
     private $data;
     private $id;
+    private $newCode;
 
     public function __construct()
     {
@@ -158,6 +154,58 @@ class TransferGuideController{
         
     }
 
+    public function dlownload(){
+        header('Content-Type: application/json');
+        
+        $response = GlobalHelper::getGlobalResponse();
+        // try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                if(!ValidateHelper::validateProperty($data, ['id'])){
+                    $response['errors'] = ['id' => 'El id es obligatorio'];
+                }
+                else{
+                    $this->data = $this->transferGuideRepository->findOneWithDetails($data['id']);
+                    if(!$this->data){
+                        $response['errors'] = ['id' => 'Registro no encontrado'];
+                    }
+                    else if(!$this->data['flag_sent']){
+                        $response['errors'] = ['sent' => 'El registro aún no ha sido enviado'];
+                    }
+                    else{
+                        $queryResponse = $this->downloadTransferGuide($this->data);
+                        $response['data'] = $queryResponse['data'];
+                        $response['message'] = $queryResponse['message'];
+                        if(!$queryResponse['success']){
+                            $response['errors'] = $queryResponse['errors'];
+                        }
+                    }
+                }
+
+                if(!$this->data['errors']){
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                    $response['message'] = 'Información exitosamente.';
+                    if(ValidateHelper::validateProperty($response['data'], ['ent_Resultado.at_ArchivoRI'])){
+                        $response['data'] = [
+                            'file' => $response['data']['ent_Resultado']['at_ArchivoRI']
+                            ?"data:application/pdf;base64,{$response['data']['ent_Resultado']['at_ArchivoRI']}"
+                            :null
+                        ];
+                    }
+                }
+            } 
+        // } 
+        // catch (PDOException $e) {
+        //     Session::setAttribute("error", $e->getMessage());
+        //     echo json_encode($e->getMessage());
+        // }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+        
+    }
+
     private function storeData(){
         if($this->data['guide']['id']){
             $this->transferGuideRepository->update($this->data['guide']['id'], $this->data['guide']);
@@ -247,6 +295,28 @@ class TransferGuideController{
         }
     }
 
+    private function storeProvider(){
+        if($this->data['guide']['id']){
+            $this->providerRepository->deleteBy('transfer_guide_id', $this->id);
+        }
+
+        if($this->data['provider']){
+            $this->data['provider']['transfer_guide_id'] = $this->id;
+            $this->providerRepository->store($this->data['provider']);
+        }
+    }
+
+    private function storeBuyer(){
+        if($this->data['guide']['id']){
+            $this->buyerRepository->deleteBy('transfer_guide_id', $this->id);
+        }
+
+        if($this->data['buyer']){
+            $this->data['buyer']['transfer_guide_id'] = $this->id;
+            $this->buyerRepository->store($this->data['buyer']);
+        }
+    }
+
     private function sendTransitMovementGuide($id, $establishmentId){
         $response = GlobalHelper::getGlobalResponse();
         $this->newCode = null;
@@ -300,26 +370,22 @@ class TransferGuideController{
         return $response;
     }
 
-    private function storeProvider(){
-        if($this->data['guide']['id']){
-            $this->providerRepository->deleteBy('transfer_guide_id', $this->id);
+    private function downloadTransferGuide($data){
+        $response = GlobalHelper::getGlobalResponse();
+        $tciService = new TCIService();
+
+        $tciResponse = $tciService->queryPdf(FormatHelper::parseDownloadPDF($data));
+        $response['data'] = $tciResponse['data'];
+        $response['message'] = $tciResponse['message'];
+        
+        if($tciResponse['success']){
+            $response['success'] = true;
+        }
+        else{
+            $response['errors'] = [$tciResponse['message']];
         }
 
-        if($this->data['provider']){
-            $this->data['provider']['transfer_guide_id'] = $this->id;
-            $this->providerRepository->store($this->data['provider']);
-        }
-    }
-
-    private function storeBuyer(){
-        if($this->data['guide']['id']){
-            $this->buyerRepository->deleteBy('transfer_guide_id', $this->id);
-        }
-
-        if($this->data['buyer']){
-            $this->data['buyer']['transfer_guide_id'] = $this->id;
-            $this->buyerRepository->store($this->data['buyer']);
-        }
+        return $response;
     }
 
 
