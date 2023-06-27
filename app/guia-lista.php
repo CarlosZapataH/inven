@@ -144,8 +144,8 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </td>
                                 <td>
                                     <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm">Ver</a>
-                                    <button class="btn btn-primary btn-sm" @click="listenBtnDownload(guide.id)" v-if="guide.tci_response_description == 'Aceptado'">
-                                        Descargar
+                                    <button class="btn btn-primary btn-sm" @click="listenBtnDownload(guide)" v-if="guide.tci_response_description == 'Aceptado'">
+                                        Descargar GRE
                                     </button>
                                 </td>
                             </tr>

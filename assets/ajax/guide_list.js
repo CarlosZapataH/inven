@@ -32,19 +32,21 @@ new Vue({
   },
 
   methods: {
-    downloadFile(base64Data) {
-      console.log(base64Data);
-      // const link = document.createElement("a");
-      // link.href = "data:application/octet-stream;base64," + base64Data;
-      // link.download = "archivo.descargar"; // Cambia el nombre del archivo según tus necesidades
-      // link.click();
+    downloadFile(base64Data, code) {
+      const link = document.createElement("a");
+      link.href = base64Data;
+      link.download = "GRE_" + code;
+      link.click();
     },
 
-    listenBtnDownload(guideId) {
-      //downloadGuide
-      downloadGuide({ id: guideId })
+    listenBtnDownload(guide) {
+      downloadGuide({ id: guide?.id })
         .then((response) => {
-          this.downloadFile(response);
+          if (response?.data?.file)
+            this.downloadFile(
+              response?.data?.file,
+              guide?.serie + "-" + guide?.number
+            );
         })
         .catch((error) => {
           swal.fire({

@@ -100,7 +100,8 @@ function createCompany(data, params) {
 }
 
 function downloadGuide(data, params) {
-  const url = urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
+  const url =
+    urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
   return axios
     .post(url, data, {
       params: {
