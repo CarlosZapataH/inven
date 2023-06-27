@@ -232,6 +232,8 @@ new Vue({
 
       this.provider = movement?.provider || this.provider;
       this.buyer = movement?.buyer || this.buyer;
+      if (movement?.provider) this.toggleProvider = true;
+      if (movement?.buyer) this.togglebuyer = true;
 
       if (Array.isArray(detailsList)) {
         arrAssets = detailsList.reduce((acc, item) => {
@@ -322,8 +324,11 @@ new Vue({
         data.motive_description = this.generalData.description_transfer;
       }
 
-      if (this.generalData.motive == 13) {
+      if (this.generalData.motive == 13 && this.provider?.document) {
         data.provider = this.provider;
+      }
+
+      if (this.generalData.motive == 13 && this.buyer?.document) {
         data.buyer = this.buyer;
       }
 

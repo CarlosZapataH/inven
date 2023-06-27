@@ -121,7 +121,6 @@ new Vue({
         if (result == false) {
           isCompleted = false;
           alertMsm = "Completar formulario correctamente";
-          console.log(this.errors)
         } else if (
           this.en_InformacionTransporteGRR.at_Modalidad == 2 &&
           this.drivers.length == 0
@@ -339,8 +338,11 @@ new Vue({
         data.motive_description = this.generalData.description_transfer;
       }
 
-      if (this.generalData.motive == 13) {
+      if (this.generalData.motive == 13 && this.provider?.document) {
         data.provider = this.provider;
+      }
+
+      if (this.generalData.motive == 13 && this.buyer?.document) {
         data.buyer = this.buyer;
       }
 
