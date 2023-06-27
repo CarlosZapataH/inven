@@ -178,7 +178,6 @@ class FormatHelper{
 
     public static function parseResponseQueryResponseSUNAT($data){
         $documents = [];
-        echo json_encode($data);
         if(isset($data['l_ResultadoRespuestaComprobante'])){
             if(isset($data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'])){
                 if(is_array($data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'])){
