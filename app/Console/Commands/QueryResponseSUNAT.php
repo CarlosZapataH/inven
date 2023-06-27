@@ -60,7 +60,7 @@ function queryResponseSUNAT(){
                         }
                     }
                 }
-                echo json_encode("QUERY DOCUMENTS");
+                echo json_encode("QUERY DOCUMENTS - ".date("Y-m-d H:i:s"));
                 echo json_encode($documents);
             }
     } 

@@ -154,7 +154,7 @@ class TransferGuideController{
         
     }
 
-    public function dlownload(){
+    public function download(){
         header('Content-Type: application/json');
         
         $response = GlobalHelper::getGlobalResponse();
