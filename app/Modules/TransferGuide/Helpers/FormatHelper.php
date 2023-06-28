@@ -180,31 +180,58 @@ class FormatHelper{
         $documents = [];
         if(isset($data['l_ResultadoRespuestaComprobante'])){
             if(isset($data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'])){
-                foreach($data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'] as $response){
-                    if(isset($response['ent_RespuestaComprobante'])){
-                        $restFormat = [
-                            'serie' => $response['at_Serie'],
-                            'number' => $response['at_Numero'],
-                            'type_response' => $response['ent_RespuestaComprobante']['at_TipoRespuesta'],
-                            'code_response' => $response['ent_RespuestaComprobante']['at_CodigoRespuesta'],
-                            'description' => $response['ent_RespuestaComprobante']['at_Descripcion'],
-                            'date' => $response['ent_RespuestaComprobante']['at_FechaRespuesta'],
-                            'messages' => []
-                        ];
-
-                        if(isset($response['ent_RespuestaComprobante']['at_Mensaje'])){
-                            if(isset($response['ent_RespuestaComprobante']['at_Mensaje']['string'])){
-                                if(is_array($response['ent_RespuestaComprobante']['at_Mensaje']['string'])){
-                                    $restFormat['messages'] = $response['ent_RespuestaComprobante']['at_Mensaje']['string'];
-                                }
-                                else{
-                                    $restFormat['messages'] = [$response['ent_RespuestaComprobante']['at_Mensaje']['string']];
+                if(is_array($data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'])){
+                    foreach($data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'] as $response){
+                        if(isset($response['ent_RespuestaComprobante'])){
+                            $restFormat = [
+                                'serie' => $response['at_Serie'],
+                                'number' => $response['at_Numero'],
+                                'type_response' => $response['ent_RespuestaComprobante']['at_TipoRespuesta'],
+                                'code_response' => $response['ent_RespuestaComprobante']['at_CodigoRespuesta'],
+                                'description' => $response['ent_RespuestaComprobante']['at_Descripcion'],
+                                'date' => $response['ent_RespuestaComprobante']['at_FechaRespuesta'],
+                                'messages' => []
+                            ];
+    
+                            if(isset($response['ent_RespuestaComprobante']['at_Mensaje'])){
+                                if(isset($response['ent_RespuestaComprobante']['at_Mensaje']['string'])){
+                                    if(is_array($response['ent_RespuestaComprobante']['at_Mensaje']['string'])){
+                                        $restFormat['messages'] = $response['ent_RespuestaComprobante']['at_Mensaje']['string'];
+                                    }
+                                    else{
+                                        $restFormat['messages'] = [$response['ent_RespuestaComprobante']['at_Mensaje']['string']];
+                                    }
                                 }
                             }
+    
+                            array_push($documents, $restFormat);
                         }
-
-                        array_push($documents, $restFormat);
                     }
+                }
+                else{
+                    $response = $data['l_ResultadoRespuestaComprobante']['en_ResultadoRespuestaComprobante'];
+                    $restFormat = [
+                        'serie' => $response['at_Serie'],
+                        'number' => $response['at_Numero'],
+                        'type_response' => $response['ent_RespuestaComprobante']['at_TipoRespuesta'],
+                        'code_response' => $response['ent_RespuestaComprobante']['at_CodigoRespuesta'],
+                        'description' => $response['ent_RespuestaComprobante']['at_Descripcion'],
+                        'date' => $response['ent_RespuestaComprobante']['at_FechaRespuesta'],
+                        'messages' => []
+                    ];
+
+                    if(isset($response['ent_RespuestaComprobante']['at_Mensaje'])){
+                        if(isset($response['ent_RespuestaComprobante']['at_Mensaje']['string'])){
+                            if(is_array($response['ent_RespuestaComprobante']['at_Mensaje']['string'])){
+                                $restFormat['messages'] = $response['ent_RespuestaComprobante']['at_Mensaje']['string'];
+                            }
+                            else{
+                                $restFormat['messages'] = [$response['ent_RespuestaComprobante']['at_Mensaje']['string']];
+                            }
+                        }
+                    }
+
+                    array_push($documents, $restFormat);
                 }
             }
         }
