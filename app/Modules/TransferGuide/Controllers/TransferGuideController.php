@@ -23,6 +23,7 @@ require_once __DIR__ . '/../Services/TCIService.php';
 require_once __DIR__ . '/../../../Helpers/GlobalHelper.php';
 require_once __DIR__ . '/../Validation/ValidationTransferGuide.php';
 require_once __DIR__ . '/../../../Models/TransferGuide.php';
+require_once __DIR__ . '/../../TransferGuideHistory/Repository/TransferGuideHistoryRepository.php';
 $controller = new TransferGuideController();
 call_user_func(array($controller,$action));
 
@@ -192,6 +193,88 @@ class TransferGuideController{
                             ?"data:application/pdf;base64,{$response['data']['ent_Resultado']['at_ArchivoRI']}"
                             :null
                         ];
+                    }
+                }
+            } 
+        // } 
+        // catch (PDOException $e) {
+        //     Session::setAttribute("error", $e->getMessage());
+        //     echo json_encode($e->getMessage());
+        // }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+        
+    }
+
+    public function queryOne(){
+        header('Content-Type: application/json');
+        
+        $response = GlobalHelper::getGlobalResponse();
+        // try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                if(!ValidateHelper::validateProperty($data, ['id'])){
+                    $response['errors'] = ['id' => 'El id es obligatorio'];
+                }
+                else{
+                    $this->data = $this->transferGuideRepository->findOneWithDetails($data['id']);
+                    if(!$this->data){
+                        $response['errors'] = ['id' => 'Registro no encontrado'];
+                    }
+                    else if(!$this->data['flag_sent']){
+                        $response['errors'] = ['sent' => 'El registro aún no ha sido enviado'];
+                    }
+                    else{
+                        $queryResponse = $this->queryOneGRR($this->data);
+                        $response['data'] = $queryResponse['data'];
+                        $response['message'] = $queryResponse['message'];
+                        if(!$queryResponse['success']){
+                            $response['errors'] = $queryResponse['errors'];
+                        }
+                    }
+                }
+
+                if(!$this->data['errors']){
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                    $response['message'] = 'Información actualizada exitosamente.';
+                    $result = FormatHelper::parseResponseTci($this->data, $response['data']);
+                    if($result){
+                        $response['data'] = $result;
+                        
+                        $this->transferGuideRepository->update($this->data['id'], [
+                            'tci_response_code' => $result['code_response'],
+                            'tci_response_type' => $result['type_response'],
+                            'tci_response_description' => $result['description'],
+                            'tci_response_date' => $result['date'],
+                            'tci_confirm_status_response' => json_encode($result)
+                        ]);
+
+                        $transferGuideHistoryRepository = new TransferGuideHistoryRepository();
+                        $transferGuideHistoryRepository->store([
+                            'status' => $result['type_response'],
+                            'code' => $result['code_response'],
+                            'description' => $result['description'],
+                            'date' => $result['date'],
+                            'transfer_guide_id' => $this->data['id'],
+                            'tci_confirm_status_response' => json_encode($result),
+                            'created_at' => date("Y-m-d H:i:s")
+                        ]);
+                        
+                        $tciServiceConfirm = new TCIService();
+                        $tciServiceConfirm->confirmResponseSUNAT([
+                            'ent_ConfirmarRespuesta' => [
+                                'at_NumeroDocumentoIdentidad' => $this->data['start_store']['company']['document'],
+                                'l_Comprobante' => [
+                                    'en_ComprobanteConfirmarRespuesta' => [
+                                        'at_Serie' => $result['serie'],
+                                        'at_Numero' => $result['number'],
+                                        'at_CodigoRespuesta' => $result['code_response']
+                                    ]
+                                ]
+                            ]
+                        ]);
                     }
                 }
             } 
@@ -388,6 +471,23 @@ class TransferGuideController{
         return $response;
     }
 
+    private function queryOneGRR($data){
+        $response = GlobalHelper::getGlobalResponse();
+        $tciService = new TCIService();
+
+        $tciResponse = $tciService->queryOneGRR(FormatHelper::parseQueryOneGRR($data));
+        $response['data'] = $tciResponse['data'];
+        $response['message'] = $tciResponse['message'];
+        
+        if($tciResponse['success']){
+            $response['success'] = true;
+        }
+        else{
+            $response['errors'] = [$tciResponse['message']];
+        }
+
+        return $response;
+    }
 
     
 
@@ -520,7 +620,7 @@ class TransferGuideController{
                 $tciResponse = $tciService->queryStatusGRR20([
                     'ent_ConsultarEstado' => [
                         'at_NumeroDocumentoIdentidad' => '20357259976',
-                        'at_CantidadConsultar' => 10
+                        'at_CantidadConsultar' => 300
                     ]
                 ]);
                 
