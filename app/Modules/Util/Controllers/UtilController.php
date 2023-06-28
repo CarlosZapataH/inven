@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../../assets/util/Session.php';
 require_once __DIR__ . '/../../DocumentType/Repository/DocumentTypeRepository.php';
 require_once __DIR__ . '/../Helpers/ModalityHelper.php';
 require_once __DIR__ . '/../Helpers/MotiveHelper.php';
+require_once __DIR__ . '/../Helpers/UnitMeasure.php';
 
 $controller = new UtilController();
 call_user_func(array($controller,$action));
@@ -29,6 +30,7 @@ class UtilController{
                     'documentTypes' => $documentTypes,
                     'modalities' => ModalityHelper::getAll(),
                     'motives' => MotiveHelper::getAll(),
+                    'unit_measure' => UnitMeasure::getAll(),
                 ],
                 'success' => true
             ]);
