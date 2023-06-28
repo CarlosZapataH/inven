@@ -108,6 +108,13 @@ new Vue({
     senderHasUbigeo() {
       return !!this.movement?.start_store?.district?.id;
     },
+    hasObservationsTci() {
+      return (
+        this.movement?.tci_response_type != 1 &&
+        this.movement?.flag_sent == 1 &&
+        Array.isArray(this.movement?.tci_messages)
+      );
+    },
   },
   methods: {
     submitForm(isSend) {
