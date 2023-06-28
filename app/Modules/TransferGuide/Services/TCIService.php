@@ -77,6 +77,17 @@ class TCIService{
         ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | ConsultaIndividualGRR
+    |--------------------------------------------------------------------------
+    */
+    public function queryOneGRR($data){
+        return self::sendAction('ConsultaIndividualGRR', [
+            'ConsultaIndividualGRR' => $data
+        ]);
+    }
+
     private function getHeaders($action){
         return [
             'Content-Type: text/xml;charset=UTF-8',
