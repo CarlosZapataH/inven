@@ -81,12 +81,18 @@ class FormatHelper{
 
         $storeIni = [
             'at_Ubigeo' => $data['start_store']['district']['code'],
-            'at_DireccionCompleta' => $data['start_store']['address_complete']
+            'at_DireccionCompleta' => $data['start_store']['address'],
+            'at_Departamento' => $data['start_store']['district']['department'],
+            'at_Provincia' => $data['start_store']['district']['province'],
+            'at_Distrito' => $data['start_store']['district']['name'],
         ];
 
         $storeEnd = [
             'at_Ubigeo' => $data['end_store']['district']['code'],
-            'at_DireccionCompleta' => $data['end_store']['address_complete']
+            'at_DireccionCompleta' => $data['end_store']['address'],
+            'at_Departamento' => $data['end_store']['district']['department'],
+            'at_Provincia' => $data['end_store']['district']['province'],
+            'at_Distrito' => $data['end_store']['district']['name']
         ];
 
         if($data['motive_code'] == TransferGuide::BETWEENCOMPANY){
