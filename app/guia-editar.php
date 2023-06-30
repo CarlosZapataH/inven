@@ -106,7 +106,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card" id="section_origin" v-if="movement && movement.flag_sent">
+                    <div class="card" id="section_origin" v-if="movement && movement.flag_sent == 1">
                         <div class="card-header">
                             Detalles del GRE
                         </div>

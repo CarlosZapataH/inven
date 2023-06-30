@@ -107,6 +107,14 @@ new Vue({
     getGuideStatus(guide) {
       updateGuideStatus({ id: guide?.id })
         .then((response) => {
+          console.log(response?.data?.at_MensajeResultado);
+          swal.fire({
+            title: "",
+            type: response?.data?.at_MensajeResultado ? "info" : "success",
+            text:
+              response?.data?.at_MensajeResultado ||
+              "Los registros se han actualizado correctamente.",
+          });
           this.listenFilter();
         })
         .catch((error) => {
