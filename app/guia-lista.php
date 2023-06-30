@@ -147,6 +147,9 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide)" v-if="guide.tci_response_description == 'Aceptado'">
                                         Descargar GRE
                                     </button>
+                                    <button class="btn btn-primary btn-sm m-1" @click="getGuideStatus(guide)" v-if="(!guide?.tci_response_type) && guide?.flag_sent == 1">
+                                        Consultar estado
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>

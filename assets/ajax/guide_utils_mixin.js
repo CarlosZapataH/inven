@@ -4,6 +4,7 @@ var guideUtilsMixin = {
       documentTypes: [],
       modalities: [],
       motives: [],
+      unit_measure: [],
     };
   },
   methods: {
@@ -12,6 +13,7 @@ var guideUtilsMixin = {
         this.documentTypes = response?.data?.documentTypes || [];
         this.modalities = response?.data?.modalities || [];
         this.motives = response?.data?.motives || [];
+        this.unit_measure = response?.data?.unit_measure?.all || [];
       });
     },
 

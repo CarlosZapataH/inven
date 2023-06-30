@@ -625,7 +625,15 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <td>{{index + 1}}</td>
                                             <td>{{item.code}}</td>
                                             <td>{{item.name}}</td>
-                                            <td>{{item.unit_measure}}</td>
+                                            <td>
+                                                <div style="width: 120px;">
+                                                    <select v-model="item.unit_measure" :name="'unidad_de_medida' + index" v-validate="'required'" class="form-control">
+                                                        <option v-for="(unit, unitIndex) in unit_measure" :key="'op_' + index +'_' +unitIndex" :value="unit.code">
+                                                            {{unit.description}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </td>
                                             <td>{{item.quantity}}</td>
                                             <td>
                                                 <textarea v-model="item.additional_description" class="form-control" rows="1"></textarea>

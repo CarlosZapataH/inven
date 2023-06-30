@@ -82,6 +82,11 @@ new Vue({
     this.getCompany();
     this.generalData.at_FechaEmision = this.getCurrentDate();
   },
+  watch: {
+    "generalData.motive"(newValue) {
+      this.validateTransferType(newValue);
+    },
+  },
   mounted() {},
   computed: {
     idMov: function () {
@@ -112,6 +117,22 @@ new Vue({
     },
   },
   methods: {
+    validateTransferType(typeCode) {
+      if (
+        typeCode == "06" &&
+        this.start_store?.company_id == this.end_store?.company_id
+      ) {
+        swal.fire({
+          title: "",
+          type: "warning",
+          text: "Para el tipo de traslado 'Devolución', el remitente y el destinatario deben ser diferentes.",
+        });
+        this.$nextTick(() => {
+          this.generalData.motive = null;
+        });
+      }
+    },
+
     submitForm(isSend) {
       this.$refs.ppUbigeoSelects.$validator.validate();
       this.$refs.plUbigeoSelects.$validator.validate();

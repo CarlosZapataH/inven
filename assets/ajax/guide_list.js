@@ -103,5 +103,19 @@ new Vue({
       }
       return { value, class: "" };
     },
+
+    getGuideStatus(guide) {
+      updateGuideStatus({ id: guide?.id })
+        .then((response) => {
+          this.listenFilter();
+        })
+        .catch((error) => {
+          swal.fire({
+            title: "",
+            type: "error",
+            text: "Lo sentimos, Inténtalo de nuevo más tarde. Disculpa las molestias.",
+          });
+        });
+    },
   },
 });
