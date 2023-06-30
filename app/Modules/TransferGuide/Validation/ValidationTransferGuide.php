@@ -4,8 +4,10 @@ require_once __DIR__ . '/../Requests/TransferBetweenCompanyRequest.php';
 require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../../../Models/TransferGuide.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
+require_once __DIR__ . '/../../../../config/Config.php';
 
 class ValidationTransferGuide{
+    private $config;
     private $data;
     private $response;
     private $guide;
@@ -24,6 +26,7 @@ class ValidationTransferGuide{
     public function __construct($data)
     {
         $this->response = GlobalHelper::getGlobalResponse();
+        $this->config = new Config();
         $this->data = $data;
         $this->guide = [];
         $this->startStore = null;
@@ -178,9 +181,7 @@ class ValidationTransferGuide{
             $this->startStore = $response['start_store'];
             $this->endStore = $response['end_store'];
 
-            if($this->guide['motive_code'] == TransferGuide::BETWEENCOMPANY){
-                $this->validateSameCompany();
-            }
+            $this->validateSameCompany();
         }
     }
 
@@ -214,8 +215,17 @@ class ValidationTransferGuide{
             $this->addErrors(['end_store.company' => 'El id de empresa del almacen de llegada es obligatorio']);
         }
 
-        if($startStoreCompanyId && $endStoreCompanyId && $startStoreCompanyId != $endStoreCompanyId){
-            $this->addErrors(['guide.company' => 'El remitente y destinatario debe ser el mismo.']);
+        if($startStoreCompanyId && $endStoreCompanyId){
+            if($this->guide['motive_code'] == TransferGuide::BETWEENCOMPANY && $startStoreCompanyId != $endStoreCompanyId){
+                $this->addErrors(['guide.company' => 'El remitente y destinatario deben ser el mismo.']);
+            }
+            else if($this->guide['motive_code'] == TransferGuide::DEVOLUTION && $startStoreCompanyId == $endStoreCompanyId){
+                $this->addErrors(['guide.company' => 'El remitente y destinatario no deben ser el mismo.']);
+            }
+
+            if(!$this->startStore['establishment_id']){
+                $this->addErrors(['guide.company' => 'El almacen de partida no cuenta con un establecimiento asignado.']);
+            }
         }
     }
 

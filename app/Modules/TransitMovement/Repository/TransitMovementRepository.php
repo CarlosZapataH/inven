@@ -105,6 +105,12 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                     u_est_des.id_ubigeo as u_est_des_id_ubigeo,
                     u_est_des.nombre_ubigeo as u_est_des_nombre_ubigeo,
                     u_est_des.codigo_inei as u_est_des_codigo_inei,
+                    u_alm_ini.id_ubigeo as u_alm_ini_id_ubigeo,
+                    u_alm_ini.nombre_ubigeo as u_alm_ini_nombre_ubigeo,
+                    u_alm_ini.codigo_inei as u_alm_ini_codigo_inei,
+                    u_alm_des.id_ubigeo as u_alm_des_id_ubigeo,
+                    u_alm_des.nombre_ubigeo as u_alm_des_nombre_ubigeo,
+                    u_alm_des.codigo_inei as u_alm_des_codigo_inei,
                     inventario.id_inv,
                     inventario.um_inv as inventario_um_inv,
                     inventario.cod_inv as inventario_cod_inv,
@@ -130,6 +136,8 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                 LEFT JOIN document_types as document_types_des ON document_types_des.id = company_des.document_type_id
                 LEFT JOIN ubigeo as u_est_ini ON u_est_ini.id_ubigeo = establishment_ini.ubigeo_id
                 LEFT JOIN ubigeo as u_est_des ON u_est_des.id_ubigeo = establishment_des.ubigeo_id
+                LEFT JOIN ubigeo as u_alm_ini ON u_alm_ini.id_ubigeo = almacen_ini.distrito_alm
+                LEFT JOIN ubigeo as u_alm_des ON u_alm_des.id_ubigeo = almacen_des.distrito_alm
                 LEFT JOIN inventario ON inventario.id_inv = movimientos_transito_detalle.id_inv
         ';
 
