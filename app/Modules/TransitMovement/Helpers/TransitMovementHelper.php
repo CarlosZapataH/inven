@@ -26,7 +26,7 @@ class TransitMovementHelper{
                     $newItem['start_store'] = [
                         'id' => $row['almacen_ini_id'],
                         'name' => $row['almacen_ini_titulo_alm'],
-                        'address' => $row['establishment_ini_address'],
+                        'address' => $row['establishment_ini_id']?$row['establishment_ini_address']:$row['almacen_ini_direccion_alm'],
                         'establishment_id' => $row['establishment_ini_id'],
                         'company' => [
                             'id' => $row['company_ini_id'],
@@ -38,9 +38,9 @@ class TransitMovementHelper{
                             'document' => $row['company_ini_document']
                         ],
                         'district' => [
-                            'id' => $row['u_est_ini_id_ubigeo'],
-                            'name' => $row['u_est_ini_nombre_ubigeo'],
-                            'code' => $row['u_est_ini_codigo_inei']
+                            'id' => $row['establishment_ini_id']?$row['u_est_ini_id_ubigeo']:$row['u_alm_ini_id_ubigeo'],
+                            'name' => $row['establishment_ini_id']?$row['u_est_ini_nombre_ubigeo']:$row['u_alm_ini_nombre_ubigeo'],
+                            'code' => $row['establishment_ini_id']?$row['u_est_ini_codigo_inei']:$row['u_alm_ini_codigo_inei']
                         ]
                     ];
                     
@@ -51,7 +51,7 @@ class TransitMovementHelper{
                     $newItem['end_store'] = [
                         'id' => $row['almacen_des_id'],
                         'name' => $row['almacen_des_titulo_alm'],
-                        'address' => $row['establishment_des_address'],
+                        'address' => $row['establishment_des_id']?$row['establishment_des_address']:$row['almacen_des_direccion_alm'],
                         'establishment_id' => $row['establishment_des_id'],
                         'email_principal' => $row['transfers_guides_email_principal'],
                         'email_secondary' => $row['transfers_guides_email_secondary'],
@@ -65,9 +65,9 @@ class TransitMovementHelper{
                             'document' => $row['company_des_document']
                         ],
                         'district' => [
-                            'id' => $row['u_est_des_id_ubigeo'],
-                            'name' => $row['u_est_des_nombre_ubigeo'],
-                            'code' => $row['u_est_des_codigo_inei']
+                            'id' => $row['establishment_des_id']?$row['u_est_des_id_ubigeo']:$row['u_alm_des_id_ubigeo'],
+                            'name' => $row['establishment_des_id']?$row['u_est_des_nombre_ubigeo']:$row['u_alm_des_nombre_ubigeo'],
+                            'code' => $row['establishment_des_id']?$row['u_est_des_codigo_inei']:$row['u_alm_des_codigo_inei']
                         ]
                     ];
 
