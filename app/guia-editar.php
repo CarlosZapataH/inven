@@ -106,7 +106,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                     </div>
 
-                    <div class="card" id="section_origin" v-if="movement && movement.flag_sent == 1">
+                    <div class="card" id="section_origin" v-if="movement && movement.tci_response_type">
                         <div class="card-header">
                             Detalles del GRE
                         </div>
@@ -123,6 +123,12 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <input v-model="movement.tci_response_description" type="text" class="form-control" disabled>
                                 </div>
                             </div>
+                            <div class="form-group row" v-if="movement && movement.tci_response_description">
+                                <label class="col-sm-3 col-form-label">Fecha</label>
+                                <div class="col-sm-9">
+                                    <input :value="movement.date_issue" type="text" class="form-control" disabled>
+                                </div>
+                            </div>                            
                         </div>
                     </div>
 
@@ -421,8 +427,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </label>
                                 <div class="col-sm-8">
                                     <select v-model="en_InformacionTransporteGRR.at_Modalidad" name="DT_Modalidad" v-validate="'required'" class="form-control">
-                                        <option :value="1">Transporte público</option>
-                                        <option :value="2">Transporte privado</option>
+                                        <option v-for="transportType in modalities" :key="transportType.code + '-transportType'" :value="transportType.code">{{ transportType.description }}</option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('DT_Modalidad') }}</span>
                                 </div>
@@ -608,8 +613,8 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             Bienes
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table datatable-responsive-row-control">
+                            <div class="table-responsive-xl">
+                                <table class="table">
                                     <thead>
                                         <tr>
                                             <th></th>
@@ -626,12 +631,8 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <td>{{item.code}}</td>
                                             <td>{{item.name}}</td>
                                             <td>
-                                                <div style="width: 120px;">
-                                                    <select v-model="item.unit_measure" :name="'unidad_de_medida' + index" v-validate="'required'" class="form-control">
-                                                        <option v-for="(unit, unitIndex) in unit_measure" :key="'op_' + index +'_' +unitIndex" :value="unit.code">
-                                                            {{unit.description}}
-                                                        </option>
-                                                    </select>
+                                                <div style="width: 170px;">
+                                                    <autocomplete-field v-model="item.unit_measure" v-if="Array.isArray(unit_measure)" :options="unit_measure" />
                                                 </div>
                                             </td>
                                             <td>{{item.quantity}}</td>
@@ -895,5 +896,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
+    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_utils_mixin.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_edit.js<?= $version ?>"></script>

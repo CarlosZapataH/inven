@@ -6287,3 +6287,17 @@ Notify
     background: #dc3545 !important;
 }
 
+.activex {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.dropdown-menu.dropdown-menu-sm {
+    max-width: 300px;
+    max-height: 300px;
+    overflow-y: auto;    
+}
+
+.dropdown-item {
+    white-space: initial;
+}
