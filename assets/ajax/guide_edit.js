@@ -80,6 +80,11 @@ new Vue({
     this.getCompany();
     this.generalData.at_FechaEmision = this.getCurrentDate();
   },
+  watch: {
+    "generalData.motive"(newValue) {
+      this.validateTransferType(newValue);
+    },
+  },
   mounted() {},
   computed: {
     idGuide: function () {
@@ -108,8 +113,31 @@ new Vue({
     senderHasUbigeo() {
       return !!this.movement?.start_store?.district?.id;
     },
+    hasObservationsTci() {
+      return (
+        this.movement?.tci_response_type != 1 &&
+        this.movement?.flag_sent == 1 &&
+        Array.isArray(this.movement?.tci_messages)
+      );
+    },
   },
   methods: {
+    validateTransferType(typeCode) {
+      if (
+        typeCode == "06" &&
+        this.start_store?.company_id == this.end_store?.company_id
+      ) {
+        swal.fire({
+          title: "",
+          type: "warning",
+          text: "Para el tipo de traslado 'Devolución', el remitente y el destinatario deben ser diferentes.",
+        });
+        this.$nextTick(() => {
+          this.generalData.motive = null;
+        });
+      }
+    },
+
     submitForm(isSend) {
       this.$refs.ppUbigeoSelects.$validator.validate();
       this.$refs.plUbigeoSelects.$validator.validate();

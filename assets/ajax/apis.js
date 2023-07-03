@@ -115,3 +115,20 @@ function downloadGuide(data, params) {
       throw error;
     });
 }
+
+function updateGuideStatus (data, params) {
+  const url =
+    urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
+  return axios
+    .post(url, data, {
+      params: {
+        action: "queryOne",
+        ...params,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error en la solicitud POST:", error);
+      throw error;
+    });
+}

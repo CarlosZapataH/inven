@@ -96,8 +96,36 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
         </div>
         <div>
             <div class="row justify-content-center">
-
                 <div class="col-12 col-lg-10" v-if="movement">
+
+                    <div v-if="hasObservationsTci">
+                        <div v-for="(msm, index) in movement.tci_messages" :index="index + '-tci-response'">
+                            <div class="alert alert-warning" role="alert">
+                                {{msm}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="section_origin" v-if="movement && movement.flag_sent == 1">
+                        <div class="card-header">
+                            Detalles del GRE
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row" v-if="movement && movement.tci_response_description">
+                                <label class="col-sm-3 col-form-label">Código</label>
+                                <div class="col-sm-9">
+                                    <input :value="movement.serie + '-' + movement.number" type="text" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row" v-if="movement && movement.tci_response_description">
+                                <label class="col-sm-3 col-form-label">Estado</label>
+                                <div class="col-sm-9">
+                                    <input v-model="movement.tci_response_description" type="text" class="form-control" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card" id="section_origin">
                         <div class="card-header">
                             Datos del Remitente
@@ -597,7 +625,15 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <td>{{index + 1}}</td>
                                             <td>{{item.code}}</td>
                                             <td>{{item.name}}</td>
-                                            <td>{{item.unit_measure}}</td>
+                                            <td>
+                                                <div style="width: 120px;">
+                                                    <select v-model="item.unit_measure" :name="'unidad_de_medida' + index" v-validate="'required'" class="form-control">
+                                                        <option v-for="(unit, unitIndex) in unit_measure" :key="'op_' + index +'_' +unitIndex" :value="unit.code">
+                                                            {{unit.description}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </td>
                                             <td>{{item.quantity}}</td>
                                             <td>
                                                 <textarea v-model="item.additional_description" class="form-control" rows="1"></textarea>
