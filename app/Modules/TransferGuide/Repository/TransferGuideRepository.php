@@ -101,6 +101,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transfers_guides.tci_response_type,
                 transfers_guides.tci_response_description,
                 transfers_guides.tci_response_date,
+                transfers_guides.tci_send_date,
                 transfers_guides.tci_confirm_status_response,
                 almacen_ini.id_alm as almacen_ini_id,
                 almacen_ini.titulo_alm as almacen_ini_titulo_alm,
