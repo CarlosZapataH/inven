@@ -137,14 +137,14 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <td>{{guide.start_store.company.name}}</td>
                                 <td>{{guide.end_store.company.name}}</td>
                                 <td>
-                                    <span :class="'m-1 py-2 d-block badge ' + (getStatusProperty(guide.tci_response_description).class)" style="max-width: 140px;" v-if="guide.tci_response_description">
+                                    <span :class="['m-1 py-2 d-block badge ', getStatusProperty(guide.tci_response_type).class]" style="max-width: 140px;" v-if="guide.tci_response_type">
                                         {{guide.tci_response_description}}
                                     </span>
-                                    <span v-if="guide?.flag_sent == 0" class="py-2 d-block badge badge-info m-1">Borrador</span>
+                                    <span v-if="guide?.flag_sent == 0" class="py-2 d-block badge badge-info m-1" style="max-width: 140px;">Borrador</span>
                                 </td>
                                 <td>
                                     <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm m-1">Ver</a>
-                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide)" v-if="guide.tci_response_description == 'Aceptado'">
+                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide)" v-if="guide.tci_response_type == '1'">
                                         Descargar GRE
                                     </button>
                                     <button class="btn btn-primary btn-sm m-1" @click="getGuideStatus(guide)" v-if="(!guide?.tci_response_type) && guide?.flag_sent == 1">
@@ -158,13 +158,13 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-center">
                         <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
-                            <a class="page-link" href="#" @click="setCurrentPage(currentPage - 1)">Anterior</a>
+                            <a class="page-link" @click.prevent="setCurrentPage(currentPage - 1)">Anterior</a>
                         </li>
                         <li class="page-item" v-for="page in totalPages" :key="page" :class="{ 'active': currentPage === page }">
-                            <a class="page-link" href="#" @click="setCurrentPage(page)">{{ page }}</a>
+                            <a class="page-link" @click.prevent="setCurrentPage(page)">{{ page }}</a>
                         </li>
                         <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
-                            <a class="page-link" href="#" @click="setCurrentPage(currentPage + 1)">Siguiente</a>
+                            <a class="page-link" @click.prevent="setCurrentPage(currentPage + 1)">Siguiente</a>
                         </li>
                     </ul>
                 </nav>

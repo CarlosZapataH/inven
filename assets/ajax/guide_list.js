@@ -86,22 +86,32 @@ new Vue({
     getStatusProperty(value) {
       const list = [
         {
-          value: "Rechazado",
-          class: "badge-danger",
+          type: 1,
+          value: "Aceptado",
+          class: "badge-success",
         },
         {
+          type: 2,
           value: "Aceptado Con Obs.",
           class: "badge-warning",
         },
         {
-          value: "Aceptado",
-          class: "badge-success",
+          type: 3,
+          value: "Rechazado",
+          class: "badge-danger",
+        },
+
+        {
+          type: 4,
+          value: "Excepción",
+          class: "badge-orange",
         },
       ];
-      if (value) {
-        return list.find((e) => e.value == value);
-      }
-      return { value, class: "" };
+
+      const defaultStatus = { value: "", class: "" };
+      const status = list.find((item) => item.type == value);
+
+      return status || defaultStatus;
     },
 
     getGuideStatus(guide) {

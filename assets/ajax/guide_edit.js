@@ -123,14 +123,25 @@ new Vue({
   },
   methods: {
     validateTransferType(typeCode) {
+      let messageAlert = "";
       if (
         typeCode == "06" &&
         this.start_store?.company_id == this.end_store?.company_id
       ) {
+        messageAlert =
+          "Para el tipo de traslado 'Devolución', el remitente y el destinatario deben ser diferentes.";
+      } else if (
+        typeCode == "04" &&
+        this.start_store?.company_id != this.end_store?.company_id
+      ) {
+        messageAlert = "El remitente y destinatario deben ser el mismo.";
+      }
+
+      if (messageAlert) {
         swal.fire({
           title: "",
           type: "warning",
-          text: "Para el tipo de traslado 'Devolución', el remitente y el destinatario deben ser diferentes.",
+          text: messageAlert,
         });
         this.$nextTick(() => {
           this.generalData.motive = null;
@@ -178,7 +189,6 @@ new Vue({
     getData() {
       readGuide({ id: this.idGuide }).then((response) => {
         this.movement = response?.data || {};
-        console.log(this.movement);
         this.setData();
       });
     },
@@ -399,7 +409,6 @@ new Vue({
           }, 5000);
         })
         .catch((error) => {
-          console.log(error?.response?.data);
           this.apiErros = error?.response?.data?.errors || [];
           swal.fire({
             title: "",
