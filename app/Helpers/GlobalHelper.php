@@ -56,4 +56,39 @@ class GlobalHelper{
             ]
         ];
     }
+
+    public static function getDaysBetweenDates($firstDate, $secondDate){
+        $timestampSecondDate = strtotime($secondDate);
+        $timestampFirstDate = strtotime($firstDate);
+
+        $diffSeconds = $timestampFirstDate - $timestampSecondDate;
+        $diffDays = floor($diffSeconds / (60 * 60 * 24));
+
+        return $diffDays;
+    }
+
+    public static function getDiffHours($startDate, $endDate){
+
+        // Crea objetos DateTime con las fechas y horas
+        $start = new DateTime($startDate);
+        $end = new DateTime($endDate);
+
+        // Calcula la diferencia entre las dos fechas
+        $between = $start->diff($end);
+
+        // Obtiene los días, las horas y los minutos transcurridos
+        $days = $between->days;
+        $hours = $between->h;
+
+        // Calcula el total de horas considerando los días completos
+        $totalHours = ($days * 24) + $hours;
+
+        return $totalHours;
+    }
+
+    public static function firstDateThanSecond($first, $second){
+        $firstDate = new DateTime($first);
+        $secondDate = new DateTime($second);
+        return ($firstDate >= $secondDate);
+    }
 }

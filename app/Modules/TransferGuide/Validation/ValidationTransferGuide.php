@@ -99,6 +99,10 @@ class ValidationTransferGuide{
         if(!$this->response['errors']){
             $this->validateBuyer();
         }
+
+        if(!$this->response['errors']){
+            $this->validateCompleteStores();
+        }
     }
 
     private function validateGuide(){
@@ -369,6 +373,44 @@ class ValidationTransferGuide{
                 else {
                     $this->addErrors($validator->getErrors());
                 }
+            }
+        }
+    }
+
+    private function validateCompleteStores(){
+        // if($this->send){
+            if(!ValidateHelper::validateProperty($this->startStore, ['address']) && !ValidateHelper::validateProperty($this->data['start_store'], ['address'])){
+                $this->addErrors(['start_store.address' => 'La dirección del almacén de salida es obligatoria.']);
+            }
+            if(!ValidateHelper::validateProperty($this->startStore, ['district.id']) && !ValidateHelper::validateProperty($this->data['start_store'], ['district_id'])){
+                $this->addErrors(['start_store.address' => 'El distrito del almacén de salida es obligatorio.']);
+            }
+
+            if(!ValidateHelper::validateProperty($this->endStore, ['address']) && !ValidateHelper::validateProperty($this->data['end_store'], ['address'])){
+                $this->addErrors(['end_store.address' => 'La dirección del almacén de llegada es obligatoria.']);
+            }
+            if(!ValidateHelper::validateProperty($this->endStore, ['district.id']) && !ValidateHelper::validateProperty($this->data['end_store'], ['district_id'])){
+                $this->addErrors(['end_store.address' => 'El distrito del almacén de llegada es obligatorio.']);
+            }
+        // }
+            
+        if(!$this->response['errors']){
+            if(!ValidateHelper::validateProperty($this->startStore, ['address'])){
+                $this->startStore['update'] = true;
+                $this->startStore['update_address'] = $this->data['start_store']['address'];
+            }
+            if(!ValidateHelper::validateProperty($this->startStore, ['district.id'])){
+                $this->startStore['update'] = true;
+                $this->startStore['update_district_id'] = $this->data['start_store']['district_id'];
+            }
+
+            if(!ValidateHelper::validateProperty($this->endStore, ['address'])){
+                $this->endStore['update'] = true;
+                $this->endStore['update_address'] = $this->data['end_store']['address'];
+            }
+            if(!ValidateHelper::validateProperty($this->endStore, ['district.id'])){
+                $this->endStore['update'] = true;
+                $this->endStore['update_district_id'] = $this->data['end_store']['district_id'];
             }
         }
     }

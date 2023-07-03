@@ -108,6 +108,7 @@ class TransferGuideController{
             if (json_last_error() === JSON_ERROR_NONE){
                 $this->validationTransferGuide = new ValidationTransferGuide($data);
                 $this->data = $this->validationTransferGuide->validate();
+                
                 if(!$this->data['errors']){
                     $this->data = $this->data['data'];
                     $this->storeData();
@@ -368,13 +369,40 @@ class TransferGuideController{
 
     private function completeStoreIni(){
         if($this->data['startStore']['update']){
-            $this->storeRepository->updateBy('id_alm', $this->data['startStore']['id'], [ 'company_id' => $this->data['startStore']['company_id']]);
+            $data = [];
+
+            if(isset($this->data['startStore']['company_id'])){
+                $data['company_id'] =$this->data['startStore']['company_id'];
+            }
+            
+            if(isset($this->data['startStore']['update_address'])){
+                $data['direccion_alm'] =$this->data['startStore']['update_address'];
+            }
+
+            if(isset($this->data['startStore']['update_district_id'])){
+                $data['distrito_alm'] =$this->data['startStore']['update_district_id'];
+            }
+            $this->storeRepository->updateBy('id_alm', $this->data['startStore']['id'], $data);
         }
     }
 
     private function completeStoreDes(){
         if($this->data['endStore']['update']){
-            $this->storeRepository->updateBy('id_alm', $this->data['endStore']['id'], [ 'company_id' => $this->data['endStore']['company_id']]);
+            $data = [];
+
+            if(isset($this->data['endStore']['company_id'])){
+                $data['company_id'] =$this->data['endStore']['company_id'];
+            }
+            
+            if(isset($this->data['endStore']['update_address'])){
+                $data['direccion_alm'] =$this->data['endStore']['update_address'];
+            }
+
+            if(isset($this->data['endStore']['update_district_id'])){
+                $data['distrito_alm'] =$this->data['endStore']['update_district_id'];
+            }
+
+            $this->storeRepository->updateBy('id_alm', $this->data['endStore']['id'], $data);
         }
     }
 
@@ -432,6 +460,7 @@ class TransferGuideController{
                     'flag_sent' => true,
                     'sent_attempts' => $movement['sent_attempts'] + 1,
                     'tci_send' => $tciResponse['content_send'],
+                    'tci_send_date' => date("Y-m-d H:i:s"),
                     'tci_response' => $tciResponse['original'],
                     'date_issue' => $transferGuide['date_issue'],
                     'time_issue' => $transferGuide['time_issue'],
@@ -491,126 +520,7 @@ class TransferGuideController{
     }
 
     
-
     
-
-    
-
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-    public function storeDevolutionGuide(){
-        header('Content-Type: application/json');
-        $response = GlobalHelper::getGlobalResponse();
-        try {
-            $data = GlobalHelper::getPostData();
-            if (json_last_error() === JSON_ERROR_NONE){
-                // TEST
-                $movement = [
-                    'detalle' => [
-                        [
-                            'cant_mde' => '1.00',
-                            'um_sunat_code' => 'SET',
-                            'des_mde' => 'TORQUIMETRO',
-                            'cod_inv' => '92932'
-                        ],
-                        [
-                            'cant_mde' => '1.00',
-                            'um_sunat_code' => 'SET',
-                            'des_mde' => 'TELUROMETRO',
-                            'cod_inv' => 'C0042'
-                        ],
-                        [
-                            'cant_mde' => '1.00',
-                            'um_sunat_code' => 'SET',
-                            'des_mde' => 'RUGOSIMETRO',
-                            'cod_inv' => 'C0182'
-                        ]
-                    ]
-                ];
-                if($data['send']){
-                    $tciService = new TCIService();
-                    $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreDevolutionGuide($movement, $data));
-                    $response['data'] = $tciResponse['data'];
-                    $response['message'] = $tciResponse['message'];
-                }
-                // END TEST
-            } 
-        } 
-        catch (PDOException $e) {
-            Session::setAttribute("error", $e->getMessage());
-        }
-
-        http_response_code($response['code']);
-        echo json_encode($response);
-    }
-
-    public function storeOthersGuide(){
-        header('Content-Type: application/json');
-        $response = GlobalHelper::getGlobalResponse();
-        try {
-            $data = GlobalHelper::getPostData();
-            if (json_last_error() === JSON_ERROR_NONE){
-                // TEST
-                $movement = [
-                    'detalle' => [
-                        [
-                            'cant_mde' => '1.00',
-                            'um_sunat_code' => 'SET',
-                            'des_mde' => 'TORQUIMETRO',
-                            'cod_inv' => '92932'
-                        ],
-                        [
-                            'cant_mde' => '1.00',
-                            'um_sunat_code' => 'SET',
-                            'des_mde' => 'TELUROMETRO',
-                            'cod_inv' => 'C0042'
-                        ],
-                        [
-                            'cant_mde' => '1.00',
-                            'um_sunat_code' => 'SET',
-                            'des_mde' => 'RUGOSIMETRO',
-                            'cod_inv' => 'C0182'
-                        ]
-                    ]
-                ];
-                if($data['send']){
-                    $tciService = new TCIService();
-                    $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreOthersGuide($movement, $data));
-                    $response['data'] = $tciResponse['data'];
-                    $response['message'] = $tciResponse['message'];
-                }
-                // END TEST
-            } 
-        } 
-        catch (PDOException $e) {
-            Session::setAttribute("error", $e->getMessage());
-        }
-
-        http_response_code($response['code']);
-        echo json_encode($response);
-    }
-
     public function queryStatusTCI(){
         header('Content-Type: application/json');
         $response = GlobalHelper::getGlobalResponse();
@@ -727,269 +637,6 @@ class TransferGuideController{
     }
 
     // PROCESS
-
-    public function validatedData($data, $rules){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-        $validator = new TransitMovementGuideRequest();
-
-        if ($validator->validateStore($data, $rules)) {
-            $result['data'] = $validator->getValidData();
-            $result['success'] = true;
-        } 
-        else {
-            $result['errors'] = $validator->getErrors();
-        }
-        if(!$result['errors']){
-            $modality = $data['transport_modality'];
-            $result['data']['transports'] = [];
-            if(isset($data['transports'])){
-                if(is_array($data['transports'])){
-                    foreach($data['transports'] as $rowTransport){
-                        $validatorTs = new TransitMovementGuideRequest();
-                        if($modality == 1){
-                            $resultTransport = $validatorTs->validatedTransportPublic($rowTransport);
-                        }
-                        else{
-                            $resultTransport = $validatorTs->validatedTransportPrivate($rowTransport);
-                        }
-                        if($resultTransport){
-                            array_push($result['data']['transports'], $validatorTs->getValidData());
-                        }
-                        else{
-                            $result['errors'] = $validatorTs->getErrors();
-                            $result['success'] = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            else{
-                $result['errors'] = [
-                    "transports" => ["El transporte es obligatorio."]
-                ];
-            }
-        }
-        
-
-        if(!$result['errors']){
-            $modality = $data['transport_modality'];
-            $result['data']['vehicles']  = [];
-            if($modality == 2){
-                if(isset($data['vehicles'])){
-                    foreach($data['vehicles'] as $rowVehicle){
-                        $validatorV = new TransitMovementGuideRequest();
-
-                        $resultVehicle = $validatorV->validatedVehicle($rowVehicle);
-                      
-                        if($resultVehicle){
-                            array_push($result['data']['vehicles'], $validatorV->getValidData());
-                        }
-                        else{
-                            $result['errors'] = $validatorV->getErrors();
-                            $result['success'] = false;
-                            break;
-                        }
-                    }
-                }
-                else{
-                    $result['errors'] = [
-                        "vehicles" => ["Los vehículos son obligatorios."]
-                    ];
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    public function validatedDetail($data){
-        $result = [
-            'success' => false,
-            'errors' => null,
-            'data' => null
-        ];
-        foreach($data as $row){
-            $validator = new TransitMovementGuideRequest();
-            $status = $validator->validateStoreDetail($row);
-            if ($status) {
-                if(!$result['data']){
-                    $result['data'] = [];
-                }
-                array_push($result['data'], $validator->getValidData());
-                $result['success'] = true;
-            } 
-            else {
-                $result['success'] = false;
-                $result['errors'] = $validator->getErrors();
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    
-    
-
-    private function getRulesTransitMovementGuide($movement){
-        $rules = [];
-        $existGuide = ValidateHelper::validateProperty($movement, ['transfer_guide_id']);
-
-        // $rules['send'] = [['required']];
-
-        // ent_RemitenteGRR
-        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.document'])){ 
-            $rules['almacen_partida.document'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.name'])){
-            $rules['almacen_partida.name'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.commercial_name'])){
-            $rules['almacen_partida.commercial_name'] = [['required']];
-        }
-
-        // // ent_PuntoPartidaGRR
-        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.company.id'])){
-            $rules['almacen_partida.document_type_id'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.district.code'])){
-            $rules['almacen_partida.ubigeo'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_partida.direccion_alm'])){
-            $rules['almacen_partida.address'] = [['required']];
-        }
-
-        // ent_DestinatarioGRR
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.document_type_code'])){
-            $rules['almacen_destino.document_type_code'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.document'])){
-            $rules['almacen_destino.document'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.name'])){
-            $rules['almacen_destino.name'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.email_principal']) || $existGuide){
-            $rules['almacen_destino.email_principal'] = [['required'], ['email']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.email_secondary']) || $existGuide){
-            $rules['almacen_destino.email_secondary'] = [['required'], ['email']];
-        }
-
-        // // ent_PuntoLlegadaGRR
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.company.id'])){
-            $rules['almacen_destino.document_type_id'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.district.code'])){
-            $rules['almacen_destino.ubigeo'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['almacen_destino.direccion_alm'])){
-            $rules['almacen_destino.address'] = [['required']];
-        }
-
-        // ent_General
-        if(!ValidateHelper::validateProperty($movement, ['modalidad_transporte']) || $existGuide){
-            $rules['modalidad_transporte'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['fecha_emision']) || $existGuide){
-            $rules['fecha_emision'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['serie']) || $existGuide){
-            $rules['serie'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['numero']) || $existGuide){
-            $rules['numero'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['observacion']) || $existGuide){
-            $rules['observacion'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['hora_emision']) || $existGuide){
-            $rules['hora_emision'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['peso']) || $existGuide){
-            $rules['peso'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['cantidad']) || $existGuide){
-            $rules['cantidad'] = [['required']];
-        }
-
-        if(!ValidateHelper::validateProperty($movement, ['modalidad_transporte']) || $existGuide){
-            $rules['modalidad_transporte'] = [['required']];
-        }
-
-        // ent_Transpor
-       /*  if(!ValidateHelper::validateProperty($movement, ['transporte.modalidad'])){
-            $rules['transporte.modalidad'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['transporte.fecha_inicio'])){
-            $rules['transporte.fecha_inicio'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['transporte.tipo_documento'])){
-            $rules['transporte.tipo_documento'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['transporte.documento'])){
-            $rules['transporte.documento'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['transporte.razon_social'])){
-            $rules['transporte.razon_social'] = [['required']];
-        }
-        if(!ValidateHelper::validateProperty($movement, ['transporte.numero_mtc'])){
-            $rules['transporte.numero_mtc'] = [['required']];
-        } */
-
-        return $rules;
-    }
-
-    
-
-    private function groupStoreTransitMovementGuideTransport($data, $transferGuideId){
-        $groupData = ['modality' => $modality, 'transfer_guide_id' => $transferGuideId];
-        
-        if($modality == 1){
-            if($data['start_date']){
-                $groupData['start_date'] = $data['start_date'];
-            }
-    
-            if($data['document_type']){
-                $groupData['document_type'] = $data['document_type'];
-            }
-    
-            if($data['document']){
-                $groupData['document'] = $data['transporte']['document'];
-            }
-    
-            if($data['company_name']){
-                $groupData['company_name'] = $data['transporte']['company_name'];
-            }
-    
-            if($data['mtc_number']){
-                $groupData['mtc_number'] = $data['transporte']['mtc_number'];
-            }
-        }
-
-        if(isset($data['created_at'])){
-            $groupData['created_at'] = $data['created_at'];
-        }
-
-        if(isset($data['updated_at'])){
-            $groupData['updated_at'] = $data['updated_at'];
-        }
-        return $groupData;
-    }
-
-    
-
-    
-
-    
-    
-    
-
-    
 
     private function formatQueryStatus($data){
         $documents = [];
