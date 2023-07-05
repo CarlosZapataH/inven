@@ -34,7 +34,12 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 $conditions = ' WHERE ' . $conditions;
             }
 
-            $result = self::query($query.$conditions);
+            $query .= $conditions;
+            $query .= '
+             ORDER BY transfers_guides.created_at DESC
+            ';
+
+            $result = self::query($query);
 
 
             if($result){
@@ -103,6 +108,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transfers_guides.tci_response_date,
                 transfers_guides.tci_send_date,
                 transfers_guides.tci_confirm_status_response,
+                transfers_guides.created_at,
                 almacen_ini.id_alm as almacen_ini_id,
                 almacen_ini.titulo_alm as almacen_ini_titulo_alm,
                 almacen_ini.direccion_alm as almacen_ini_direccion_alm,

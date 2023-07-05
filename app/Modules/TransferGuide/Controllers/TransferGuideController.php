@@ -447,8 +447,8 @@ class TransferGuideController{
                 if(!$transferGuide['serie']){
                     $transferGuide['serie'] = $this->newCode['serie'];
                     $transferGuide['number'] = $this->newCode['number'];
-                    // $transferGuide['date_issue'] = date("Y-m-d");
-                    $transferGuide['date_issue'] = date('Y-m-d', strtotime('-1 day', strtotime(date("Y-m-d"))));
+                    $transferGuide['date_issue'] = date("Y-m-d");
+                    // $transferGuide['date_issue'] = date('Y-m-d', strtotime('-1 day', strtotime(date("Y-m-d"))));
                     $transferGuide['time_issue'] = date("H:i:s");
                 }
                 

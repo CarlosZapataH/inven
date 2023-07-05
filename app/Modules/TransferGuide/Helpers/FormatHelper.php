@@ -81,7 +81,7 @@ class FormatHelper{
 
         $storeIni = [
             'at_Ubigeo' => $data['start_store']['district']['code'],
-            'at_DireccionCompleta' => $data['start_store']['address'],
+            'at_DireccionCompleta' => $data['start_store']['address'] . ', ' . $data['start_store']['district']['name'] . ', ' . $data['start_store']['district']['province'] . ', ' . $data['start_store']['district']['department'],
             'at_Departamento' => $data['start_store']['district']['department'],
             'at_Provincia' => $data['start_store']['district']['province'],
             'at_Distrito' => $data['start_store']['district']['name'],
@@ -89,7 +89,7 @@ class FormatHelper{
 
         $storeEnd = [
             'at_Ubigeo' => $data['end_store']['district']['code'],
-            'at_DireccionCompleta' => $data['end_store']['address'],
+            'at_DireccionCompleta' => $data['end_store']['address'] . ', ' . $data['end_store']['district']['name'] . ', ' . $data['end_store']['district']['province'] . ', ' . $data['end_store']['district']['department'],
             'at_Departamento' => $data['end_store']['district']['department'],
             'at_Provincia' => $data['end_store']['district']['province'],
             'at_Distrito' => $data['end_store']['district']['name']

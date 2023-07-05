@@ -94,6 +94,7 @@ class TransferGuideHelper{
                             'tci_response_type' => $row['tci_response_type'],
                             'tci_response_description' => $row['tci_response_description'],
                             'tci_response_date' => $row['tci_response_date'],
+                            'created_at' => $row['created_at'],
                             'flag_resend' => false,
                             'start_store' => [
                                 'id' => $row['almacen_ini_id'],
