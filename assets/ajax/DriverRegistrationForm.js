@@ -1,10 +1,7 @@
 Vue.component("DriverRegistrationForm", {
+  mixins: [guideUtilsMixin],
   props: {
     value: {
-      type: [Array],
-      required: false,
-    },
-    documentTypes: {
       type: [Array],
       required: false,
     },
@@ -60,7 +57,7 @@ Vue.component("DriverRegistrationForm", {
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
                         <label for="cdt_at_NumeroDocumentoIdentidad">Número de Documento</label>
-                        <input v-model="en_ConductorGRR.document" v-validate="'required|uniqueDocument'" name="driver_document" type="text" class="form-control" id="cdt_at_NumeroDocumentoIdentidad">
+                        <input v-model="en_ConductorGRR.document" v-validate="transportDocumentRule" name="driver_document" type="text" class="form-control" id="cdt_at_NumeroDocumentoIdentidad">
                         <span class="text-danger">{{ errors.first('driver_document') }}</span>
                     </div>
                 </div>
@@ -139,6 +136,11 @@ Vue.component("DriverRegistrationForm", {
       set(value) {
         this.$emit("input", value);
       },
+    },
+    transportDocumentRule() {
+      const code = this.en_ConductorGRR?.document_type_code;
+      const rule = this.getRuleDocument(code);
+      return { ...rule, uniqueDocument: true };
     },
   },
   methods: {

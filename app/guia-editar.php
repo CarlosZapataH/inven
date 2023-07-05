@@ -128,7 +128,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <div class="col-sm-9">
                                     <input :value="movement.date_issue" type="text" class="form-control" disabled>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
                     </div>
 
@@ -169,7 +169,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="start_store.document" name="RM_Numero_Documento_Identidad" v-validate="'required|alpha_dash|length:11'" type="text" class="form-control" id="at_NumeroDocumentoIdentidad" disabled>
+                                    <input v-model="start_store.document" name="RM_Numero_Documento_Identidad" v-validate="senderDocumentRule" type="text" class="form-control" id="at_NumeroDocumentoIdentidad" disabled>
                                     <span class="text-danger">{{ errors.first('RM_Numero_Documento_Identidad') }}</span>
                                 </div>
                             </div>
@@ -228,7 +228,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="end_store.document" name="DES_Numero_Documento_Identidad" v-validate="'required'" type="text" class="form-control" disabled>
+                                    <input v-model="end_store.document" name="DES_Numero_Documento_Identidad" v-validate="recipientDocumentRule" type="text" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DES_Numero_Documento_Identidad') }}</span>
                                 </div>
                             </div>
@@ -355,7 +355,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="provider.document" name="supplier_document" v-validate="'required|alpha_dash'" type="text" class="form-control" id="supplier_document">
+                                    <input v-model="provider.document" name="supplier_document" v-validate="providerDocumentRule" type="text" class="form-control" id="supplier_document">
                                     <span class="text-danger">{{ errors.first('supplier_document') }}</span>
                                 </div>
                             </div>
@@ -402,7 +402,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="buyer.document" name="buyer_document" v-validate="'required|alpha_dash|length:11'" type="text" class="form-control" id="buyer_document">
+                                    <input v-model="buyer.document" name="buyer_document" v-validate="buyerDocumentRule" type="text" class="form-control" id="buyer_document">
                                     <span class="text-danger">{{ errors.first('buyer_document') }}</span>
                                 </div>
                             </div>
@@ -433,7 +433,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
 
-                            <driver-registration-form v-model="drivers" :document-types="documentTypes" :date-issued="dateIssued" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></driver-registration-form>
+                            <driver-registration-form v-model="drivers" :date-issued="dateIssued" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></driver-registration-form>
 
                             <vehicle-registration-form v-model="vehicles" v-if="en_InformacionTransporteGRR.at_Modalidad == 2"></vehicle-registration-form>
 
@@ -481,7 +481,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                                     <label>Tipo de Documento
                                                         <span class="text-danger font-weight-bold">*</span>
                                                     </label>
-                                                    <select v-model="ent_TransportePublicoGRR.at_TipoDocumentoIdentidad" name="TP_Tipo_Documento_Identidad" v-validate="'required'" class="form-control">
+                                                    <select v-model="publicTransport.at_TipoDocumentoIdentidad" name="TP_Tipo_Documento_Identidad" v-validate="'required'" class="form-control">
                                                         <option v-for="document in documentTypes" :key="document.id + '-tp-documentCode'" :value="document.code">{{ document.description }}</option>
                                                     </select>
                                                     <span class="text-danger">{{ errors.first('TP_Tipo_Documento_Identidad') }}</span>
@@ -492,7 +492,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                                     <label>Número de Documento
                                                         <span class="text-danger font-weight-bold">*</span>
                                                     </label>
-                                                    <input v-model="ent_TransportePublicoGRR.at_NumeroDocumentoIdentidad" name="TP_Numero_Documento" v-validate="'required'" type="text" class="form-control">
+                                                    <input v-model="publicTransport.at_NumeroDocumentoIdentidad" name="TP_Numero_Documento" v-validate="transportDocumentRule" type="text" class="form-control">
                                                     <span class="text-danger">{{ errors.first('TP_Numero_Documento') }}</span>
                                                 </div>
                                             </div>
@@ -502,7 +502,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                                     <label>Razón Social
                                                         <span class="text-danger font-weight-bold">*</span>
                                                     </label>
-                                                    <input v-model="ent_TransportePublicoGRR.at_RazonSocial" name="TP_Razon_Social" v-validate="'required'" type="text" class="form-control" id="tp_at_RazonSocial">
+                                                    <input v-model="publicTransport.at_RazonSocial" name="TP_Razon_Social" v-validate="'required'" type="text" class="form-control" id="tp_at_RazonSocial">
                                                     <span class="text-danger">{{ errors.first('TP_Razon_Social') }}</span>
                                                 </div>
                                             </div>
@@ -513,7 +513,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                                         Fecha de inicio o entrega
                                                         <span class="text-danger font-weight-bold">*</span>
                                                     </label>
-                                                    <input v-model="ent_TransportePublicoGRR.at_FechaInicio" name="TP_FechaInicio" v-validate="'required'" :min="dateIssued" type="date" class="form-control" id="tp_at_RazonSocial">
+                                                    <input v-model="publicTransport.at_FechaInicio" name="TP_FechaInicio" v-validate="'required'" :min="dateIssued" type="date" class="form-control" id="tp_at_RazonSocial">
                                                     <span class="text-danger">{{ errors.first('TP_FechaInicio') }}</span>
                                                 </div>
                                             </div>
@@ -521,7 +521,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <div class="col-12 col-sm-6">
                                                 <div class="form-group">
                                                     <label for="tp_at_NumeroMTC">Número MTC</label>
-                                                    <input v-model="ent_TransportePublicoGRR.at_NumeroMTC" type="text" class="form-control" id="tp_at_NumeroMTC">
+                                                    <input v-model="publicTransport.at_NumeroMTC" type="text" class="form-control" id="tp_at_NumeroMTC">
                                                 </div>
                                             </div>
                                         </div>
@@ -892,10 +892,10 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script src="../assets/ajax/apis.js<?= $version ?>"></script>
+    <script src="../assets/ajax/guide_utils_mixin.js<?= $version ?>"></script>
     <script src="../assets/ajax/InputUbigeo.js<?= $version ?>"></script>
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
-    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>
-    <script src="../assets/ajax/guide_utils_mixin.js<?= $version ?>"></script>
+    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>    
     <script src="../assets/ajax/guide_edit.js<?= $version ?>"></script>

@@ -7,6 +7,29 @@ var guideUtilsMixin = {
       unit_measure: [],
     };
   },
+  computed: {
+    submotives: function () {
+      const motive = this.motives.find((e) => e?.code == 13);
+      return motive?.submotives || [];
+    },
+
+    lengthDocument() {
+      const lengthDocument = [
+        { code: 1, length: 8, id: 2 },
+        { code: 4, length: 12, id: 3 },
+        { code: 6, length: 11, id: 4 },
+        { code: 7, length: 12, id: 5 },
+      ];
+
+      const updatedLengthDocument = lengthDocument.map((e) => {
+        const document = this.documentTypes.find((doc) => doc?.code == e.code);
+        const id = document ? document.id : null;
+        return { ...e, id };
+      });
+
+      return updatedLengthDocument;
+    },
+  },
   methods: {
     getUtil() {
       listUtil().then((response) => {
@@ -15,6 +38,18 @@ var guideUtilsMixin = {
         this.motives = response?.data?.motives || [];
         this.unit_measure = response?.data?.unit_measure?.all || [];
       });
+    },
+
+    getLengthByDocument(documentCode, by = "code") {
+      const found = this.lengthDocument.find((e) => e[by] == documentCode);
+      return found ? found.length : null;
+    },
+
+    getRuleDocument(code = "", by = "code") {
+      let rule = { required: true, alpha_dash: true };
+      const length = this.getLengthByDocument(code, by);
+      if (length) rule.length = length;
+      return rule;
     },
 
     getCurrentDate() {
@@ -54,11 +89,5 @@ var guideUtilsMixin = {
   },
   created: function () {
     this.getUtil();
-  },
-  computed: {
-    submotives: function () {
-      const motive = this.motives.find((e) => e?.code == 13);
-      return motive?.submotives || [];
-    },
   },
 };

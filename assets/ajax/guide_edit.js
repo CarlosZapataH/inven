@@ -5,6 +5,11 @@ VeeValidate.Validator.localize("es", {
     email: "El campo de correo electrónico no es válido",
     date: "El campo debe tener un formato válido",
     date_format: "El campo debe tener un formato válido",
+    alpha_dash: "El campo solo debe contener letras, números y guiones",
+    length: (_, args) => {
+      const [min] = args;
+      return `El campo debe tener ${min} caracteres.`;
+    },
   },
 });
 
@@ -37,7 +42,7 @@ new Vue({
       at_Modalidad: 1,
     },
 
-    ent_TransportePublicoGRR: {
+    publicTransport: {
       at_FechaInicio: "",
       at_TipoDocumentoIdentidad: 6,
       at_NumeroDocumentoIdentidad: "",
@@ -119,6 +124,26 @@ new Vue({
         this.movement?.flag_sent == 1 &&
         Array.isArray(this.movement?.tci_messages)
       );
+    },
+    senderDocumentRule() {
+      const code = this.start_store?.document_type;
+      return this.getRuleDocument(code, "id");
+    },
+    recipientDocumentRule() {
+      const code = this.end_store?.document_type;
+      return this.getRuleDocument(code, "id");
+    },
+    providerDocumentRule() {
+      const code = this.provider?.document_type_code;
+      return this.getRuleDocument(code);
+    },
+    buyerDocumentRule() {
+      const code = this.buyer?.document_type_code;
+      return this.getRuleDocument(code);
+    },
+    transportDocumentRule() {
+      const code = this.publicTransport?.at_TipoDocumentoIdentidad;
+      return this.getRuleDocument(code);
     },
   },
   methods: {
@@ -292,7 +317,7 @@ new Vue({
         transports.length > 0 &&
         movement.transport_modality == 1
       ) {
-        this.ent_TransportePublicoGRR = {
+        this.publicTransport = {
           at_FechaInicio: transports[0].start_date,
           at_TipoDocumentoIdentidad: transports[0].document_type_code,
           at_NumeroDocumentoIdentidad: transports[0].document,
@@ -373,13 +398,13 @@ new Vue({
       if (this.en_InformacionTransporteGRR?.at_Modalidad == 1) {
         data.transports = [
           {
-            start_date: this.ent_TransportePublicoGRR?.at_FechaInicio,
+            start_date: this.publicTransport?.at_FechaInicio,
             document_type_code:
-              this.ent_TransportePublicoGRR?.at_TipoDocumentoIdentidad,
+              this.publicTransport?.at_TipoDocumentoIdentidad,
             document:
-              this.ent_TransportePublicoGRR?.at_NumeroDocumentoIdentidad,
-            company_name: this.ent_TransportePublicoGRR?.at_RazonSocial,
-            mtc_number: this.ent_TransportePublicoGRR?.at_NumeroMTC,
+              this.publicTransport?.at_NumeroDocumentoIdentidad,
+            company_name: this.publicTransport?.at_RazonSocial,
+            mtc_number: this.publicTransport?.at_NumeroMTC,
           },
         ];
       } else if (this.en_InformacionTransporteGRR?.at_Modalidad == 2) {
