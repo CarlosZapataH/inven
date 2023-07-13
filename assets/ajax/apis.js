@@ -132,3 +132,22 @@ function updateGuideStatus (data, params) {
       throw error;
     });
 }
+
+function guideReversal (data, params) {
+  const url =
+    urlBase + "/TransferGuide/Controllers/TransferGuideController.php";
+  return axios
+    .post(url, data, {
+      params: {
+        action: "reversionOne",
+        ...params,
+      },
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error en la solicitud POST:", error);
+      throw error;
+    });
+}
+
+// {{path}}/Modules/TransferGuide/Controllers/TransferGuideController.php?action=

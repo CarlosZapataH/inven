@@ -85,19 +85,21 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 <input type="hidden" id="inv_devol" value="<?= $dtllePerfil['devolver_perfil'] ?>">
 <div class="container-fluid" id="divHead">
     <div id="app">
-        <div class="page-title pl-0 pr-0 pb-10">
-            <h4 class="mb-0">
-                <!-- <span id="txtAlmacen"><?= $nameAlmacen ?></span> -->
-                <span>Formulario GRE</span>
-            </h4>
-            <ol class="breadcrumb mb-0 pl-0 pt-1 pb-0">
-                <li class="breadcrumb-item text-muted">Formulario para generar guía de remisión electrónica (GRE)</li>
-            </ol>
-        </div>
-        <div>
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-10" v-if="movement">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="row justify-content-between align-items-end pt-4 pb-3">
+                    <div class="col-12 col-md-auto">
+                        <h4 class="mb-0"> Formulario GRE </h4>
+                        <ol class="breadcrumb mb-0 pl-0 pt-1 pb-0">
+                            <li class="breadcrumb-item text-muted">Formulario para generar guía de remisión electrónica (GRE)</li>
+                        </ol>
+                    </div>
+                    <div class="col-12 col-md-auto" v-if="movement">
+                        <button type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
+                    </div>
+                </div>
 
+                <div v-if="movement">
                     <div v-if="hasObservationsTci">
                         <div v-for="(msm, index) in movement.tci_messages" :index="index + '-tci-response'">
                             <div class="alert alert-warning" role="alert">
@@ -704,7 +706,6 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                 </div>
             </div>
         </div>
-
         <!-- <div class="card card-body shadow mb-40">
             <h5 class="card-title font-weight-bold">Datos Generales</h5>
             <form id="form_Change_Password">
@@ -897,5 +898,5 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
-    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>    
+    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_edit.js<?= $version ?>"></script>

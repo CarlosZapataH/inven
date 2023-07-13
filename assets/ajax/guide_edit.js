@@ -399,10 +399,8 @@ new Vue({
         data.transports = [
           {
             start_date: this.publicTransport?.at_FechaInicio,
-            document_type_code:
-              this.publicTransport?.at_TipoDocumentoIdentidad,
-            document:
-              this.publicTransport?.at_NumeroDocumentoIdentidad,
+            document_type_code: this.publicTransport?.at_TipoDocumentoIdentidad,
+            document: this.publicTransport?.at_NumeroDocumentoIdentidad,
             company_name: this.publicTransport?.at_RazonSocial,
             mtc_number: this.publicTransport?.at_NumeroMTC,
           },
@@ -443,6 +441,54 @@ new Vue({
         })
         .finally(() => {
           this.loadingSave = false;
+        });
+    },
+
+    reverseGuides() {
+      Swal.fire({
+        title: "¿Desea revertir la guía?",
+        text: "Esta acción revertirá la guía. ¿Está seguro?",
+        type: "question",
+        showCancelButton: true,
+        confirmButtonText: "Revertir",
+        cancelButtonText: "Cancelar",
+        input: "text",
+        inputPlaceholder: "Ingrese el motivo aquí",
+        inputValidator: (value) => {
+          if (!value) {
+            return "El campo de motivo es obligatorio";
+          }
+        },
+      }).then((result) => {
+        const motive = result?.value;
+        if (motive) this.sendReverseGuides(motive);
+      });
+    },
+    sendReverseGuides(motive = "") {
+      const data = {
+        id: this.idGuide,
+        motive,
+      };
+      guideReversal(data, {})
+        .then((response) => {
+          console.log("response:", response);
+          // swal.fire({
+          //   title: "",
+          //   type: "success",
+          //   text:
+          //     response?.message ||
+          //     "¡El formulario se ha guardado correctamente!",
+          //   showConfirmButton: false,
+          //   timer: 5000,
+          // });
+        })
+        .catch((error) => {
+          this.apiErros = error?.response?.data?.errors || [];
+          swal.fire({
+            title: "",
+            type: "error",
+            text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
+          });
         });
     },
   },
