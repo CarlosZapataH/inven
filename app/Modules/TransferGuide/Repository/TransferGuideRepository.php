@@ -109,6 +109,11 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transfers_guides.tci_send_date,
                 transfers_guides.tci_confirm_status_response,
                 transfers_guides.created_at,
+                transfers_guides.number_reversion,
+                transfers_guides.flag_reversion,
+                transfers_guides.tci_reversion_send,
+                transfers_guides.tci_reversion_response,
+                transfers_guides.tci_reversion_date,
                 almacen_ini.id_alm as almacen_ini_id,
                 almacen_ini.titulo_alm as almacen_ini_titulo_alm,
                 almacen_ini.direccion_alm as almacen_ini_direccion_alm,
@@ -236,6 +241,36 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             }
 
             return $data;
+        }
+        catch(Exception $e){
+
+        }
+        return null;
+    }
+
+    public function getMaxNumberReversion(){
+        try{
+            $num = 1;
+            $data = null;
+            $result = self::query("
+                SELECT MAX(number_reversion) as max_number
+                FROM transfers_guides
+                ORDER BY max_number DESC
+                LIMIT 1
+            ");
+
+            if($result){
+                if(is_array($result)){
+                    if(count($result) > 0){
+                        $data = $result[0];
+                        if(isset($data['max_number'])){
+                            $num = (intval($data['max_number']) > 0)?(intval($data['max_number']) + 1):1;
+                        }
+                    }
+                }
+            }
+
+            return $num;
         }
         catch(Exception $e){
 

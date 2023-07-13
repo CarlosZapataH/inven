@@ -5,6 +5,10 @@ require_once __DIR__ . '/../Helpers/HttpHelper.php';
 class TCIService{
     private $baseUrl = 'http://egestor.qa.efacturacion.pe/WS_eCica/GuiaRemisionRemitente/ServicioGuiaRemisionRemitente.svc/soap11';
     private $namespace = 'http://tci.net.pe/WS_eCica/GuiaRemisionRemitente/';
+    
+    private $baseUrlReversion = 'http://egestor.qa.efacturacion.pe/ws_Reversiones/ServicioReversiones.svc/soap11';
+    private $namespaceReversion = 'http://tci.net.pe/WS_eCica/Reversiones/';
+
     private $httpHelper;
     
     public function __construct() {
@@ -88,10 +92,28 @@ class TCIService{
         ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | RegistrarResumenReversion
+    |--------------------------------------------------------------------------
+    */
+    public function registerResumeReversion($data){
+        return self::sendActionReversion('RegistrarResumenReversion', [
+            'RegistrarResumenReversion' => $data
+        ]);
+    }
+    
     private function getHeaders($action){
         return [
             'Content-Type: text/xml;charset=UTF-8',
             'SOAPAction: http://tci.net.pe/WS_eCica/GuiaRemisionRemitente/IServicioGuiaRemisionRemitente/'.$action
+        ];
+    }
+
+    private function getHeadersReversion($action){
+        return [
+            'Content-Type: text/xml;charset=UTF-8',
+            'SOAPAction: http://tci.net.pe/WS_eCica/Reversiones/IServicioReversiones/'.$action
         ];
     }
 
@@ -101,10 +123,24 @@ class TCIService{
         return $xmlContent;
     }
 
+    private function getXMLContentReversion($data){
+        $xmlHelper = new XMLHelper($data, $this->namespaceReversion);
+        $xmlContent = $xmlHelper->generateXML();
+        return $xmlContent;
+    }
+
     private function sendAction($action, $data){
         $xmlContent = self::getXmlContent($data, $action);
-        // echo $xmlContent;
         $response = $this->httpHelper->postXML($this->baseUrl, self::getHeaders($action), $xmlContent);
+        // echo json_encode($response);
+        $response['content_send'] = $xmlContent;
+        return self::getResponse($response, $action);
+    }
+
+    private function sendActionReversion($action, $data){
+        $xmlContent = self::getXMLContentReversion($data, $action);
+        $response = $this->httpHelper->postXML($this->baseUrlReversion, self::getHeadersReversion($action), $xmlContent);
+        // echo json_encode($response);
         $response['content_send'] = $xmlContent;
         return self::getResponse($response, $action);
     }

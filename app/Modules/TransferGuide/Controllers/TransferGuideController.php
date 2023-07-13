@@ -111,33 +111,50 @@ class TransferGuideController{
                 
                 if(!$this->data['errors']){
                     $this->data = $this->data['data'];
-                    $this->storeData();
-                    $this->updateRelations();
-                    
-                    if($this->data['send']){
-                        $sendResponse = $this->sendTransitMovementGuide($this->id, $this->data['startStore']['establishment_id']);
-                        $response['data'] = $sendResponse['data'];
-                        $response['message'] = $sendResponse['message'];
-                        if($sendResponse['success']){
-                            $this->transferGuideRepository->update($this->id, [
-                                'hash_code' => $response['data']['at_CodigoHash'],
-                                'xml_name' => $response['data']['at_NombreXML']
-                            ]);
-                            $response['code'] = 200;
-                            $response['success'] = true;
-                            $response['data']['id'] = $this->id;
+
+                    if($this->data['guide']['id']){
+                        $transferGuideExist = $this->transferGuideRepository->findOneWithDetails($this->data['guide']['id']);
+                        if(!$transferGuideExist){
+                            $this->data['errors'] = ['La guia no existe.'];
+                        }
+                        else if(in_array($transferGuideExist['tci_response_type'], [1, 2]) || $transferGuideExist['flag_reversion']){
+                            $this->data['errors'] = ['No es posible editar guias aprobadas o anuladas.'];
+                        }
+                    }
+
+                    if(!$this->data['errors']){
+                        $this->storeData();
+                        $this->updateRelations();
+                        
+                        if($this->data['send']){
+                            $sendResponse = $this->sendTransitMovementGuide($this->id, $this->data['startStore']['establishment_id']);
+                            $response['data'] = $sendResponse['data'];
+                            $response['message'] = $sendResponse['message'];
+                            if($sendResponse['success']){
+                                $this->transferGuideRepository->update($this->id, [
+                                    'hash_code' => $response['data']['at_CodigoHash'],
+                                    'xml_name' => $response['data']['at_NombreXML']
+                                ]);
+                                $response['code'] = 200;
+                                $response['success'] = true;
+                                $response['data']['id'] = $this->id;
+                            }
+                            else{
+                                $response['errors'] = $sendResponse['errors'];
+                            }
                         }
                         else{
-                            $response['errors'] = $sendResponse['errors'];
+                            $response['code'] = 200;
+                            $response['success'] = true;
+                            $response['message'] = 'Información '. ($this->id?'registrada':'actualizada') . ' exitosamente.';
+                            $response['data'] = [
+                                'transfer_guide_id' => ($this->id)
+                            ];
                         }
                     }
                     else{
-                        $response['code'] = 200;
-                        $response['success'] = true;
-                        $response['message'] = 'Información '. ($this->id?'registrada':'actualizada') . ' exitosamente.';
-                        $response['data'] = [
-                            'transfer_guide_id' => ($this->id)
-                        ];
+                        $response['success'] = false;
+                        $response['errors'] = $this->data['errors'];
                     }
                 }
                 else{
@@ -276,6 +293,134 @@ class TransferGuideController{
                                 ]
                             ]
                         ]);
+                    }
+                }
+            } 
+        // } 
+        // catch (PDOException $e) {
+        //     Session::setAttribute("error", $e->getMessage());
+        //     echo json_encode($e->getMessage());
+        // }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+        
+    }
+
+    public function reversionOne(){
+        header('Content-Type: application/json');
+        
+        $response = GlobalHelper::getGlobalResponse();
+        // try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                if(!ValidateHelper::validateProperty($data, ['id'])){
+                    $response['errors'] = ['id' => 'El id es obligatorio'];
+                }
+                else if(!ValidateHelper::validateProperty($data, ['motive'])){
+                    $response['errors'] = ['motive' => 'El motivo es obligatorio'];
+                }
+                else{
+                    $this->data = $this->transferGuideRepository->findOneWithDetails($data['id']);
+                    
+                    if(!$this->data){
+                        $response['errors'] = ['id' => 'Registro no encontrado'];
+                    }
+                    else if(!$this->data['flag_sent']){
+                        $response['errors'] = ['sent' => 'El registro aún no ha sido enviado'];
+                    }
+                    else if(!in_array($this->data['tci_response_type'], [1,2])){
+                        $response['errors'] = ['sent' => 'Solo es posible revertir documentos aprobados'];
+                    }
+                    else if($this->data['flag_reversion']){
+                        $response['errors'] = ['sent' => 'El documento ya fue enviado para su reversión'];
+                    }
+                    else{
+                        $numberReversion = $this->transferGuideRepository->getMaxNumberReversion();
+                        $sendData = [
+                            'company' => [
+                                'document' => $this->data['start_store']['company']['document'],
+                                'name' => $this->data['start_store']['company']['name']
+                            ],
+                            'number_reversion' => $numberReversion, 
+                            'date_issue' => $this->data['date_issue'],
+                            'date_generated' => date("Y-m-d"),
+                            'serie' => $this->data['serie'],
+                            'number' => $this->data['number'],
+                            'motive' => $data['motive']
+                        ];
+                        $tciResponse = $this->registerResumeReversion($sendData);
+                        $response['data'] = $tciResponse['data'];
+                        $response['message'] = $tciResponse['message'];
+                        if(!$tciResponse['success']){
+                            $response['errors'] = $tciResponse['errors'];
+                        }
+                    }
+                }
+
+                if(!$this->data['errors']){
+                    if($response['data']){
+                        $status = false;
+                        if(isset($response['data']['at_NivelResultado'])){
+                            if(($response['data']['at_NivelResultado'] == true || $response['data']['at_NivelResultado'] == 'true' || $response['data']['at_NivelResultado'] == 1 || $response['data']['at_NivelResultado'] == '1') && $response['data']['at_NivelResultado'] != 'false'){
+                                $status = true;
+                            }
+                        }
+
+                        if($response['data']){
+                            $this->transferGuideRepository->update($this->data['id'], [
+                                'flag_reversion' => true,
+                                'tci_reversion_date' => date("Y-m-d H:i:s"),
+                                'tci_reversion_send' => $tciResponse['content_send'],
+                                'tci_reversion_response' => $tciResponse['original'],
+                                'number_reversion' => $numberReversion
+                            ]);
+                        }
+                        
+                        if($status){
+                            $response['code'] = 200;
+                            $response['success'] = true;
+                            $response['message'] = 'Reversión solicitada exitosamente.';
+                            
+                            /* $this->transferGuideRepository->update($this->data['id'], [
+                                'tci_response_code' => $result['code_response'],
+                                'tci_response_type' => $result['type_response'],
+                                'tci_response_description' => $result['description'],
+                                'tci_response_date' => $result['date'],
+                                'tci_confirm_status_response' => json_encode($result)
+                            ]);
+    
+                            $transferGuideHistoryRepository = new TransferGuideHistoryRepository();
+                            $transferGuideHistoryRepository->store([
+                                'status' => $result['type_response'],
+                                'code' => $result['code_response'],
+                                'description' => $result['description'],
+                                'date' => $result['date'],
+                                'transfer_guide_id' => $this->data['id'],
+                                'tci_confirm_status_response' => json_encode($result),
+                                'created_at' => date("Y-m-d H:i:s")
+                            ]);
+                            
+                            $tciServiceConfirm = new TCIService();
+                            $tciServiceConfirm->confirmResponseSUNAT([
+                                'ent_ConfirmarRespuesta' => [
+                                    'at_NumeroDocumentoIdentidad' => $this->data['start_store']['company']['document'],
+                                    'l_Comprobante' => [
+                                        'en_ComprobanteConfirmarRespuesta' => [
+                                            'at_Serie' => $result['serie'],
+                                            'at_Numero' => $result['number'],
+                                            'at_CodigoRespuesta' => $result['code_response']
+                                        ]
+                                    ]
+                                ]
+                            ]); */
+                        }
+                        else{
+                            if(isset($response['data']['at_MensajeResultado'])){
+                                $response['message'] = $response['data']['at_MensajeResultado'];
+                                $response['errors'] = [$response['data']['at_MensajeResultado']];
+                            }
+                        }
                     }
                 }
             } 
@@ -519,7 +664,26 @@ class TransferGuideController{
         return $response;
     }
 
-    
+    private function registerResumeReversion($data){
+        $response = GlobalHelper::getGlobalResponse();
+        $tciService = new TCIService();
+
+        $tciResponse = $tciService->registerResumeReversion(FormatHelper::parseResumeReversion($data));
+        
+        $response['data'] = $tciResponse['data'];
+        $response['message'] = $tciResponse['message'];
+        $response['content_send'] = $tciResponse['content_send'];
+        $response['original'] = $tciResponse['original'];
+        
+        if($tciResponse['success']){
+            $response['success'] = true;
+        }
+        else{
+            $response['errors'] = [$tciResponse['message']];
+        }
+
+        return $response;
+    }
     
     public function queryStatusTCI(){
         header('Content-Type: application/json');
