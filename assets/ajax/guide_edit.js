@@ -471,23 +471,25 @@ new Vue({
       };
       guideReversal(data, {})
         .then((response) => {
-          console.log("response:", response);
-          // swal.fire({
-          //   title: "",
-          //   type: "success",
-          //   text:
-          //     response?.message ||
-          //     "¡El formulario se ha guardado correctamente!",
-          //   showConfirmButton: false,
-          //   timer: 5000,
-          // });
+          swal.fire({
+            title: "",
+            type: "success",
+            text:
+              response?.message ||
+              "La acción se ha realizado correctamente.",
+            showConfirmButton: false,
+            timer: 5000,
+          });
+          setTimeout(() => {
+            location.reload();
+          }, 5000);
         })
         .catch((error) => {
           this.apiErros = error?.response?.data?.errors || [];
           swal.fire({
             title: "",
             type: "error",
-            text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
+            text: "La acción no se pudo completar.",
           });
         });
     },

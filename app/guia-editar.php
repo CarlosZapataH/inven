@@ -95,7 +95,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </ol>
                     </div>
                     <div class="col-12 col-md-auto" v-if="movement">
-                        <button type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
+                        <button v-if="movement.flag_reversion == 0 && movement.tci_response_type == 1" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
                     </div>
                 </div>
 
@@ -106,6 +106,10 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 {{msm}}
                             </div>
                         </div>
+                    </div>
+
+                    <div v-if="movement.flag_reversion == 1">
+                        <div class="alert alert-warning" role="alert">La guía se ha revertido</div>
                     </div>
 
                     <div class="card" id="section_origin" v-if="movement && movement.tci_response_type">
