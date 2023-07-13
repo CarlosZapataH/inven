@@ -81,18 +81,12 @@ class FormatHelper{
 
         $storeIni = [
             'at_Ubigeo' => $data['start_store']['district']['code'],
-            'at_DireccionCompleta' => $data['start_store']['address'] . ', ' . $data['start_store']['district']['name'] . ', ' . $data['start_store']['district']['province'] . ', ' . $data['start_store']['district']['department'],
-            'at_Departamento' => $data['start_store']['district']['department'],
-            'at_Provincia' => $data['start_store']['district']['province'],
-            'at_Distrito' => $data['start_store']['district']['name'],
+            'at_DireccionCompleta' => $data['start_store']['address'] . ' - ' . $data['start_store']['district']['name'] . ' - ' . $data['start_store']['district']['province'] . ' - ' . $data['start_store']['district']['department']
         ];
 
         $storeEnd = [
             'at_Ubigeo' => $data['end_store']['district']['code'],
-            'at_DireccionCompleta' => $data['end_store']['address'] . ', ' . $data['end_store']['district']['name'] . ', ' . $data['end_store']['district']['province'] . ', ' . $data['end_store']['district']['department'],
-            'at_Departamento' => $data['end_store']['district']['department'],
-            'at_Provincia' => $data['end_store']['district']['province'],
-            'at_Distrito' => $data['end_store']['district']['name']
+            'at_DireccionCompleta' => $data['end_store']['address'] . ' - ' . $data['end_store']['district']['name'] . ' - ' . $data['end_store']['district']['province'] . ' - ' . $data['end_store']['district']['department']
         ];
 
         if($data['motive_code'] == TransferGuide::BETWEENCOMPANY){
@@ -121,6 +115,12 @@ class FormatHelper{
 
         if($data['motive_code'] == TransferGuide::OTHER){
             $transportInformation['at_DescripcionMotivo'] = $data['motive_description'];
+
+            if($data['motive_description'] == 'Traslado de materiales EPPS, instrumentos al trabajador'){
+                $transportInformation['aa_IndicadorServicio'] = [
+                    'string' => "02"
+                ];
+            }
 
             if(isset($data['provider'])){
                 $provider = [
@@ -157,6 +157,9 @@ class FormatHelper{
                         ]
                     ]
                 ],
+                'ent_InformacionAdicionalGRR' => [
+                    'at_LogoRepresentacionImpresa' => 'SKA'
+                ]
             ]
         ];
 
@@ -290,7 +293,35 @@ class FormatHelper{
                 }
             }
         }
-
+        
         return $document;
+    }
+
+    public static function parseResumeReversion($data){
+        $result = [
+            'ent_ResumenReversion' => [
+                'ent_Emisor' => [
+                    'at_NumeroDocumentoIdentidad' => $data['company']['document'],
+                    'at_RazonSocial' => $data['company']['name']
+                ],
+                'ent_DatoResumenReversion' => [
+                    'ent_CabeceraResumenReversion' => [
+                        'at_FechaComprobante' => $data['date_issue'],
+                        'at_FechaGeneracion' => $data['date_generated'],
+                        'at_IdentificadorUnico' => $data['number_reversion'],
+                        'l_ComprobantesRevertidos' => [
+                            'en_ComprobantesRevertidos' => [
+                                'at_TipoComprobante' => '09',
+                                'at_Serie' => $data['serie'],
+                                'at_Numero' => $data['number'],
+                                'at_MotivoReversion' => $data['motive']
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return $result;
     }
 }
