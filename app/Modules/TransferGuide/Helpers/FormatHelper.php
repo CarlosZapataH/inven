@@ -72,7 +72,9 @@ class FormatHelper{
                 'at_Codigo' => $item['code']
             ];
             if($item['additional_description']){
-                $newBien['additional_description'] = $item['additional_description'];
+                $newBien['aa_DescripcionAdicional'] = [
+                    'string' => $item['additional_description']
+                ];
             }
             array_push($bienes, [
                 'en_BienesGRR' => $newBien
