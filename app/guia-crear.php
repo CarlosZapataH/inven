@@ -263,21 +263,10 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <select v-model="generalData.description_transfer" name="description" v-validate="'required'" class="form-control">
-                                                <option v-for="(submotive, index) in submotives" :key="index + '-submotives'" :value="submotive.value">{{ submotive.description }}</option>
-                                                <option value="NEW">Escribir nueva descripción</option>
-                                            </select>
-                                            <span class="text-danger">{{ errors.first('description') }}</span>
-                                        </div>
-                                        <div class="col-sm-6" v-if="generalData.description_transfer == 'NEW'">
-                                            <input v-model="generalData.new_description" name="new_motive" v-validate="'required'" type="text" class="form-control" placeholder="">
-                                            <span class="text-danger">{{ errors.first('new_motive') }}</span>
-                                        </div>
-                                    </div>
-                                    <!-- <input v-model="generalData.at_DescripcionMotivo" type="text" class="form-control" id="at_DescripcionMotivo"> -->
-
+                                    <select v-model="generalData.description_transfer" name="description" v-validate="'required'" class="form-control">
+                                        <option v-for="(submotive, index) in submotives" :key="index + '-submotives'" :value="submotive.value">{{ submotive.description }}</option>
+                                    </select>
+                                    <span class="text-danger">{{ errors.first('description') }}</span>
                                 </div>
                             </div>
 
@@ -902,5 +891,5 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
     <script src="../assets/ajax/DriverRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/VehicleRegistrationForm.js<?= $version ?>"></script>
     <script src="../assets/ajax/CompanyRegistrationModal.js<?= $version ?>"></script>
-    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>    
+    <script src="../assets/ajax/AutocompleteField.js<?= $version ?>"></script>
     <script src="../assets/ajax/guide_create.js<?= $version ?>"></script>
