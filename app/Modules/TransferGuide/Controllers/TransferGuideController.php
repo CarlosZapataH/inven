@@ -173,7 +173,7 @@ class TransferGuideController{
         
     }
 
-    public function download(){
+    public function downloadPDF(){
         header('Content-Type: application/json');
         
         $response = GlobalHelper::getGlobalResponse();
@@ -210,6 +210,60 @@ class TransferGuideController{
                             'file' => $response['data']['ent_Resultado']['at_ArchivoRI']
                             ?"data:application/pdf;base64,{$response['data']['ent_Resultado']['at_ArchivoRI']}"
                             :null
+                        ];
+                    }
+                }
+            } 
+        // } 
+        // catch (PDOException $e) {
+        //     Session::setAttribute("error", $e->getMessage());
+        //     echo json_encode($e->getMessage());
+        // }
+
+        http_response_code($response['code']);
+        echo json_encode($response);
+        
+    }
+
+    public function downloadXML(){
+        header('Content-Type: application/json');
+        
+        $response = GlobalHelper::getGlobalResponse();
+        // try {
+            $data = GlobalHelper::getPostData();
+            if (json_last_error() === JSON_ERROR_NONE){
+                if(!ValidateHelper::validateProperty($data, ['id'])){
+                    $response['errors'] = ['id' => 'El id es obligatorio'];
+                }
+                else{
+                    $this->data = $this->transferGuideRepository->findOneWithDetails($data['id']);
+                    if(!$this->data){
+                        $response['errors'] = ['id' => 'Registro no encontrado'];
+                    }
+                    else if(!$this->data['flag_sent']){
+                        $response['errors'] = ['sent' => 'El registro aún no ha sido enviado'];
+                    }
+                    else{
+                        $queryResponse = $this->downloadXMLTransferGuide($this->data);
+                        $response['data'] = $queryResponse['data'];
+                        $response['message'] = $queryResponse['message'];
+                        if(!$queryResponse['success']){
+                            $response['errors'] = $queryResponse['errors'];
+                        }
+                    }
+                }
+
+                if(!$this->data['errors']){
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                    $response['message'] = 'Información exitosamente.';
+                    if(ValidateHelper::validateProperty($response['data'], ['ent_ResultadoXML.at_XML'])){
+                        $response['data'] = [
+                            'file' => $response['data']['ent_ResultadoXML']['at_XML']
+                            ?"data:text/xml;base64,{$response['data']['ent_ResultadoXML']['at_XML']}"
+                            :null,
+                            'name' => $response['data']['ent_ResultadoXML']['at_NombreXML'],
+                            'date' => $response['data']['ent_ResultadoXML']['at_FechaXML']
                         ];
                     }
                 }
@@ -633,6 +687,24 @@ class TransferGuideController{
         $tciService = new TCIService();
 
         $tciResponse = $tciService->queryPdf(FormatHelper::parseDownloadPDF($data));
+        $response['data'] = $tciResponse['data'];
+        $response['message'] = $tciResponse['message'];
+        
+        if($tciResponse['success']){
+            $response['success'] = true;
+        }
+        else{
+            $response['errors'] = [$tciResponse['message']];
+        }
+
+        return $response;
+    }
+
+    private function downloadXMLTransferGuide($data){
+        $response = GlobalHelper::getGlobalResponse();
+        $tciService = new TCIService();
+
+        $tciResponse = $tciService->queryXML(FormatHelper::parseDownloadXML($data));
         $response['data'] = $tciResponse['data'];
         $response['message'] = $tciResponse['message'];
         

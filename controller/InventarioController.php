@@ -1854,7 +1854,7 @@ class InventarioController {
             else if((int)$_POST['tipoTransfer'] == 2){
                 $ttMotivo = "";
                 $ttFechaGuia = "0000-00-00";
-                $ttNroGuia = "";
+                $ttNroGuia = null;
                 $ttDias = 0;
                 $persona1 = "";
                 $ndoc1 = "";
@@ -1862,7 +1862,7 @@ class InventarioController {
                 $ndoc2 = "";
                 if(!empty(trim($_POST['motivo_itm']))){ $ttMotivo = trim($_POST['motivo_itm']); }
                 if(!empty(trim($_POST['fguia_itm']))){ $ttFechaGuia = $obj_fn->fecha_ESP_ENG($_POST['fguia_itm']); }
-                if(!empty(trim($_POST['nguia_itm']))){ $ttNroGuia = $_POST['nguia_itm']; }
+                // if(!empty(trim($_POST['nguia_itm']))){ $ttNroGuia = $_POST['nguia_itm']; }
                 if(!empty(trim($_POST['ndias_itm'])) and (int)$_POST['ndias_itm']>0){ $ttDias = (int)$_POST['ndias_itm']; }
 
                 if(!empty(trim($_POST['aper1_itm']))){ $persona1 = $_POST['aper1_itm']; }

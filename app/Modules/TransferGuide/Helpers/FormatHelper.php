@@ -264,6 +264,21 @@ class FormatHelper{
         return $result;
     }
 
+    public static function parseDownloadXML($data){
+        $result = [
+            'ent_ConsultarXML' => [
+                'at_NumeroDocumentoIdentidad' => $data['start_store']['company']['document'],
+                'ent_ComprobanteConsultarXML' => [
+                    'at_Serie' => $data['serie'],
+                    'at_Numero' => $data['number'],
+                    'at_NumeroRespuesta' => 1
+                ]
+            ]
+        ];
+
+        return $result;
+    }
+
     public static function parseQueryOneGRR($data){
         $result = [
             'ent_ConsultarComprobanteIndividual' => [
