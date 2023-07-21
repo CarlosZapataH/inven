@@ -17,7 +17,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
         if($send){
             $rules = [
                 'id' => [['nullable']],
-                'name' => [['required']],
+                'name' => [['nullable']],
                 'detail' => [['array']],
                 'motive_code' => [['required']],
                 'observations' => [['nullable']],
@@ -29,7 +29,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
         else{
             $rules = [
                 'id' => [['nullable']],
-                'name' => [['nullable']],
+                'name' => [['required']],
                 'detail' => [['array']],
                 'motive_code' => [['required']],
                 'observations' => [['nullable']],
