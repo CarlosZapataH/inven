@@ -29,7 +29,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
         else{
             $rules = [
                 'id' => [['nullable']],
-                'name' => [['required']],
+                'name' => [['nullable']],
                 'detail' => [['array']],
                 'motive_code' => [['required']],
                 'observations' => [['nullable']],
@@ -51,6 +51,9 @@ class TransferBetweenCompanyRequest extends CommonRequest
             // en_BienesGRR
             'serie' => [
                 'required' => 'La serie es obligatoria.',
+            ],
+            'name' => [
+                'required' => 'El nombre es obligatorio.',
             ],
             'number' => [
                 'required' => 'El número de serie es obligatorio.',
