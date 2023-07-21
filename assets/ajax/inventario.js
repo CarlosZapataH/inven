@@ -1010,16 +1010,10 @@ $(document).on('submit','#formTransferirItem', function(e) {
             if (result.value) {
                 sga.blockUI.loading_body();
                 $.post('../controller/InventarioController.php?action=tranferir_Item_JSON', data, function (response) {
-                    console.log(response);
                     if (parseInt(response.status) === 1) {
                         if(parseInt(response.tipotransfer) === 2){
-                            let btngenFileGuia = '<div><a class="btn btn-danger btn-sm btn-hover-transform mt-10 cursor-pointer text-white" data-id="'+response.isetId+'" id="btnOptionsGuia_Export">' +
-                                    '   <b><i class="icon-download4 position-left"></i></b>\n' +
-                                    '   Descargar Guia [' + data.nguia_itm + ']'+
-                                    '</a></div>';
-
                             swal.fire({
-                                html: response.message+btngenFileGuia,
+                                html: response.message,
                                 type: "success",
                                 showCancelButton: false,
                                 showConfirmButton: true,
@@ -1973,6 +1967,7 @@ $(document).on('submit','#formDevolverItem', function(e) {
     "use strict";
     e.preventDefault();
     let data = $(this).serialize();
+    
     Swal.fire({
         html: 'Se va realizar la devolución de los Ítems descritos.<br>Desea continuar...!.',
         type: 'warning',
@@ -2202,15 +2197,15 @@ $(document).on('click','.tipoTransAlmacen', function() {
             '                   name="fguia_itm" id="fguia_itm" maxlength="10" placeholder="**/**/****">' +
             '           </div>' +
             '       </div>' +
-            '       <div class="form-group row">' +
-            '           <label for="nguia_itm" class="col-sm-4 col-form-label text-lg-right text-md-right text-left">' +
-            '               Número de Guía <span class="text-danger font-weight-bold">*</span>' +
-            '           </label>' +
-            '           <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">' +
-            '               <input type="text" class="form-control input-md text-left" autocomplete="off" required' +
-            '                   id="nguia_itm" name="nguia_itm" maxlength="11" placeholder="***-*******">' +
-            '           </div>' +
-            '       </div>' +
+            // '       <div class="form-group row">' +
+            // '           <label for="nguia_itm" class="col-sm-4 col-form-label text-lg-right text-md-right text-left">' +
+            // '               Número de Guía <span class="text-danger font-weight-bold">*</span>' +
+            // '           </label>' +
+            // '           <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">' +
+            // '               <input type="text" class="form-control input-md text-left" autocomplete="off" required' +
+            // '                   id="nguia_itm" name="nguia_itm" maxlength="11" placeholder="***-*******">' +
+            // '           </div>' +
+            // '       </div>' +
             '       <div class="form-group row">' +
             '           <label for="nguia_itm" class="col-sm-4 col-form-label text-lg-right text-md-right text-left">' +
             '               Tiempo llegada estimada <span class="text-danger font-weight-bold">*</span>' +

@@ -105,8 +105,7 @@ new Vue({
       return queryValue;
     },
     dateIssued: function () {
-      const date = this.generalData?.at_FechaEmision;
-      return this.addDay(date);
+      return this.generalData?.at_FechaEmision;
     },
     recipientHasCompany() {
       return !!this.movement?.end_store?.company?.id;
@@ -401,7 +400,7 @@ new Vue({
           swal.fire({
             title: "",
             type: "error",
-            text: "No se pudo procesar la solicitud de guardado debido a errores en el formulario. Por favor, revisa la información ingresada.",
+            text: "No hemos podido registrar la guía en este momento. Te recomendamos revisar las observaciones en la parte inferior para obtener más detalles sobre el problema",
           });
         })
         .finally(() => {

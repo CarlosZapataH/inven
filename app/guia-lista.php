@@ -143,12 +143,17 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span v-if="guide?.flag_sent == 0" class="py-2 d-block badge badge-info m-1" style="max-width: 140px;">Borrador</span>
                                 </td>
                                 <td>
-                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm m-1">Ver</a>
-                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide)" v-if="guide.tci_response_type == '1'">
-                                        Descargar GRE
+                                    <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm m-1">
+                                        <i class="ti-file fz-10 position-left"></i> Ver
+                                    </a>
+                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide, 'downloadPDF')" v-if="guide.tci_response_type == '1'">
+                                        <i class="ti-download fz-10 position-left"></i> PDF
+                                    </button>
+                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide, 'downloadXML')" v-if="guide.tci_response_type == '1'">
+                                        <i class="ti-download fz-10 position-left"></i> XML
                                     </button>
                                     <button class="btn btn-primary btn-sm m-1" @click="getGuideStatus(guide)" v-if="guide.flag_resend">
-                                        Consultar estado
+                                        <i class="ti-reload fz-10 position-left"></i> Consultar estado
                                     </button>
                                 </td>
                             </tr>
