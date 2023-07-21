@@ -257,11 +257,9 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Correo Secundario
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
+                                <label class="col-sm-3 col-form-label">Correo Secundario</label>
                                 <div class="col-sm-9">
-                                    <input v-model="end_store.email_secondary" name="DES_Correo_Secundario" v-validate="'required|email'" type="email" class="form-control">
+                                    <input v-model="end_store.email_secondary" name="DES_Correo_Secundario" v-validate="'email'" type="email" class="form-control">
                                     <span class="text-danger">{{ errors.first('DES_Correo_Secundario') }}</span>
                                 </div>
                             </div>
@@ -275,17 +273,15 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         <div class="card-body">
 
                             <div class="form-group row">
-                                <label class="col-sm-3 col-form-label">Nombre de la guía
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
+                                <label class="col-sm-3 col-form-label">Nombre de la guía</label>
                                 <div class="col-sm-9">
-                                    <input v-model="generalData.name" name="GD_name" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="generalData.name" name="GD_name" type="text" class="form-control">
                                     <span class="text-danger">{{ errors.first('GD_name') }}</span>
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label for="at_CodigoMotivo" class="col-sm-3 col-form-label">Tipo de Traslado
+                                <label for="at_CodigoMotivo" class="col-sm-3 col-form-label">Motivo de movimiento
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
