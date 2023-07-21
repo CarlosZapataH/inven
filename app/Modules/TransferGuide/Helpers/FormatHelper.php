@@ -153,10 +153,7 @@ class FormatHelper{
                     'at_NumeroDocumentoIdentidad' => $data['end_store']['company']['document'],
                     'at_RazonSocial' => $data['end_store']['company']['name'],
                     'ent_Correo' => [
-                        'at_CorreoPrincipal' => $data['end_store']['email_principal'],
-                        'aa_CorreoSecundario' => [
-                            'string' => $data['end_store']['email_secondary']
-                        ]
+                        'at_CorreoPrincipal' => $data['end_store']['email_principal']
                     ]
                 ],
                 'ent_InformacionAdicionalGRR' => [
@@ -164,6 +161,14 @@ class FormatHelper{
                 ]
             ]
         ];
+
+        if(isset($data['end_store']['email_secondary'])){
+            if($data['end_store']['email_secondary']){
+                $result['ent_GuiaRemisionRemitente']['ent_DestinatarioGRR']['ent_Correo']['aa_CorreoSecundario'] = [
+                    'string' => $data['end_store']['email_secondary']
+                ];
+            }
+        }
 
         if($provider){
             $result['ent_GuiaRemisionRemitente']['ent_ProveedorGRR'] = $provider;

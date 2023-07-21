@@ -238,9 +238,9 @@ class ValidationTransferGuide{
             if(!ValidateHelper::validateProperty($this->data, ['end_store.email_principal'])){
                 $this->addErrors(['end_store.email_principal' => 'El correo electrónico primario del almacén de llegada es obligatorio.']);
             }
-            if(!ValidateHelper::validateProperty($this->data, ['end_store.email_secondary'])){
+            /* if(!ValidateHelper::validateProperty($this->data, ['end_store.email_secondary'])){
                 $this->addErrors(['end_store.email_secondary' => 'El correo electrónico secundario del almacén de llegada es obligatorio.']);
-            }
+            } */
         }
         
         $this->guide['email_principal'] = ValidateHelper::validateProperty($this->data, ['end_store.email_principal'])?$this->data['end_store']['email_principal']:null;
