@@ -105,7 +105,6 @@ function downloadGuide(data, params) {
   return axios
     .post(url, data, {
       params: {
-        action: "download",
         ...params,
       },
     })

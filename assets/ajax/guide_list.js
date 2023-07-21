@@ -39,8 +39,8 @@ new Vue({
       link.click();
     },
 
-    listenBtnDownload(guide) {
-      downloadGuide({ id: guide?.id })
+    listenBtnDownload(guide, action) {
+      downloadGuide({ id: guide?.id }, { action })
         .then((response) => {
           if (response?.data?.file)
             this.downloadFile(
