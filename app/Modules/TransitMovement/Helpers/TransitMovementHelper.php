@@ -84,6 +84,7 @@ class TransitMovementHelper{
                             'unit_measure' => $row['um_sunat_code'],
                             'quantity' => $row['cant_mde'],
                             'code' => $row['inventario_cod_inv'],
+                            'additional_description' => self::getAdditionalDescription($row)
                         ]
                     ];
 
@@ -106,6 +107,7 @@ class TransitMovementHelper{
                         'unit_measure' => $row['um_sunat_code'],
                         'quantity' => $row['cant_mde'],
                         'code' => $row['inventario_cod_inv'],
+                        'additional_description' => self::getAdditionalDescription($row)
                     ]);
                 }
             }
@@ -118,5 +120,36 @@ class TransitMovementHelper{
             'start_store' => $startStore,
             'end_store' => $endStore
         ];
+    }
+
+    private static function getAdditionalDescription($row){
+        $additionalDescription = null;
+
+        if($row['inventario_marca_inv'] && $row['inventario_marca_inv'] != ''){
+            $additionalDescription .= $row['inventario_marca_inv'];
+        }
+
+        if($row['inventario_nroparte_inv'] && $row['inventario_nroparte_inv'] != ''){
+            if($additionalDescription){
+                $additionalDescription .= ' / ';
+            }
+            $additionalDescription .= $row['inventario_nroparte_inv'];
+        }
+
+        if($row['inventario_cactivo_inv'] && $row['inventario_cactivo_inv'] != ''){
+            if($additionalDescription){
+                $additionalDescription .= ' / ';
+            }
+            $additionalDescription .= $row['inventario_cactivo_inv'];
+        }
+
+        if($row['inventario_cinventario_inv'] && $row['inventario_cinventario_inv'] != ''){
+            if($additionalDescription){
+                $additionalDescription .= ' / ';
+            }
+            $additionalDescription .= $row['inventario_cinventario_inv'];
+        }
+
+        return $additionalDescription;
     }
 }
