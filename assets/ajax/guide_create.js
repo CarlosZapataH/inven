@@ -33,6 +33,7 @@ new Vue({
       motive: 4,
       description_transfer: null,
       new_description: null,
+      indicator_service: null,
       ent_InformacionPesoBrutoGRR: {
         at_Peso: "",
         at_UnidadMedida: "KGM",
@@ -330,6 +331,8 @@ new Vue({
         total_witght: this.generalData?.total_witght,
         total_quantity: this.generalData?.total_quantity,
         transport_modality: this.en_InformacionTransporteGRR?.at_Modalidad,
+
+        indicator_service: this.generalData?.indicator_service || null,
 
         start_store: {
           company_id: this.start_store.company_id,

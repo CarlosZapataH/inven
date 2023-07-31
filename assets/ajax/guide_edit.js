@@ -283,6 +283,7 @@ new Vue({
         total_witght: movement?.total_witght || null,
         unit_measure: movement?.unit_measure || "KGM",
         total_quantity: movement?.total_quantity || null,
+        indicator_service: movement?.indicator_service || null,
       };
 
       if (this.isMotiveInSubmotives(movement?.motive_description)) {
@@ -365,6 +366,7 @@ new Vue({
         total_witght: this.generalData?.total_witght,
         total_quantity: this.generalData?.total_quantity,
         transport_modality: this.en_InformacionTransporteGRR?.at_Modalidad,
+        indicator_service: this.generalData?.indicator_service || null,
 
         start_store: {
           company_id: this.start_store.company_id,

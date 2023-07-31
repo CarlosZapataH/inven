@@ -148,7 +148,8 @@ Vue.component("DriverRegistrationForm", {
       if (this.drivers.length < 3) {
         this.$validator.validateAll().then((result) => {
           if (result) {
-            this.drivers.push({ ...this.en_ConductorGRR });
+            const license = (this.en_ConductorGRR?.license || "").toUpperCase();
+            this.drivers.push({ ...this.en_ConductorGRR, license });
             this.cleanform();
           }
         });
