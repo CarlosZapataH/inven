@@ -117,7 +117,7 @@ class TransferGuideController{
                         if(!$transferGuideExist){
                             $this->data['errors'] = ['La guia no existe.'];
                         }
-                        else if(in_array($transferGuideExist['tci_response_type'], [1, 2]) || $transferGuideExist['flag_reversion']){
+                        else if(in_array($transferGuideExist['tci_response_type'], [1]) || $transferGuideExist['flag_reversion']){
                             $this->data['errors'] = ['No es posible editar guias aprobadas o anuladas.'];
                         }
                     }

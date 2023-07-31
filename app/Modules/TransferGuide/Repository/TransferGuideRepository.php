@@ -100,6 +100,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transfers_guides.email_principal,
                 transfers_guides.email_secondary,
                 transfers_guides.transport_modality,
+                transfers_guides.indicator_service,
                 transfers_guides.flag_sent,
                 transfers_guides.sent_attempts,
                 transfers_guides.tci_response_code,

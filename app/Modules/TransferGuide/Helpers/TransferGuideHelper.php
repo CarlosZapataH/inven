@@ -88,6 +88,7 @@ class TransferGuideHelper{
                             'unit_measure' => $row['unit_measure'],
                             'total_quantity' => $row['total_quantity'],
                             'transport_modality' => $row['transport_modality'],
+                            'indicator_service' => $row['indicator_service'],
                             'flag_sent' => $row['flag_sent'],
                             'sent_attempts' => $row['sent_attempts'],
                             'tci_response_code' => $row['tci_response_code'],

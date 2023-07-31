@@ -20,7 +20,7 @@ class FormatHelper{
                                 'at_TipoDocumentoIdentidad' => $data['transports'][0]['document_type_code'],
                                 'at_NumeroDocumentoIdentidad' => $data['transports'][0]['document'],
                                 'at_RazonSocial' => $data['transports'][0]['company_name'],
-                                'at_NumeroMTC' => $data['transports'][0]['mtc_number']
+                                'at_NumeroMTC' => strtoupper($data['transports'][0]['mtc_number'])
                             ]
                         ]
                     ];
@@ -42,7 +42,7 @@ class FormatHelper{
                             'en_ConductorGRR' => [
                                 'at_TipoDocumentoIdentidad' => $transport['document_type_code'],
                                 'at_NumeroDocumentoIdentidad' => $transport['document'],
-                                'at_Licencia' => $transport['license'],
+                                'at_Licencia' => strtoupper($transport['license']),
                                 'at_Nombres' => $transport['name'],
                                 'at_Apellidos' => $transport['last_name']
                             ]
@@ -53,7 +53,7 @@ class FormatHelper{
                         array_push($transports['en_InformacionTransporteGRR']['ent_TransportePrivadoGRR']['l_VehiculoGRR'], [
                             'en_VehiculoGRR' => [
                                 'aa_NumeroPlaca' => [
-                                    'string' => $vehicle['plate']
+                                    'string' => strtoupper($vehicle['plate'])
                                 ]
                             ]
                         ]);
@@ -115,14 +115,16 @@ class FormatHelper{
         $provider = null;
         $buyer = null;
 
-        if($data['motive_code'] == TransferGuide::OTHER){
-            $transportInformation['at_DescripcionMotivo'] = $data['motive_description'];
-
-            if($data['motive_description'] == 'Traslado de materiales EPPS, instrumentos al trabajador'){
+        if(isset($data['indicator_service'])){
+            if($data['indicator_service']){
                 $transportInformation['aa_IndicadorServicio'] = [
-                    'string' => "02"
+                    'string' => $data['indicator_service']
                 ];
             }
+        }
+
+        if($data['motive_code'] == TransferGuide::OTHER){
+            $transportInformation['at_DescripcionMotivo'] = $data['motive_description'];
 
             if(isset($data['provider'])){
                 $provider = [

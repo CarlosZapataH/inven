@@ -18,6 +18,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
             $rules = [
                 'id' => [['nullable']],
                 'name' => [['nullable']],
+                'indicator_service' => [['nullable']],
                 'detail' => [['array']],
                 'motive_code' => [['required']],
                 'observations' => [['nullable']],
@@ -30,6 +31,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
             $rules = [
                 'id' => [['nullable']],
                 'name' => [['required']],
+                'indicator_service' => [['nullable']],
                 'detail' => [['array']],
                 'motive_code' => [['required']],
                 'observations' => [['nullable']],
