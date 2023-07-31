@@ -5,6 +5,7 @@ $action = $_REQUEST["action"];
 
 require_once __DIR__ . '/../../../../assets/util/Session.php';
 require_once __DIR__ . '/../../DocumentType/Repository/DocumentTypeRepository.php';
+require_once __DIR__ . '/../Helpers/IndicatorServiceHelper.php';
 require_once __DIR__ . '/../Helpers/ModalityHelper.php';
 require_once __DIR__ . '/../Helpers/MotiveHelper.php';
 require_once __DIR__ . '/../Helpers/UnitMeasure.php';
@@ -31,6 +32,7 @@ class UtilController{
                     'modalities' => ModalityHelper::getAll(),
                     'motives' => MotiveHelper::getAll(),
                     'unit_measure' => UnitMeasure::getAll(),
+                    'indicatorsServices' => IndicatorServiceHelper::getAll()
                 ],
                 'success' => true
             ]);
