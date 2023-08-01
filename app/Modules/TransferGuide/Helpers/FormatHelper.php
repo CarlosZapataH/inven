@@ -71,7 +71,7 @@ class FormatHelper{
                 'at_Descripcion' => $item['name'],
                 'at_Codigo' => $item['code']
             ];
-            if($item['additional_description']){
+            if($item['additional_description'] && $item['additional_description'] != ''){
                 $newBien['aa_DescripcionAdicional'] = [
                     'string' => $item['additional_description']
                 ];
