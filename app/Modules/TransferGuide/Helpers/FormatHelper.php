@@ -92,11 +92,15 @@ class FormatHelper{
         ];
 
         if($data['motive_code'] == TransferGuide::BETWEENCOMPANY){
-            $storeIni['at_CodigoEstablecimiento'] = $data['start_store']['establishment_code'];
             $storeIni['at_NumeroDocumentoIdentidad'] = $data['start_store']['company']['document'];
+            if($data['start_store']['establishment_code'] && $data['start_store']['establishment_code'] != ''){
+                $storeIni['at_CodigoEstablecimiento'] = $data['start_store']['establishment_code'];
+            }
 
-            $storeEnd['at_CodigoEstablecimiento'] = $data['end_store']['establishment_code'];
             $storeEnd['at_NumeroDocumentoIdentidad'] = $data['end_store']['company']['document'];
+            if($data['end_store']['establishment_code'] && $data['end_store']['establishment_code'] != ''){
+                $storeEnd['at_CodigoEstablecimiento'] = $data['end_store']['establishment_code'];
+            }
         }
 
         $transportInformation = [
