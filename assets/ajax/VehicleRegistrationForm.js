@@ -77,7 +77,8 @@ Vue.component("VehicleRegistrationForm", {
         } else {
           this.$validator.validateAll().then((result) => {
             if (result) {
-              this.vehicles.push({ ...this.en_VehiculoGRR });
+              const plate = (this.en_VehiculoGRR?.plate || "").toUpperCase();
+              this.vehicles.push({ ...this.en_VehiculoGRR, plate });
               this.cleanform();
             }
           });

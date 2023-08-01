@@ -5,6 +5,7 @@ var guideUtilsMixin = {
       modalities: [],
       motives: [],
       unit_measure: [],
+      indicatorsServices: [],
     };
   },
   computed: {
@@ -37,6 +38,7 @@ var guideUtilsMixin = {
         this.modalities = response?.data?.modalities || [];
         this.motives = response?.data?.motives || [];
         this.unit_measure = response?.data?.unit_measure?.all || [];
+        this.indicatorsServices = response?.data?.indicatorsServices || [];
       });
     },
 
