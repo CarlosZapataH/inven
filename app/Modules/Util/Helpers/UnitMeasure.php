@@ -6,6 +6,33 @@ class UnitMeasure{
 
     private static function values(){
         return [
+            'all' => [
+                "code" => "KIT", "description" => "Set",
+                "code" => "BJ", "description" => "Balde",
+                "code" => "BG", "description" => "Bolsa",
+                "code" => "BX", "description" => "Caja",
+                "code" => "CY", "description" => "Cilindro",
+                "code" => "GLL", "description" => "Galón",
+                "code" => "KIT", "description" => "Juego",
+                "code" => "58", "description" => "Kilogramo",
+                "code" => "KIT", "description" => "Kit",
+                "code" => "SET", "description" => "Litros",
+                "code" => "LM", "description" => "Metros",
+                "code" => "SM3", "description" => "Metro cúbico",
+                "code" => "KIT", "description" => "Paquete",
+                "code" => "PR", "description" => "Par",
+                "code" => "RO", "description" => "Rollo",
+                "code" => "SA", "description" => "Saco",
+                "code" => "NIU", "description" => "Unidad",
+                "code" => "DR", "description" => "BDN",
+                "code" => "NIU", "description" => "PZ"
+            ],
+            'others' => []
+        ];
+    }
+
+    private static function values2(){
+        return [
             'all' => self::getFull(),
             'others' => self::getOthers()
         ];
