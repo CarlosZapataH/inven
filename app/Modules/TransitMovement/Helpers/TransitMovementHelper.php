@@ -131,21 +131,21 @@ class TransitMovementHelper{
 
         if($row['inventario_nroparte_inv'] && $row['inventario_nroparte_inv'] != ''){
             if($additionalDescription){
-                $additionalDescription .= ' / ';
+                $additionalDescription .= ' - ';
             }
             $additionalDescription .= $row['inventario_nroparte_inv'];
         }
 
         if($row['inventario_cactivo_inv'] && $row['inventario_cactivo_inv'] != ''){
             if($additionalDescription){
-                $additionalDescription .= ' / ';
+                $additionalDescription .= ' - ';
             }
             $additionalDescription .= $row['inventario_cactivo_inv'];
         }
 
         if($row['inventario_cinventario_inv'] && $row['inventario_cinventario_inv'] != ''){
             if($additionalDescription){
-                $additionalDescription .= ' / ';
+                $additionalDescription .= ' - ';
             }
             $additionalDescription .= $row['inventario_cinventario_inv'];
         }

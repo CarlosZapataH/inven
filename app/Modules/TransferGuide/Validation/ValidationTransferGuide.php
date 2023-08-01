@@ -379,6 +379,8 @@ class ValidationTransferGuide{
 
     private function validateCompleteStores(){
         // if($this->send){
+            $this->isAlternative();
+           
             if(!ValidateHelper::validateProperty($this->startStore, ['address']) && !ValidateHelper::validateProperty($this->data['start_store'], ['address'])){
                 $this->addErrors(['start_store.address' => 'La dirección del almacén de salida es obligatoria.']);
             }
@@ -386,10 +388,16 @@ class ValidationTransferGuide{
                 $this->addErrors(['start_store.address' => 'El distrito del almacén de salida es obligatorio.']);
             }
 
-            if(!ValidateHelper::validateProperty($this->endStore, ['address']) && !ValidateHelper::validateProperty($this->data['end_store'], ['address'])){
+            if(
+                (!ValidateHelper::validateProperty($this->endStore, ['address']) && !ValidateHelper::validateProperty($this->data['end_store'], ['address'])) || 
+                (!ValidateHelper::validateProperty($this->data['end_store'], ['address']) && $this->data['end_store']['alternative_address'])
+            ){
                 $this->addErrors(['end_store.address' => 'La dirección del almacén de llegada es obligatoria.']);
             }
-            if(!ValidateHelper::validateProperty($this->endStore, ['district.id']) && !ValidateHelper::validateProperty($this->data['end_store'], ['district_id'])){
+            if(
+                (!ValidateHelper::validateProperty($this->endStore, ['district.id']) && !ValidateHelper::validateProperty($this->data['end_store'], ['district_id'])) || 
+                (!ValidateHelper::validateProperty($this->data['end_store'], ['district_id']) && $this->data['end_store']['alternative_address'])
+            ){
                 $this->addErrors(['end_store.address' => 'El distrito del almacén de llegada es obligatorio.']);
             }
         // }
@@ -404,14 +412,40 @@ class ValidationTransferGuide{
                 $this->startStore['update_district_id'] = $this->data['start_store']['district_id'];
             }
 
-            if(!ValidateHelper::validateProperty($this->endStore, ['address'])){
-                $this->endStore['update'] = true;
-                $this->endStore['update_address'] = $this->data['end_store']['address'];
+            if($this->data['end_store']['alternative_address']){
+                $this->guide['store_des_address'] = $this->data['end_store']['address'];
+                $this->guide['store_des_district_id'] = $this->data['end_store']['district_id'];
             }
-            if(!ValidateHelper::validateProperty($this->endStore, ['district.id'])){
-                $this->endStore['update'] = true;
-                $this->endStore['update_district_id'] = $this->data['end_store']['district_id'];
+            else{
+                if(!ValidateHelper::validateProperty($this->endStore, ['address'])){
+                    $this->endStore['update'] = true;
+                    $this->endStore['update_address'] = $this->data['end_store']['address'];
+                    $this->guide['store_des_address'] = $this->data['end_store']['address'];
+                }
+                else{
+                    $this->guide['store_des_address'] = $this->endStore['address'];
+                }
+
+                if(!ValidateHelper::validateProperty($this->endStore, ['district.id'])){
+                    $this->endStore['update'] = true;
+                    $this->endStore['update_district_id'] = $this->data['end_store']['district_id'];
+                    $this->guide['store_des_district_id'] = $this->data['end_store']['district_id'];
+                }
+                else{
+                    $this->guide['store_des_district_id'] = $this->endStore['district']['id'];
+                }
             }
         }
+    }
+
+    private function isAlternative(){
+        $result = false;
+        if(isset($this->data['end_store']['alternative_address'])){
+            if($this->data['end_store']['alternative_address'] == true || $this->data['end_store']['alternative_address'] == 'true' || $this->data['end_store']['alternative_address'] == 1 || $this->data['end_store']['alternative_address'] == '1'){
+                $result = true;
+            }
+        }
+
+        $this->data['end_store']['alternative_address'] = $result;
     }
 }
