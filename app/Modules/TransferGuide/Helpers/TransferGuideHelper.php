@@ -72,7 +72,7 @@ class TransferGuideHelper{
                             }
                         }
                     }
-
+echo json_encode($row);
                     if($iGuide < 0){
                         $newRow = [
                             'id' => $row['id'],

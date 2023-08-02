@@ -5,6 +5,7 @@ require_once __DIR__ . '/../Helpers/ValidateHelper.php';
 require_once __DIR__ . '/../../../Models/TransferGuide.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
 require_once __DIR__ . '/../../../../config/Config.php';
+require_once __DIR__ . '/../../Ubigeo/Repository/UbigeoRepository.php';
 
 class ValidationTransferGuide{
     private $config;
@@ -22,6 +23,7 @@ class ValidationTransferGuide{
     private $buyer;
     
     private $transitMovementRepository;
+    private $ubigeoRepository;
 
     public function __construct($data)
     {
@@ -37,6 +39,7 @@ class ValidationTransferGuide{
         $this->provider = null;
         $this->buyer = null;
         $this->transitMovementRepository = new TransitMovementRepository();
+        $this->ubigeoRepository = new UbigeoRepository();
 
         if(isset($this->data['send'])){
             if($this->data['send'] == 1 || $this->data['send'] == true || $this->data['send'] == 'true' || $this->data['send'] == '1'){
@@ -403,6 +406,14 @@ class ValidationTransferGuide{
         // }
             
         if(!$this->response['errors']){
+            if($this->data['end_store']['alternative_address']){
+                $ubigeoFind = $this->ubigeoRepository->getDistrict($this->data['end_store']['district_id']);
+                if($ubigeoFind){
+                    $this->data['end_store']['district_id'] = $ubigeoFind['id_ubigeo'];
+                }
+            }
+
+
             if(!ValidateHelper::validateProperty($this->startStore, ['address'])){
                 $this->startStore['update'] = true;
                 $this->startStore['update_address'] = $this->data['start_store']['address'];

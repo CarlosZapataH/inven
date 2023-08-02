@@ -10,6 +10,7 @@ require_once __DIR__ . '/../Helpers/TransferGuideHelper.php';
 require_once __DIR__ . '/../Requests/TransferBetweenCompanyRequest.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
 require_once __DIR__ . '/../../Transport/Repository/TransportRepository.php';
+require_once __DIR__ . '/../../Ubigeo/Repository/UbigeoRepository.php';
 require_once __DIR__ . '/../../Vehicle/Repository/VehicleRepository.php';
 require_once __DIR__ . '/../../TransferGuideDetail/Repository/TransferGuideDetailRepository.php';
 require_once __DIR__ . '/../../Company/Repository/CompanyRepository.php';
@@ -39,6 +40,7 @@ class TransferGuideController{
     private $storeRepository;
     private $transferGuideDetailRepository;
     private $validationTransferGuide;
+    private $ubigeoRepository;
 
     
     private $data;
@@ -56,6 +58,7 @@ class TransferGuideController{
         $this->providerRepository = new ProviderRepository();
         $this->buyerRepository = new BuyerRepository();
         $this->transferGuideDetailRepository = new TransferGuideDetailRepository();
+        $this->ubigeoRepository = new UbigeoRepository();
     }
 
     public function index(){
@@ -80,6 +83,7 @@ class TransferGuideController{
 
     public function show(){
         header('Content-Type: application/json');
+        
         $response = [
             'data' => null,
             'success' => false,
