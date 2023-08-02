@@ -27,7 +27,7 @@ Vue.component("AutocompleteField", {
       @mouseover="highlightOption(option.code)"
       @click.prevent="selectOption(option.code)"
     >
-      {{ option?.description }}
+      {{ option?.description +' - '+ option?.code}}
     </div>
   </div>
 </div>
@@ -52,11 +52,15 @@ Vue.component("AutocompleteField", {
   },
   computed: {
     filteredOptions() {
-      return this.options.filter((option) =>
-        option?.description
-          ?.toLowerCase()
-          .includes(this.searchTerm?.toLowerCase())
-      );
+      return this.options.filter((option) => {
+        const newOption = (
+          option?.description +
+          " - " +
+          option?.code
+        ).toLowerCase();
+        const newSearchTerm = this.searchTerm?.toLowerCase();
+        return newOption.includes(newSearchTerm);
+      });
     },
   },
   //   watch: {
@@ -75,7 +79,8 @@ Vue.component("AutocompleteField", {
       (option) => option.code === this.value
     );
     if (selectedOption) {
-      this.searchTerm = selectedOption.description;
+      this.searchTerm =
+        selectedOption?.description + " - " + selectedOption?.code;
       this.highlightedCode = selectedOption.code;
     }
   },
@@ -126,7 +131,8 @@ Vue.component("AutocompleteField", {
         (option) => option.code === code
       );
       if (selectedOption) {
-        this.searchTerm = selectedOption.description;
+        this.searchTerm =
+          selectedOption.description + " - " + selectedOption.code;
         this.showOptions = false;
         this.$emit("input", selectedOption.code);
       }

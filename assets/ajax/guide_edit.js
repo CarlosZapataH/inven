@@ -5,10 +5,19 @@ VeeValidate.Validator.localize("es", {
     email: "El campo de correo electrónico no es válido",
     date: "El campo debe tener un formato válido",
     date_format: "El campo debe tener un formato válido",
-    alpha_dash: "El campo solo debe contener letras, números y guiones",
+    alpha_dash: "El campo solo debe contener letras, números o guiones",
+    alpha_num: "El campo solo puede contener caracteres alfanuméricos",
     length: (_, args) => {
       const [min] = args;
       return `El campo debe tener ${min} caracteres.`;
+    },
+    max: (_, args) => {
+      const [max] = args;
+      return `El campo no debe ser mayor a ${max} caracteres.`;
+    },
+    min: (_, args) => {
+      const [min] = args;
+      return `El campo debe tener al menos ${min} caracteres.`;
     },
   },
 });
@@ -24,7 +33,9 @@ new Vue({
   mixins: [guideUtilsMixin],
   data: {
     start_store: {},
-    end_store: {},
+    end_store: {
+      alternative_address: false,
+    },
 
     generalData: {
       name: null,
@@ -269,10 +280,13 @@ new Vue({
         address: end_store?.address,
         email_principal: end_store?.email_principal,
         email_secondary: end_store?.email_secondary,
-        ubigeo: end_store?.district?.code,
+        ubigeo: end_store?.alternative_address
+          ? end_store?.district_id
+          : end_store?.district?.code,
         company_id: end_store?.company?.id,
         document: end_store?.company?.document,
         document_type: end_store?.company?.document_type_id,
+        alternative_address: end_store?.alternative_address,
       };
 
       this.generalData = {
@@ -375,6 +389,9 @@ new Vue({
           company_id: this.end_store?.company_id,
           email_principal: this.end_store?.email_principal,
           email_secondary: this.end_store?.email_secondary,
+          alternative_address: this.end_store?.alternative_address || false,
+          district_id: this.end_store.ubigeo || null,
+          address: this.end_store.address || null,
         },
         detail,
       };
