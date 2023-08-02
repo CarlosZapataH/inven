@@ -135,6 +135,7 @@ class TransferGuideHelper{
                                 'establishment_code' => $row['establishment_des_code'],
                                 'email_principal' => $row['email_principal'],
                                 'email_secondary' => $row['email_secondary'],
+                                'alternative_address' => $row['alternative_address'],
                                 'company' => [
                                     'id' => $row['company_des_id'],
                                     'name' => $row['company_des_name'],

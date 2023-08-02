@@ -447,5 +447,7 @@ class ValidationTransferGuide{
         }
 
         $this->data['end_store']['alternative_address'] = $result;
+        $this->guide['alternative_address'] = $result;
+
     }
 }
