@@ -523,7 +523,8 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                             <div class="col-12 col-sm-6">
                                                 <div class="form-group">
                                                     <label for="tp_at_NumeroMTC">Número MTC</label>
-                                                    <input v-model="publicTransport.at_NumeroMTC" type="text" class="form-control" id="tp_at_NumeroMTC">
+                                                    <input v-model="publicTransport.at_NumeroMTC" name="NumeroMTC" v-validate="'alpha_dash|max:20'" type="text" class="form-control" id="tp_at_NumeroMTC">
+                                                    <span class="text-danger">{{ errors.first('NumeroMTC') }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -593,6 +594,15 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <div class="col-sm-9">
                                     <input v-model="end_store.address" name="PL_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
                                     <span class="text-danger">{{ errors.first('PL_Direccion_Completa') }}</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label"></label>
+                                <div class="col-sm-9">
+                                    <div class="form-check">
+                                        <input v-model="end_store.alternative_address" type="checkbox" class="form-check-input" id="exampleCheck1">
+                                        <label class="form-check-label" for="exampleCheck1">Marcar para registrar el nuevo punto de llegada</label>
+                                    </div>
                                 </div>
                             </div>
                             <!-- <div class="form-group row">

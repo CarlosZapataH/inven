@@ -65,7 +65,7 @@ Vue.component("DriverRegistrationForm", {
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
                         <label for="cdt_at_Licencia">Licencia:</label>
-                        <input v-model="en_ConductorGRR.license" v-validate="'required'" name="driver_license" type="text" class="form-control" id="cdt_at_Licencia">
+                        <input v-model="en_ConductorGRR.license" v-validate="'required|alpha_dash|min:9|max:10'" name="driver_license" type="text" class="form-control" id="cdt_at_Licencia">
                         <span class="text-danger">{{ errors.first('driver_license') }}</span>
                     </div>
                 </div>

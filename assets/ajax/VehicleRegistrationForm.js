@@ -21,7 +21,7 @@ Vue.component("VehicleRegistrationForm", {
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="vhl_aa_NumeroPlaca">Placa</label>
-                            <input v-model="en_VehiculoGRR.plate"  v-validate="'required'" name="vehicle_placa" type="text" class="form-control" id="vhl_aa_NumeroPlaca">
+                            <input v-model="en_VehiculoGRR.plate"  v-validate="'required|alpha_num|min:6|max:8'" name="vehicle_placa" type="text" class="form-control" id="vhl_aa_NumeroPlaca">
                             <span class="text-danger">{{ errors.first('vehicle_placa') }}</span>
                         </div>
                     </div>
