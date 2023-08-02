@@ -2173,7 +2173,7 @@ $(document).on('click','.tipoTransAlmacen', function() {
             '           <option value="Préstamo">Préstamo</option>' +
             '           <option value="Transferencia">Transferencia</option>' +
             '           <option value="Mantenimiento y Reparación">Mantenimiento y Reparación</option>' +
-            '           <option value="Devolución Proveedor">Devolución Proveedor</option>' +
+            '           <option value="Devolución">Devolución</option>' +
             '       </select>' +
             '   </div>' +
             '</div>';
