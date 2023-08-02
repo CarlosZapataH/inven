@@ -62,8 +62,8 @@ Vue.component("input-ubigeo", {
     this.loadDistrito();
     if (this.ubigeo) {
       const ubigeo = this.ubigeo?.toString();
-      this.selectedDepartamento = ubigeo.substring(0, 2) + "0000";
-      this.selectedProvincia = ubigeo.substring(0, 4) + "00";
+      this.selectedDepartamento = ubigeo?.substring(0, 2) + "0000";
+      this.selectedProvincia = ubigeo?.substring(0, 4) + "00";
       this.selectedDistrito = ubigeo;
     }
   },
@@ -84,20 +84,20 @@ Vue.component("input-ubigeo", {
     },
     provincias() {
       let provincias = [];
-      const codigoDepartamento = this.selectedDepartamento.substring(0, 2);
+      const codigoDepartamento = this.selectedDepartamento?.substring(0, 2);
       if (this.selectedDepartamento) {
         provincias = this.ubigeoProvincias.filter(function (e) {
-          return codigoDepartamento == (e?.inei || "").substring(0, 2);
+          return codigoDepartamento == (e?.inei || "")?.substring(0, 2);
         });
       }
       return provincias;
     },
     distritos() {
       let distritos = [];
-      const codigoProvincia = this.selectedProvincia.substring(0, 4);
+      const codigoProvincia = this.selectedProvincia?.substring(0, 4);
       if (this.selectedProvincia) {
         distritos = this.ubigeoDistritos.filter(function (e) {
-          return codigoProvincia == (e?.inei || "").substring(0, 4);
+          return codigoProvincia == (e?.inei || "")?.substring(0, 4);
         });
       }
       return distritos;

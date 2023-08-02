@@ -34,6 +34,8 @@ new Vue({
   data: {
     start_store: {},
     end_store: {
+      ubigeo: "",
+      address: null,
       alternative_address: false,
     },
 

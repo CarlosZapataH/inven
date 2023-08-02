@@ -109,7 +109,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     </div>
 
                     <div v-if="movement.flag_reversion == 1">
-                        <div class="alert alert-warning" role="alert">La guía se ha revertido</div>
+                        <div class="alert alert-alert" role="alert">La guía se ha revertido</div>
+                    </div>
+
+                    <div v-if="movement?.flag_sent == 1 && !movement?.tci_response_code">
+                        <div class="alert alert-info" role="alert">La guía está siendo evaluada. Por favor, vuelva en un minuto</div>
                     </div>
 
                     <div class="card" id="section_origin" v-if="movement && movement.tci_response_type">
@@ -705,8 +709,9 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             </div>
                         </div>
                     </div>
-                    <div class="row justify-content-end" v-if="movement?.tci_response_description != 'Aceptado'">
+                    <div class="row justify-content-end" v-if="(movement?.tci_response_description && movement?.tci_response_description != 'Aceptado') || movement?.flag_sent != '1'">
                         <div class="col-auto">
+                           
                             <div class="mb-10">
                                 <button type="button" class="btn btn-primary" @click="submitForm(false)" :disabled="loadingSave">Guardar Guía</button>
                                 <button type="button" class="btn btn-success" @click="submitForm(true)" :disabled="loadingSave">Guardar y Enviar</button>
