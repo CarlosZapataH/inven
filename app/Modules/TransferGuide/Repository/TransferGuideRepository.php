@@ -120,7 +120,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 almacen_ini.direccion_alm as almacen_ini_direccion_alm,
                 almacen_des.id_alm as almacen_des_id,
                 almacen_des.titulo_alm as almacen_des_titulo_alm,
-                almacen_des.direccion_alm as almacen_des_direccion_alm,
+                transfers_guides.store_des_address as almacen_des_direccion_alm,
                 company_ini.id as company_ini_id,
                 company_ini.name as company_ini_name,
                 company_ini.commercial_name as company_ini_commercial_name,
@@ -214,7 +214,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             LEFT JOIN ubigeo as u_alm_ini ON u_alm_ini.id_ubigeo = almacen_ini.distrito_alm
             LEFT JOIN ubigeo as u_alm_ini_province ON u_alm_ini_province.id_ubigeo = u_alm_ini.id_padre_ubigeo
             LEFT JOIN ubigeo as u_alm_ini_department ON u_alm_ini_department.id_ubigeo = u_alm_ini_province.id_padre_ubigeo
-            LEFT JOIN ubigeo as u_alm_des ON u_alm_des.id_ubigeo = almacen_des.distrito_alm
+            LEFT JOIN ubigeo as u_alm_des ON u_alm_des.id_ubigeo = transfers_guides.store_des_district_id
             LEFT JOIN ubigeo as u_alm_des_province ON u_alm_des_province.id_ubigeo = u_alm_des.id_padre_ubigeo
             LEFT JOIN ubigeo as u_alm_des_department ON u_alm_des_department.id_ubigeo = u_alm_des_province.id_padre_ubigeo
         ';
