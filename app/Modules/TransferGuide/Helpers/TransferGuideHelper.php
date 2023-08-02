@@ -239,7 +239,7 @@ class TransferGuideHelper{
                                 $hoursNow >= 1 &&
                                 (
                                     !$row['tci_response_date'] ||
-                                    $row['tci_response_date'] && $isLast
+                                    ($row['tci_response_date'] && $isLast)
                                 )
                             ){
                                 $flagResend = true;
