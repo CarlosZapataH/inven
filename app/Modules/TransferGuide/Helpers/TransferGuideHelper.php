@@ -74,6 +74,10 @@ class TransferGuideHelper{
                     }
 
                     if($iGuide < 0){
+                        $address = "";
+                        $ubigeo = "";
+
+
                         $newRow = [
                             'id' => $row['id'],
                             'name' => $row['name'],
@@ -129,8 +133,8 @@ class TransferGuideHelper{
                             'end_store' => [
                                 'id' => $row['almacen_des_id'],
                                 'name' => $row['almacen_des_titulo_alm'],
-                                'address' => $row['establishment_des_id']?$row['establishment_des_address']:$row['almacen_des_direccion_alm'],
-                                'address_complete' => "{$row['establishment_des_address']} - {$row['department_des_name']} - {$row['province_des_name']} - {$row['u_est_des_nombre_ubigeo']}",
+                                'address' => $row['almacen_des_direccion_alm'],
+                                'address_complete' => "{$row['almacen_des_direccion_alm']} - {$row['department_des_name']} - {$row['province_des_name']} - {$row['u_est_des_nombre_ubigeo']}",
                                 'establishment_id' => $row['establishment_des_id'],
                                 'establishment_code' => $row['establishment_des_code'],
                                 'email_principal' => $row['email_principal'],
@@ -146,11 +150,11 @@ class TransferGuideHelper{
                                     'document' => $row['company_des_document']
                                 ],
                                 'district' => [
-                                    'id' => $row['establishment_des_id']?$row['u_est_des_id_ubigeo']:$row['u_alm_des_id_ubigeo'],
-                                    'name' => $row['establishment_des_id']?$row['u_est_des_nombre_ubigeo']:$row['u_alm_des_nombre_ubigeo'],
-                                    'code' => $row['establishment_des_id']?$row['u_est_des_codigo_inei']:$row['u_alm_des_codigo_inei'],
-                                    'province' => $row['establishment_des_id']?$row['province_des_name']:$row['u_alm_des_province_name'],
-                                    'department' => $row['establishment_des_id']?$row['department_des_name']:$row['u_alm_des_department_name']
+                                    'id' => $row['u_alm_des_id_ubigeo'],
+                                    'name' => $row['u_alm_des_nombre_ubigeo'],
+                                    'code' => $row['u_alm_des_codigo_inei'],
+                                    'province' => $row['u_alm_des_province_name'],
+                                    'department' => $row['u_alm_des_department_name']
                                 ],
                             ],
                             'details' => [
