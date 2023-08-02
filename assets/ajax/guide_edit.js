@@ -280,13 +280,11 @@ new Vue({
         address: end_store?.address,
         email_principal: end_store?.email_principal,
         email_secondary: end_store?.email_secondary,
-        ubigeo: end_store?.alternative_address
-          ? end_store?.district_id
-          : end_store?.district?.code,
+        ubigeo: end_store?.district?.code,
         company_id: end_store?.company?.id,
         document: end_store?.company?.document,
         document_type: end_store?.company?.document_type_id,
-        alternative_address: end_store?.alternative_address,
+        alternative_address: !!end_store?.alternative_address,
       };
 
       this.generalData = {
