@@ -39,6 +39,13 @@ new Vue({
       alternative_address: false,
     },
 
+    newCompany: {
+      flag_new_company: false,
+      new_document_type_id: 4,
+      new_document: "",
+      new_company_name: "",
+    },
+
     generalData: {
       name: null,
       at_FechaEmision: null,
@@ -102,6 +109,11 @@ new Vue({
     "generalData.motive"(newValue) {
       this.validateTransferType(newValue);
     },
+    "newCompany.flag_new_company"() {
+      this.$nextTick(async function () {
+        this.$validator.reset();
+      });
+    },
   },
   mounted() {},
   computed: {
@@ -143,6 +155,10 @@ new Vue({
     },
     recipientDocumentRule() {
       const code = this.end_store?.document_type;
+      return this.getRuleDocument(code, "id");
+    },
+    newRecipientDocumentRule() {
+      const code = this.newCompany?.new_document_type_id;
       return this.getRuleDocument(code, "id");
     },
     providerDocumentRule() {
@@ -300,6 +316,14 @@ new Vue({
         indicator_service: movement?.indicator_service || null,
       };
 
+      this.newCompany = {
+        ...this.newCompany,
+        flag_new_company: movement?.flag_new_company || false,
+        new_document_type_id: movement?.new_document_type_id || 2,
+        new_document: movement?.new_document || "",
+        new_company_name: movement?.new_company_name || "",
+      };
+
       if (this.isMotiveInSubmotives(movement?.motive_description)) {
         this.generalData.description_transfer = movement?.motive_description;
       } else {
@@ -394,6 +418,7 @@ new Vue({
           address: this.end_store.address || null,
         },
         detail,
+        ...this.newCompany,
       };
 
       if (

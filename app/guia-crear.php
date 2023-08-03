@@ -178,33 +178,75 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger">{{ errors.first('DES_company') }}</span>
                                 </div>
                             </div>
-                            <div class="form-group row" v-if="recipientHasCompany">
-                                <label class="col-sm-3 col-form-label">Tipo de documento
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
-                                <div class="col-sm-9">
-                                    <select v-model="end_store.document_type" name="DES_TipoDocumento" v-validate="'required'" class="form-control" disabled>
-                                        <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.id">{{ document.description }}</option>
-                                    </select>
-                                    <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
+                            <div v-if="!newCompany?.flag_new_company">
+                                <div class="form-group row" v-if="recipientHasCompany">
+                                    <label class="col-sm-3 col-form-label">Tipo de documento
+                                        <span class="text-danger font-weight-bold">*</span>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <select v-model="end_store.document_type" name="DES_TipoDocumento" v-validate="'required'" class="form-control" disabled>
+                                            <option v-for="document in documentTypes" :key="document.id + '-DESdocumentCode'" :value="document.id">{{ document.description }}</option>
+                                        </select>
+                                        <span class="text-danger">{{ errors.first('DES_TipoDocumento') }}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" v-if="recipientHasCompany">
+                                    <label class="col-sm-3 col-form-label">Número de Documento
+                                        <span class="text-danger font-weight-bold">*</span>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <input v-model="end_store.document" name="DES_Numero_Documento_Identidad" v-validate="recipientDocumentRule" type="text" class="form-control" disabled>
+                                        <span class="text-danger">{{ errors.first('DES_Numero_Documento_Identidad') }}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" v-if="recipientHasCompany">
+                                    <label class="col-sm-3 col-form-label">Razón social
+                                        <span class="text-danger font-weight-bold">*</span>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <input v-model="end_store.name" name="DES_Razon_Social" v-validate="'required'" type="text" class="form-control" disabled>
+                                        <span class="text-danger">{{ errors.first('DES_Razon_Social') }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group row" v-if="recipientHasCompany">
-                                <label class="col-sm-3 col-form-label">Número de Documento
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
-                                <div class="col-sm-9">
-                                    <input v-model="end_store.document" name="DES_Numero_Documento_Identidad" v-validate="recipientDocumentRule" type="text" class="form-control" disabled>
-                                    <span class="text-danger">{{ errors.first('DES_Numero_Documento_Identidad') }}</span>
+                            <div v-show="newCompany?.flag_new_company">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Tipo de documento
+                                        <span class="text-danger font-weight-bold">*</span>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <select v-model="newCompany.new_document_type_id" name="new_DES_TipoDocumento" v-validate="newCompany?.flag_new_company ? 'required' : ''" class="form-control">
+                                            <option v-for="document in documentTypes" :key="document.id + '-newDESdocumentCode'" :value="document.id">{{ document.description }}</option>
+                                        </select>
+                                        <span class="text-danger">{{ errors.first('new_DES_TipoDocumento') }}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Número de Documento
+                                        <span class="text-danger font-weight-bold">*</span>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <input v-model="newCompany.new_document" name="new_DES_Numero_Documento_Identidad" v-validate="newCompany?.flag_new_company ? newRecipientDocumentRule : ''" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.first('new_DES_Numero_Documento_Identidad') }}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Razón social o nombre completo
+                                        <span class="text-danger font-weight-bold">*</span>
+                                    </label>
+                                    <div class="col-sm-9">
+                                        <input v-model="newCompany.new_company_name" name="new_DES_Razon_Social" v-validate="newCompany?.flag_new_company ? 'required' : ''" type="text" class="form-control">
+                                        <span class="text-danger">{{ errors.first('new_DES_Razon_Social') }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group row" v-if="recipientHasCompany">
-                                <label class="col-sm-3 col-form-label">Razón social
-                                    <span class="text-danger font-weight-bold">*</span>
-                                </label>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label"></label>
                                 <div class="col-sm-9">
-                                    <input v-model="end_store.name" name="DES_Razon_Social" v-validate="'required'" type="text" class="form-control" disabled>
-                                    <span class="text-danger">{{ errors.first('DES_Razon_Social') }}</span>
+                                    <div class="form-check">
+                                        <input v-model="newCompany.flag_new_company" type="checkbox" class="form-check-input" id="flag_new_company">
+                                        <label class="form-check-label" for="flag_new_company">Marcar para modificar los datos del destinatario</label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group row">
