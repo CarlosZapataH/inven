@@ -77,6 +77,10 @@ class TransferGuideHelper{
                         $address = "";
                         $ubigeo = "";
 
+                        $flagNewCompany = false;
+                        if($row['flag_new_company'] == true || $row['flag_new_company'] == 'true' || $row['flag_new_company'] == 1 || $row['flag_new_company'] == '1'){
+                            $flagNewCompany = true;
+                        }
 
                         $newRow = [
                             'id' => $row['id'],
@@ -106,7 +110,7 @@ class TransferGuideHelper{
                             'tci_reversion_send' => $row['tci_reversion_send'],
                             'tci_reversion_response' => $row['tci_reversion_response'],
                             'tci_reversion_date' => $row['tci_reversion_date'],
-                            'flag_new_company' => $row['flag_new_company'],
+                            'flag_new_company' => $flagNewCompany,
                             'new_document_type_id' => $row['new_document_type_id'],
                             'new_document' => $row['new_document'],
                             'new_company_name' => $row['new_company_name'],
