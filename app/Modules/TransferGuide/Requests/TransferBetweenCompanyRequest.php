@@ -24,7 +24,11 @@ class TransferBetweenCompanyRequest extends CommonRequest
                 'observations' => [['nullable']],
                 'total_witght' => [['required']],
                 'total_quantity' => [['required']],
-                'transport_modality' => [['required']]
+                'transport_modality' => [['required']],
+                'flag_new_company' => [['nullable']],
+                'new_document_type_id' => [['nullable']],
+                'new_document' => [['nullable']],
+                'new_company_name' => [['nullable']]
             ];
         }
         else{
@@ -37,7 +41,11 @@ class TransferBetweenCompanyRequest extends CommonRequest
                 'observations' => [['nullable']],
                 'total_witght' => [['nullable']],
                 'total_quantity' => [['nullable']],
-                'transport_modality' => [['nullable']]
+                'transport_modality' => [['nullable']],
+                'flag_new_company' => [['nullable']],
+                'new_document_type_id' => [['nullable']],
+                'new_document' => [['nullable']],
+                'new_company_name' => [['nullable']]
             ];
         }
 

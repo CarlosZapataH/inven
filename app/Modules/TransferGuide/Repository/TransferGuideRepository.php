@@ -116,6 +116,10 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transfers_guides.tci_reversion_response,
                 transfers_guides.tci_reversion_date,
                 transfers_guides.alternative_address,
+                transfers_guides.flag_new_company,
+                transfers_guides.new_document_type_id,
+                transfers_guides.new_document,
+                transfers_guides.new_company_name,
                 almacen_ini.id_alm as almacen_ini_id,
                 almacen_ini.titulo_alm as almacen_ini_titulo_alm,
                 almacen_ini.direccion_alm as almacen_ini_direccion_alm,
@@ -136,6 +140,9 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 document_types_des.code as document_types_des_code,
                 document_types_ini.description as document_types_ini_description,
                 document_types_des.description as document_types_des_description,
+                document_types_new.id as document_types_new_id,
+                document_types_new.code as document_types_new_code,
+                document_types_new.description as document_types_new_description,
                 u_est_ini.id_ubigeo as u_est_ini_id_ubigeo,
                 u_est_ini.nombre_ubigeo as u_est_ini_nombre_ubigeo,
                 u_est_ini.codigo_inei as u_est_ini_codigo_inei,
@@ -201,6 +208,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             LEFT JOIN establishments as establishment_des ON establishment_des.id = almacen_des.establishment_id
             LEFT JOIN document_types as document_types_ini ON document_types_ini.id = company_ini.document_type_id
             LEFT JOIN document_types as document_types_des ON document_types_des.id = company_des.document_type_id
+            LEFT JOIN document_types as document_types_new ON document_types_new.id = transfers_guides.new_document_type_id
             LEFT JOIN ubigeo as u_est_ini ON u_est_ini.id_ubigeo = establishment_ini.ubigeo_id
             LEFT JOIN ubigeo as province_ini ON province_ini.id_ubigeo = u_est_ini.id_padre_ubigeo
             LEFT JOIN ubigeo as department_ini ON department_ini.id_ubigeo = province_ini.id_padre_ubigeo

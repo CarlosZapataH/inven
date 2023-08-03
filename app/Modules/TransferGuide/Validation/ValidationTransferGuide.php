@@ -106,6 +106,10 @@ class ValidationTransferGuide{
         if(!$this->response['errors']){
             $this->validateCompleteStores();
         }
+
+        if(!$this->response['errors']){
+            $this->validateNewCompany();
+        }
     }
 
     private function validateGuide(){
@@ -460,5 +464,33 @@ class ValidationTransferGuide{
         $this->data['end_store']['alternative_address'] = $result;
         $this->guide['alternative_address'] = $result;
 
+    }
+
+    private function validateNewCompany(){
+        $newCompany = false;
+        if(isset($this->guide['flag_new_company'])){
+            if($this->guide['flag_new_company'] == true || $this->guide['flag_new_company'] == 'true' || $this->guide['flag_new_company'] == 1 || $this->guide['flag_new_company'] == '1'){
+                $newCompany = true;
+            }
+        }
+
+        $this->guide['flag_new_company'] = $newCompany;
+
+        if($newCompany){
+            if(!ValidateHelper::validateProperty($this->guide, ['new_document_type_id'])){
+                $this->addErrors(['guide.new_document_type_id' => 'El documento de identidad del nuevo remitente es obligatorio.']);
+            }
+            if(!ValidateHelper::validateProperty($this->guide, ['new_document'])){
+                $this->addErrors(['guide.new_document' => 'El documento de identidad del nuevo remitente es obligatorio.']);
+            }
+            if(!ValidateHelper::validateProperty($this->guide, ['new_company_name'])){
+                $this->addErrors(['guide.new_company_name' => 'La razón social del nuevo remitente es obligatoria.']);
+            }
+        }
+        else{
+            $this->guide['new_document_type_id'] = null ;
+            $this->guide['new_document'] = null ;
+            $this->guide['new_company_name'] = null ;
+        }
     }
 }

@@ -150,6 +150,16 @@ class FormatHelper{
             }
         }
 
+        $documentTypeCode =  $data['end_store']['company']['document_type_code'];
+        $documentNumber = $data['end_store']['company']['document'];
+        $companyName = $data['end_store']['company']['name'];
+
+        if($data['flag_new_company'] == true || $data['flag_new_company'] == 'true' || $data['flag_new_company'] == 1 || $data['flag_new_company'] == '1'){
+            $documentTypeCode =  $data['new_document_type_code'];
+            $documentNumber = $data['new_document'];
+            $companyName = $data['new_company_name'];
+        }
+
         $result = [
             'ent_GuiaRemisionRemitente' => [
                 'ent_RemitenteGRR' => [
@@ -158,9 +168,9 @@ class FormatHelper{
                     'at_NombreComercial' => $data['start_store']['company']['commercial_name']
                 ],
                 'ent_DestinatarioGRR' => [
-                    'at_TipoDocumentoIdentidad' => $data['end_store']['company']['document_type_code'],
-                    'at_NumeroDocumentoIdentidad' => $data['end_store']['company']['document'],
-                    'at_RazonSocial' => $data['end_store']['company']['name'],
+                    'at_TipoDocumentoIdentidad' => $documentTypeCode,
+                    'at_NumeroDocumentoIdentidad' => $documentNumber,
+                    'at_RazonSocial' => $companyName,
                     'ent_Correo' => [
                         'at_CorreoPrincipal' => $data['end_store']['email_principal']
                     ]

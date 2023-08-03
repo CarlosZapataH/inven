@@ -106,6 +106,11 @@ class TransferGuideHelper{
                             'tci_reversion_send' => $row['tci_reversion_send'],
                             'tci_reversion_response' => $row['tci_reversion_response'],
                             'tci_reversion_date' => $row['tci_reversion_date'],
+                            'flag_new_company' => $row['flag_new_company'],
+                            'new_document_type_id' => $row['new_document_type_id'],
+                            'new_document' => $row['new_document'],
+                            'new_company_name' => $row['new_company_name'],
+                            'new_document_type_code' => $row['document_types_new_code'],
                             'start_store' => [
                                 'id' => $row['almacen_ini_id'],
                                 'name' => $row['almacen_ini_titulo_alm'],
