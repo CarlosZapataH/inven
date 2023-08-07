@@ -433,45 +433,13 @@ class TransferGuideController{
                                 'tci_reversion_response' => $tciResponse['original'],
                                 'number_reversion' => $numberReversion
                             ]);
+                            $this->restoreMovements();
                         }
                         
                         if($status){
                             $response['code'] = 200;
                             $response['success'] = true;
                             $response['message'] = 'Reversión solicitada exitosamente.';
-                            
-                            /* $this->transferGuideRepository->update($this->data['id'], [
-                                'tci_response_code' => $result['code_response'],
-                                'tci_response_type' => $result['type_response'],
-                                'tci_response_description' => $result['description'],
-                                'tci_response_date' => $result['date'],
-                                'tci_confirm_status_response' => json_encode($result)
-                            ]);
-    
-                            $transferGuideHistoryRepository = new TransferGuideHistoryRepository();
-                            $transferGuideHistoryRepository->store([
-                                'status' => $result['type_response'],
-                                'code' => $result['code_response'],
-                                'description' => $result['description'],
-                                'date' => $result['date'],
-                                'transfer_guide_id' => $this->data['id'],
-                                'tci_confirm_status_response' => json_encode($result),
-                                'created_at' => date("Y-m-d H:i:s")
-                            ]);
-                            
-                            $tciServiceConfirm = new TCIService();
-                            $tciServiceConfirm->confirmResponseSUNAT([
-                                'ent_ConfirmarRespuesta' => [
-                                    'at_NumeroDocumentoIdentidad' => $this->data['start_store']['company']['document'],
-                                    'l_Comprobante' => [
-                                        'en_ComprobanteConfirmarRespuesta' => [
-                                            'at_Serie' => $result['serie'],
-                                            'at_Numero' => $result['number'],
-                                            'at_CodigoRespuesta' => $result['code_response']
-                                        ]
-                                    ]
-                                ]
-                            ]); */
                         }
                         else{
                             if(isset($response['data']['at_MensajeResultado'])){
@@ -874,6 +842,21 @@ class TransferGuideController{
 
         http_response_code($response['code']);
         echo json_encode($response);
+    }
+
+    public function restoreMovements(){
+        $movementsIds = [];
+        if($this->data['details']){
+            if(is_array($this->data['details'])){
+                foreach($this->data['details'] as $detail){
+                    array_push($movementsIds, $detail['movement_id']);
+                }
+            }
+        }
+
+        if(count($movementsIds) > 0){
+            $this->transitMovementRepository->updateAvailable(implode(",", $movementsIds), 1);
+        }
     }
 
     // PROCESS
