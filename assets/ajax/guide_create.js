@@ -37,7 +37,7 @@ new Vue({
 
     newCompany: {
       flag_new_company: false,
-      new_document_type_id: 4,
+      new_document_type_id: 2,
       new_document: "",
       new_company_name: "",
     },
