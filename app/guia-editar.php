@@ -109,7 +109,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                     </div>
 
                     <div v-if="movement.flag_reversion == 1">
-                        <div class="alert alert-alert" role="alert">La guía se ha revertido</div>
+                        <div class="alert alert-info" role="alert">La guía se ha revertido</div>
                     </div>
 
                     <div v-if="movement?.flag_sent == 1 && !movement?.tci_response_code">
