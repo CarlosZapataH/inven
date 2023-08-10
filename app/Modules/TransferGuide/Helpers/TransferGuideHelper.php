@@ -13,7 +13,7 @@ class TransferGuideHelper{
         $establishmentRepository = new EstablishmentRepository();
         $establishment = $establishmentRepository->findBy('id', $establishmentId);
 
-        $serie = $establishment['start_serie'].$establishment['code'];
+        $serie = $establishment['start_serie'];
         $number = $establishment['start_number'];
         $lengthNumber = $establishment['length_number'];
         $completeCh = "";
