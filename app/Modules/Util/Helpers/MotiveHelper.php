@@ -10,19 +10,19 @@ class MotiveHelper{
             ['code' => '06', 'description' => 'Devolución', 'submotives' => null],
             ['code' => '13', 'description' => 'Otros', 'submotives' => [
                 [
-                    "value" => "Traslado de muestras de aceite para análisis", "description" => "Traslado de muestras de aceite para análisis"
+                    "value" => "Tras. de muestras de aceite para análisis", "description" => "Tras. de muestras de aceite para análisis"
                 ],
                 [
-                    "value" => "Traslado de equipos para su mantenimiento/reparación", "description" => "Traslado de equipos para su mantenimiento/reparación"
+                    "value" => "Reparación", "description" => "Reparación"
                 ],
                 [
-                    "value" => "Traslado de instrumentos de medición para calibración", "description" => "Traslado de instrumentos de medición para calibración"
+                    "value" => "Tras. de instrumentos de medición para calibración", "description" => "Tras. de instrumentos de medición para calibración"
                 ],
                 [
-                    "value" => "Traslado de materiales EPPS, instrumentos al trabajador", "description" => "Traslado de materiales EPPS, instrumentos al trabajador"
+                    "value" => "Tras. de materiales EPPS", "description" => "Tras. de materiales EPPS"
                 ],
                 [
-                    "value" => "Traslado para uso en servicio", "description" => "Traslado para uso en servicio"
+                    "value" => "Tras. para uso en servicio", "description" => "Tras. para uso en servicio"
                 ]
             ]]
         ];
