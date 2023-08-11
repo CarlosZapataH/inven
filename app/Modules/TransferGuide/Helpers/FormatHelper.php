@@ -165,7 +165,18 @@ class FormatHelper{
                 'ent_RemitenteGRR' => [
                     'at_NumeroDocumentoIdentidad' => $data['start_store']['company']['document'],
                     'at_RazonSocial' => $data['start_store']['company']['name'],
-                    'at_NombreComercial' => $data['start_store']['company']['commercial_name']
+                    'at_NombreComercial' => $data['start_store']['company']['commercial_name'],
+                    'at_Telefono' => $data['start_store']['company']['phone'],
+                    'at_CorreoContacto' => $data['start_store']['company']['email'],
+                    'at_SitioWeb' => $data['start_store']['company']['page_web'],
+                    'ent_DireccionFiscal' => [
+                        'at_Ubigeo' => $data['start_store']['company']['ubigeo_code'],
+                        'at_DireccionDetallada' => $data['start_store']['company']['address'],
+                        'at_Provincia' => $data['start_store']['company']['province_name'],
+                        'at_Departamento' => $data['start_store']['company']['department_name'],
+                        'at_Distrito' => $data['start_store']['company']['district_name'],
+                        'at_CodigoPais' => 'PE'
+                    ]
                 ],
                 'ent_DestinatarioGRR' => [
                     'at_TipoDocumentoIdentidad' => $documentTypeCode,
