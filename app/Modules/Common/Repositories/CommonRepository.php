@@ -63,11 +63,12 @@ abstract class CommonRepository implements ICommonRepository{
         return null;
     }
 
-    public function findConcat($field1, $field2, $character, $value) {
+    public function findByNumber($serie, $number) {
         // Implementación para obtener un registro por su ID
-        $query = "SELECT * FROM {$this->tableName} WHERE CONCAT({$field1}, '{$character}', {$field2}) = :value";
+        $query = "SELECT * FROM {$this->tableName} WHERE serie = :serie AND number = :number";
         $stm = $this->connection->prepare($query);
-        $stm->bindParam(":value",$value);
+        $stm->bindParam(":serie",$serie);
+        $stm->bindParam(":number",$number);
         $stm->execute();
         $result = $stm->fetch(PDO::FETCH_ASSOC);
 
