@@ -334,9 +334,9 @@ class TransferBetweenCompanyRequest extends CommonRequest
         return $this->validate($data, $rules, $messages);
     }
 
-    public function validateStoreTransportPublic($data, $send)
+    public function validateStoreTransportPublic($data, $send, $requiredMTC)
     {
-        $rules = self::validateStoreRulesTransportPublic($send);
+        $rules = self::validateStoreRulesTransportPublic($send, $requiredMTC);
         $messages = self::validateStoreMessagesTransportPublic();
 
         return $this->validate($data, $rules, $messages);
@@ -387,7 +387,8 @@ class TransferBetweenCompanyRequest extends CommonRequest
     }
 
     // TRANSPORT PUBLIC
-    private function validateStoreRulesTransportPublic($send){
+    private function validateStoreRulesTransportPublic($send, $requiredMTC){
+        $mtc = $requiredMTC?'required':'nullable';
         if($send){
             return [
                 // en_BienesGRR
@@ -395,7 +396,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
                 'document_type_code' => [['required']],
                 'document' => [['required']],
                 'company_name' => [['required']],
-                'mtc_number' => [['required']]
+                'mtc_number' => [[$mtc]]
             ];
         }
         else{
@@ -405,7 +406,7 @@ class TransferBetweenCompanyRequest extends CommonRequest
                 'document_type_code' => [['nullable']],
                 'document' => [['required']],
                 'company_name' => [['nullable']],
-                'mtc_number' => [['nullable']]
+                'mtc_number' => [[$mtc]]
             ];
         }
     }
