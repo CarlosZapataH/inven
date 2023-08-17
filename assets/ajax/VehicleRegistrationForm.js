@@ -83,6 +83,12 @@ Vue.component("VehicleRegistrationForm", {
             }
           });
         }
+      }else{
+        swal.fire({
+          title: "Registro de Vehículos",
+          type: "info",
+          text: "Recuerda que solo puedes registrar un máximo de tres vehículos. ¡Gracias por tu comprensión!",
+        });
       }
     },
 
