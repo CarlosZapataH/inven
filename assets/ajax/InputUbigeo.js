@@ -8,6 +8,10 @@ Vue.component("input-ubigeo", {
       type: [String],
       required: false,
     },
+    isEdit: {
+      type: [Boolean],
+      required: false,
+    },    
   },
   data() {
     return {
@@ -26,7 +30,7 @@ Vue.component("input-ubigeo", {
               <span class="text-danger font-weight-bold">*</span>
             </label>
             <div class="col-sm-9">
-                <select v-model="selectedDepartamento" @change="onChangeDepartamento" :name="initialName + '_Departamento'" v-validate="'required'" class="form-control">
+                <select v-model="selectedDepartamento" @change="onChangeDepartamento" :name="initialName + '_Departamento'" v-validate="'required'" class="form-control" :disabled="!isEdit">
                     <option v-for="item in departamentos" :value="item.inei">{{ item.departamento }}</option>
                 </select>
                 <span class="text-danger">{{ errors.first(initialName + '_Departamento') }}</span>
@@ -37,7 +41,7 @@ Vue.component("input-ubigeo", {
               <span class="text-danger font-weight-bold">*</span>
             </label>
             <div class="col-sm-9">
-                <select v-model="selectedProvincia" @change="onChangeProvincia" :name="initialName + '_Provincia'" v-validate="'required'" class="form-control">
+                <select v-model="selectedProvincia" @change="onChangeProvincia" :name="initialName + '_Provincia'" v-validate="'required'" class="form-control" :disabled="!isEdit">
                     <option v-for="item in provincias" :value="item.inei">{{ item.provincia }}</option>
                 </select>
                 <span class="text-danger">{{ errors.first(initialName + '_Provincia') }}</span>
@@ -48,7 +52,7 @@ Vue.component("input-ubigeo", {
               <span class="text-danger font-weight-bold">*</span>
             </label>
             <div class="col-sm-9">
-                <select v-model="selectedDistrito" @change="onChangeDistrito" :name="initialName + '_Distrito'" v-validate="'required'" class="form-control">
+                <select v-model="selectedDistrito" @change="onChangeDistrito" :name="initialName + '_Distrito'" v-validate="'required'" class="form-control" :disabled="!isEdit">
                     <option v-for="item in distritos" :value="item.inei">{{ item.distrito }}</option>
                 </select>
                 <span class="text-danger">{{ errors.first(initialName + '_Distrito') }}</span>
