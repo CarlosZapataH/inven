@@ -313,7 +313,9 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <div class="col-sm-9">
                                     <select v-model="generalData.indicator_service" class="form-control" name="indicator_service">
                                         <option :value="null" default>Ninguno</option>
-                                        <option v-for="transportType in indicatorsServices" :key="transportType.code + '-indicatorsServices'" :value="transportType.code">{{ transportType.description }}</option>
+                                        <option v-for="transportType in indicatorsServices" :key="transportType.code + '-indicatorsServices'" :value="transportType.code">
+                                            {{ transportType.code + ' - ' + transportType.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger">{{ errors.first('indicator_service') }}</span>
                                 </div>
@@ -558,7 +560,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="start_store.address" name="PP_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="start_store.address" name="PP_Direccion_Completa" v-validate="'required'" type="text" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('PP_Direccion_Completa') }}</span>
                                 </div>
                             </div>
@@ -579,7 +581,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
                             <h6 class="mb-4">Punto de Llegada</h6>
                             <br>
-                            <input-ubigeo v-model="end_store.ubigeo" initial-name="PL" ref="plUbigeoSelects"></input-ubigeo>
+                            <input-ubigeo v-model="end_store.ubigeo" :is-edit="!!end_store.alternative_address" initial-name="PL" ref="plUbigeoSelects"></input-ubigeo>
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label">Ubigeo
                                     <span class="text-danger font-weight-bold">*</span>
@@ -594,7 +596,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="end_store.address" name="PL_Direccion_Completa" v-validate="'required'" type="text" class="form-control">
+                                    <input v-model="end_store.address" name="PL_Direccion_Completa" v-validate="'required'" type="text" class="form-control" :disabled="!end_store.alternative_address">
                                     <span class="text-danger">{{ errors.first('PL_Direccion_Completa') }}</span>
                                 </div>
                             </div>
