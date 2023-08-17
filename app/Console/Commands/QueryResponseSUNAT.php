@@ -22,7 +22,7 @@ function queryResponseSUNAT(){
                 if(count($documents) > 0){
                     foreach($documents as $row){
                         $nGuide = $row['serie'].'-'.$row['number'];
-                        $guide = $transferGuideRepository->findConcat('serie', 'number', '-', $nGuide);
+                        $guide = $transferGuideRepository->findByNumber($row['serie'], $row['number']);
                         
                         if($guide){
                             $transferGuideRepository->update($guide['id'], [

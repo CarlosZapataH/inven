@@ -13,7 +13,7 @@ class TransferGuideHelper{
         $establishmentRepository = new EstablishmentRepository();
         $establishment = $establishmentRepository->findBy('id', $establishmentId);
 
-        $serie = $establishment['start_serie'].$establishment['code'];
+        $serie = $establishment['start_serie'];
         $number = $establishment['start_number'];
         $lengthNumber = $establishment['length_number'];
         $completeCh = "";
@@ -129,7 +129,16 @@ class TransferGuideHelper{
                                     'document_type_id' => $row['document_types_ini_id'],
                                     'document_type' => $row['document_types_ini_description'],
                                     'document_type_code' => $row['document_types_ini_code'],
-                                    'document' => $row['company_ini_document']
+                                    'document' => $row['company_ini_document'],
+                                    'address' => $row['company_ini_address'],
+                                    'ubigeo_code' => $row['company_ini_ubigeo_codigo_inei'],
+                                    'province_name' => $row['company_ini_province_name'],
+                                    'department_name' => $row['company_ini_department_name'],
+                                    'district_name' => $row['company_ini_ubigeo_nombre_ubigeo'],
+                                    'phone' => $row['company_ini_phone'],
+                                    'page_web' => $row['company_ini_page_web'],
+                                    'email' => $row['company_ini_email'],
+
                                 ],
                                 'district' => [
                                     'id' => $row['establishment_ini_id']?$row['u_est_ini_id_ubigeo']:$row['u_alm_ini_id_ubigeo'],

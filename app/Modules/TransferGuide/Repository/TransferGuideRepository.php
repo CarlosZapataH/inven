@@ -130,6 +130,10 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 company_ini.name as company_ini_name,
                 company_ini.commercial_name as company_ini_commercial_name,
                 company_ini.document as company_ini_document,
+                company_ini.address as company_ini_address,
+                company_ini.phone as company_ini_phone,
+                company_ini.page_web as company_ini_page_web,
+                company_ini.email as company_ini_email,
                 company_des.id as company_des_id,
                 company_des.name as company_des_name,
                 company_des.commercial_name as company_des_commercial_name,
@@ -153,6 +157,11 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 u_est_des.codigo_inei as u_est_des_codigo_inei,
                 province_des.nombre_ubigeo as province_des_name,
                 department_des.nombre_ubigeo as department_des_name,
+                company_ini_ubigeo.codigo_inei as company_ini_ubigeo_codigo_inei,
+                company_ini_ubigeo.nombre_ubigeo as company_ini_ubigeo_nombre_ubigeo,
+                company_ini_province.nombre_ubigeo as company_ini_province_name,
+                company_ini_department.nombre_ubigeo as company_ini_department_name,
+                company_ini_country.nombre_ubigeo as company_ini_country_name,
                 establishment_ini.id as establishment_ini_id,
                 establishment_ini.code as establishment_ini_code,
                 establishment_ini.address as establishment_ini_address,
@@ -215,6 +224,10 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
             LEFT JOIN ubigeo as u_est_des ON u_est_des.id_ubigeo = establishment_des.ubigeo_id
             LEFT JOIN ubigeo as province_des ON province_des.id_ubigeo = u_est_des.id_padre_ubigeo
             LEFT JOIN ubigeo as department_des ON department_des.id_ubigeo = province_des.id_padre_ubigeo
+            LEFT JOIN ubigeo as company_ini_ubigeo ON company_ini_ubigeo.id_ubigeo = company_ini.district_id
+            LEFT JOIN ubigeo as company_ini_province ON company_ini_province.id_ubigeo = company_ini_ubigeo.id_padre_ubigeo
+            LEFT JOIN ubigeo as company_ini_department ON company_ini_department.id_ubigeo = company_ini_province.id_padre_ubigeo
+            LEFT JOIN ubigeo as company_ini_country ON company_ini_country.id_ubigeo = company_ini_department.id_padre_ubigeo
             LEFT JOIN inventario ON inventario.id_inv = transfer_guide_detail.inventory_id
             LEFT JOIN transports ON transports.transfer_guide_id = transfers_guides.id
             LEFT JOIN vehicles ON vehicles.transfer_guide_id = transfers_guides.id
