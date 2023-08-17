@@ -95,7 +95,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </ol>
                     </div>
                     <div class="col-12 col-md-auto" v-if="movement">
-                        <button v-if="movement.flag_reversion == 0 && movement.tci_response_type == 1" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
+                        <button v-if="movement.flag_reversion == 0 && (movement.tci_response_type == 1 || movement.tci_response_type == 2)" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
                     </div>
                 </div>
 
