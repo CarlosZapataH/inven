@@ -153,20 +153,12 @@ Vue.component("DriverRegistrationForm", {
             this.cleanform();
           }
         });
-
-        // if (this.isDocumentRepetitive()) {
-        //   this.$validator.errors.add({
-        //     field: "driver_document",
-        //     msg: "Ya existe un registro con este documento.",
-        //   });
-        // } else {
-        //   this.$validator.validateAll().then((result) => {
-        //     if (result) {
-        //       this.drivers.push({ ...this.en_ConductorGRR });
-        //       this.cleanform();
-        //     }
-        //   });
-        // }
+      } else {
+        swal.fire({
+          title: "Registro de Conductores",
+          type: "info",
+          text: "Recuerda que solo puedes registrar un máximo de tres conductores. ¡Gracias por tu comprensión!",
+        });
       }
     },
 

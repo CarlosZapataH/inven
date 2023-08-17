@@ -135,7 +135,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                 <td>{{guide.date_issue}}</td>
                                 <td>{{guide.name}}</td>
                                 <td>{{guide.start_store.company.name}}</td>
-                                <td>{{guide.end_store.company.name}}</td>
+                                <td>{{guide?.flag_new_company ? guide?.new_company_name : guide.end_store.company.name}}</td>
                                 <td>
                                     <span :class="['m-1 py-2 d-block badge ', getStatusProperty(guide.tci_response_type).class]" style="max-width: 140px;" v-if="guide.tci_response_type && guide?.flag_reversion == 0">
                                         {{guide.tci_response_description}}
