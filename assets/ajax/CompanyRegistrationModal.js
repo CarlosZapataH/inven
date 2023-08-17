@@ -1,11 +1,8 @@
 Vue.component("CompanyRegistrationModal", {
+  mixins: [guideUtilsMixin],
   props: {
     value: {
       type: [String, Number],
-      required: false,
-    },
-    documentTypes: {
-      type: [Array],
       required: false,
     },
   },
@@ -59,7 +56,7 @@ Vue.component("CompanyRegistrationModal", {
                             </label>
                             <div class="">
                                 <input v-model="company.document" name="DES_Numero_Documento_Identidad"
-                                    v-validate="'required'" type="text" class="form-control" />
+                                    v-validate="documentRule" type="text" class="form-control" />
                                 <span class="text-danger">{{ errors.first('DES_Numero_Documento_Identidad') }}</span>
                             </div>
                         </div>
@@ -109,6 +106,10 @@ Vue.component("CompanyRegistrationModal", {
       set(value) {
         this.$emit("input", value);
       },
+    },
+    documentRule() {
+      const code = this.company?.document_type_id;
+      return this.getRuleDocument(code, "id");
     },
   },
   methods: {
