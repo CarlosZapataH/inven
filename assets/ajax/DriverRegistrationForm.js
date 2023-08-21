@@ -65,7 +65,7 @@ Vue.component("DriverRegistrationForm", {
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
                         <label for="cdt_at_Licencia">Licencia:</label>
-                        <input v-model="en_ConductorGRR.license" v-validate="'required|alpha_dash|min:9|max:10'" name="driver_license" type="text" class="form-control" id="cdt_at_Licencia">
+                        <input v-model="en_ConductorGRR.license" v-validate="'required|alpha_dash|min:9|max:10|uniqueLicense'" name="driver_license" type="text" class="form-control" id="cdt_at_Licencia">
                         <span class="text-danger">{{ errors.first('driver_license') }}</span>
                     </div>
                 </div>
@@ -73,7 +73,7 @@ Vue.component("DriverRegistrationForm", {
                 <div class="col-12 col-sm-6">
                     <div class="form-group">
                         <label for="cdt_at_date">Fecha de inicio o entrega:</label>
-                        <input v-model="en_ConductorGRR.start_date" v-validate="'required'" :min="dateIssued" name="driver_startdate" type="date" class="form-control" id="cdt_at_date">
+                        <input v-model="en_ConductorGRR.start_date" v-validate="'required|minDate'" :min="dateIssued" name="driver_startdate" type="date" class="form-control" id="cdt_at_date">
                         <span class="text-danger">{{ errors.first('driver_startdate') }}</span>
                     </div>
                 </div>
@@ -111,23 +111,41 @@ Vue.component("DriverRegistrationForm", {
     </div>
 </div>
     `,
-  created() {},
-  mounted() {
-    // this.$validator.localize("es", {
-    //   // Configura los mensajes de error en el idioma deseado
-    // });
-    // this.$validator.attach(this.initialName + "_Provincia", "required");
-
-    this.$validator.extend("uniqueDocument", {
+  created() {
+    VeeValidate.Validator.extend("uniqueDocument", {
       validate: (value) => {
-        if (this.isRepetitive("document", value)) {
+        return !this.isRepetitive("document", value);
+      },
+      getMessage: () => {
+        return `El número de documento ya ha sido registrado.`;
+      },
+    });
+    VeeValidate.Validator.extend("uniqueLicense", {
+      validate: (value) => {
+        return !this.isRepetitive("license", value);
+      },
+      getMessage: () => {
+        return `El número de licencia ya ha sido registrado.`;
+      },
+    });
+
+    VeeValidate.Validator.extend("minDate", {
+      validate: (value) => {
+        if (!value) {
           return true;
-        } else {
-          return "El documento ya existe.";
         }
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(value + " 00:00:00");
+        selectedDate.setHours(0, 0, 0, 0);
+        return selectedDate >= currentDate;
+      },
+      getMessage: () => {
+        return "La fecha seleccionada no debe ser menor al día actual";
       },
     });
   },
+  mounted() {},
   computed: {
     drivers: {
       get() {
@@ -168,7 +186,11 @@ Vue.component("DriverRegistrationForm", {
 
     isRepetitive(property, value) {
       if (property) {
-        return this.drivers.some((driver) => driver[property] === value);
+        return this.drivers.some(
+          (driver) =>
+            (driver[property] || "")?.toUpperCase() ===
+            (value || "")?.toUpperCase()
+        );
       }
       return false;
     },

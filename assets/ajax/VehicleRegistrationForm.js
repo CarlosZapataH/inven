@@ -21,7 +21,7 @@ Vue.component("VehicleRegistrationForm", {
                     <div class="col-12 col-sm-6">
                         <div class="form-group">
                             <label for="vhl_aa_NumeroPlaca">Placa</label>
-                            <input v-model="en_VehiculoGRR.plate"  v-validate="'required|alpha_num|min:6|max:8'" name="vehicle_placa" type="text" class="form-control" id="vhl_aa_NumeroPlaca">
+                            <input v-model="en_VehiculoGRR.plate"  v-validate="'required|alpha_num|min:6|max:8|uniquePlate'" name="vehicle_placa" type="text" class="form-control" id="vhl_aa_NumeroPlaca">
                             <span class="text-danger">{{ errors.first('vehicle_placa') }}</span>
                         </div>
                     </div>
@@ -49,7 +49,16 @@ Vue.component("VehicleRegistrationForm", {
         </div>
     </div>
     `,
-  created() {},
+  created() {
+    VeeValidate.Validator.extend("uniquePlate", {
+      validate: () => {
+        return !this.isPlateRepetitive();
+      },
+      getMessage: () => {
+        return `El número de placa ya ha sido registrado.`;
+      },
+    });
+  },
   mounted() {
     // this.$validator.localize("es", {
     //   // Configura los mensajes de error en el idioma deseado
@@ -69,21 +78,14 @@ Vue.component("VehicleRegistrationForm", {
   methods: {
     addVehicles() {
       if (this.vehicles.length < 3) {
-        if (this.isPlateRepetitive()) {
-          this.$validator.errors.add({
-            field: "vehicle_placa",
-            msg: "Ya existe un registro con esta placa.",
-          });
-        } else {
-          this.$validator.validateAll().then((result) => {
-            if (result) {
-              const plate = (this.en_VehiculoGRR?.plate || "").toUpperCase();
-              this.vehicles.push({ ...this.en_VehiculoGRR, plate });
-              this.cleanform();
-            }
-          });
-        }
-      }else{
+        this.$validator.validateAll().then((result) => {
+          if (result) {
+            const plate = (this.en_VehiculoGRR?.plate || "").toUpperCase();
+            this.vehicles.push({ ...this.en_VehiculoGRR, plate });
+            this.cleanform();
+          }
+        });
+      } else {
         swal.fire({
           title: "Registro de Vehículos",
           type: "info",
@@ -105,7 +107,9 @@ Vue.component("VehicleRegistrationForm", {
 
     isPlateRepetitive() {
       return this.vehicles.some(
-        (vehicle) => vehicle.plate === this.en_VehiculoGRR.plate
+        (vehicle) =>
+          (vehicle?.plate || "")?.toUpperCase() ===
+          (this.en_VehiculoGRR?.plate || "")?.toUpperCase()
       );
     },
   },

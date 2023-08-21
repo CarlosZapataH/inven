@@ -563,7 +563,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                                         Fecha de inicio o entrega
                                                         <span class="text-danger font-weight-bold">*</span>
                                                     </label>
-                                                    <input v-model="publicTransport.at_FechaInicio" name="TP_FechaInicio" v-validate="'required'" :min="dateIssued" type="date" class="form-control" id="tp_at_RazonSocial">
+                                                    <input v-model="publicTransport.at_FechaInicio" name="TP_FechaInicio" v-validate="'required|minDate'" :min="dateIssued" type="date" class="form-control" id="tp_at_RazonSocial">
                                                     <span class="text-danger">{{ errors.first('TP_FechaInicio') }}</span>
                                                 </div>
                                             </div>
