@@ -19,11 +19,14 @@ class FormatHelper{
                             'ent_TransportePublicoGRR' => [
                                 'at_TipoDocumentoIdentidad' => $data['transports'][0]['document_type_code'],
                                 'at_NumeroDocumentoIdentidad' => $data['transports'][0]['document'],
-                                'at_RazonSocial' => $data['transports'][0]['company_name'],
-                                'at_NumeroMTC' => strtoupper($data['transports'][0]['mtc_number'])
+                                'at_RazonSocial' => $data['transports'][0]['company_name']
                             ]
                         ]
                     ];
+
+                    if($data['transports'][0]['mtc_number']){
+                        $transports['en_InformacionTransporteGRR']['ent_TransportePublicoGRR']['at_NumeroMTC'] = strtoupper($data['transports'][0]['mtc_number']);
+                    }
                 }
                 else{
                     $transports = [

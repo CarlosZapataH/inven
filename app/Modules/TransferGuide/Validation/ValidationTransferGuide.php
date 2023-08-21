@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../Models/TransferGuide.php';
 require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementRepository.php';
 require_once __DIR__ . '/../../../../config/Config.php';
 require_once __DIR__ . '/../../Ubigeo/Repository/UbigeoRepository.php';
+require_once __DIR__ . '/../../Util/Helpers/IndicatorServiceHelper.php';
 
 class ValidationTransferGuide{
     private $config;
@@ -275,6 +276,16 @@ class ValidationTransferGuide{
         else{
             $exist = true;
         }
+
+        $requiredMTC = false;
+        if($this->guide['indicator_service'] && $this->guide['indicator_service'] != ''){
+            $indicators = IndicatorServiceHelper::getAll();
+            foreach($indicators as $indicator){
+                if($indicator['code'] == $this->guide['indicator_service']){
+                    $requiredMTC = $indicator['required_mtc'];
+                }
+            }
+        }
         
         if($exist){
             $modality = $this->data['transport_modality'];
@@ -283,7 +294,7 @@ class ValidationTransferGuide{
                 $validator = new TransferBetweenCompanyRequest();
                 $status = null;
                 if($modality == 1){
-                    $status = $validator->validateStoreTransportPublic($row, $this->send);
+                    $status = $validator->validateStoreTransportPublic($row, $this->send, $requiredMTC);
                 }
                 else if($modality == 2){
                     $status = $validator->validateStoreTransportPrivate($row, $this->send);
