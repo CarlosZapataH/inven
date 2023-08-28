@@ -1,18 +1,21 @@
 <?php
 require_once __DIR__ . '/../Helpers/XMLHelper.php';
 require_once __DIR__ . '/../Helpers/HttpHelper.php';
+require_once __DIR__ . '/../../../Helpers/LoadEnv.php';
 
 class TCIService{
-    private $baseUrl = 'http://egestor.qa.efacturacion.pe/WS_eCica/GuiaRemisionRemitente/ServicioGuiaRemisionRemitente.svc/soap11';
+    private $baseUrl;
     private $namespace = 'http://tci.net.pe/WS_eCica/GuiaRemisionRemitente/';
     
-    private $baseUrlReversion = 'http://egestor.qa.efacturacion.pe/ws_Reversiones/ServicioReversiones.svc/soap11';
+    private $baseUrlReversion;
     private $namespaceReversion = 'http://tci.net.pe/WS_eCica/Reversiones/';
 
     private $httpHelper;
     
     public function __construct() {
         $this->httpHelper = new HttpHelper();
+        $this->baseUrl = $_ENV['TCI_URL_EMISION'];
+        $this->$baseUrlReversion = $_ENV['TCI_URL_REVERSION'];
     }
 
     /*

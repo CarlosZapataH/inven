@@ -25,6 +25,7 @@ require_once __DIR__ . '/../../../Helpers/GlobalHelper.php';
 require_once __DIR__ . '/../Validation/ValidationTransferGuide.php';
 require_once __DIR__ . '/../../../Models/TransferGuide.php';
 require_once __DIR__ . '/../../TransferGuideHistory/Repository/TransferGuideHistoryRepository.php';
+
 $controller = new TransferGuideController();
 call_user_func(array($controller,$action));
 
@@ -62,10 +63,12 @@ class TransferGuideController{
     }
 
     public function index(){
+        header('Content-Type: application/json');
         $response = [
             'data' => null,
             'success' => false,
-            'message' => 'Error'
+            'message' => 'Error',
+            'code' => 400
         ];
         try {
             $filters = GlobalHelper::getUrlData();
@@ -73,33 +76,40 @@ class TransferGuideController{
             $data = $this->transferGuideRepository->findWithPaginate($filters);
             $response['success'] = true;
             $response['data'] = $data;
-        } catch (PDOException $e) {
+            $response['code'] = 200;
+        } 
+        catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
         }
 
-        header('Content-Type: application/json');
+        http_response_code($response['code']);
         echo json_encode($response);
     }
 
     public function show(){
         header('Content-Type: application/json');
-        
-        $response = [
-            'data' => null,
-            'success' => false,
-            'message' => 'Error'
-        ];
         try {
+            $response = [
+                'data' => null,
+                'success' => false,
+                'message' => 'Error',
+                'code' => 400
+            ];
+
             $id = (int)$_GET['id'];
             $datos = $this->transferGuideRepository->findOneWithDetails($id);
             if($datos){
                 $response['data'] = $datos;
+                $response['code'] = 200;
                 $response['success'] = true;
                 $response['message'] = 'Información obtenida exitosamente.';
             }
-        } catch (PDOException $e) {
+        } 
+        catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
         }
+
+        http_response_code($response['code']);
         echo json_encode($response);
     }
 
@@ -107,7 +117,7 @@ class TransferGuideController{
         header('Content-Type: application/json');
         
         $response = GlobalHelper::getGlobalResponse();
-        // try {
+        try {
             $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
                 $this->validationTransferGuide = new ValidationTransferGuide($data);
@@ -166,11 +176,10 @@ class TransferGuideController{
                     $response['errors'] = $this->data['errors'];
                 }
             } 
-        // } 
-        // catch (PDOException $e) {
-        //     Session::setAttribute("error", $e->getMessage());
-        //     echo json_encode($e->getMessage());
-        // }
+        } 
+        catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+        }
 
         http_response_code($response['code']);
         echo json_encode($response);
@@ -287,7 +296,7 @@ class TransferGuideController{
         header('Content-Type: application/json');
         
         $response = GlobalHelper::getGlobalResponse();
-        // try {
+        try {
             $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
                 if(!ValidateHelper::validateProperty($data, ['id'])){
@@ -354,11 +363,11 @@ class TransferGuideController{
                     }
                 }
             } 
-        // } 
-        // catch (PDOException $e) {
-        //     Session::setAttribute("error", $e->getMessage());
-        //     echo json_encode($e->getMessage());
-        // }
+        } 
+        catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+            echo json_encode($e->getMessage());
+        }
 
         http_response_code($response['code']);
         echo json_encode($response);
@@ -369,7 +378,7 @@ class TransferGuideController{
         header('Content-Type: application/json');
         
         $response = GlobalHelper::getGlobalResponse();
-        // try {
+        try {
             $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
                 if(!ValidateHelper::validateProperty($data, ['id'])){
@@ -450,11 +459,10 @@ class TransferGuideController{
                     }
                 }
             } 
-        // } 
-        // catch (PDOException $e) {
-        //     Session::setAttribute("error", $e->getMessage());
-        //     echo json_encode($e->getMessage());
-        // }
+        } 
+        catch (PDOException $e) {
+            Session::setAttribute("error", $e->getMessage());
+        }
 
         http_response_code($response['code']);
         echo json_encode($response);
