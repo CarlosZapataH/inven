@@ -22,6 +22,22 @@ VeeValidate.Validator.localize("es", {
   },
 });
 
+VeeValidate.Validator.extend("minDate", {
+  validate: (value) => {
+    if (!value) {
+      return true;
+    }
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(value + " 00:00:00");
+    selectedDate.setHours(0, 0, 0, 0);
+    return selectedDate >= currentDate;
+  },
+  getMessage: () => {
+    return "La fecha seleccionada no debe ser menor al día actual";
+  },
+});
+
 VeeValidate.Validator.extend("validationRuc", {
   validate: (value) => /^[A-Za-z0-9]{11}$/.test(value),
   message:
@@ -214,6 +230,16 @@ new Vue({
         ) {
           isCompleted = false;
           alertMsm = "Agregar vehículos al registro.";
+        } else if (
+          this.newCompany?.flag_new_company &&
+          this.generalData?.motive == "04" &&
+          (this.start_store?.commercial_name !=
+            this.newCompany?.new_company_name ||
+            this.start_store?.document != this.newCompany?.new_document)
+        ) {
+          isCompleted = false;
+          alertMsm =
+            "Para el motivo de traslado seleccionado, el destinatario debe ser igual al remitente.";
         }
 
         if (isCompleted) {
@@ -223,8 +249,6 @@ new Vue({
             title: "",
             type: "info",
             text: alertMsm,
-            showConfirmButton: false,
-            timer: 3000,
           });
         }
       });
