@@ -179,6 +179,7 @@ class TransferGuideController{
         } 
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
+            $response['errors'] = [$e->getMessage()];
         }
 
         http_response_code($response['code']);
