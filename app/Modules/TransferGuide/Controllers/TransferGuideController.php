@@ -47,6 +47,7 @@ class TransferGuideController{
     private $data;
     private $id;
     private $newCode;
+    private $tciResponse;
 
     public function __construct()
     {
@@ -182,6 +183,11 @@ class TransferGuideController{
             $response['errors'] = [$e->getMessage()];
         }
 
+        if($this->tciResponse){
+            array_push($response, [
+                'tciResponse' => $this->tciResponse
+            ]);
+        }
         http_response_code($response['code']);
         echo json_encode($response);
         
@@ -633,6 +639,7 @@ class TransferGuideController{
                 }
                 
                 $tciResponse = $tciService->registerGRR20(FormatHelper::parseStoreTransitMovementGuide($transferGuide));
+                $this->tciResponse = json_encode($tciResponse);
                 $response['data'] = $tciResponse['data'];
                 $response['message'] = $tciResponse['message'];
         
@@ -647,7 +654,7 @@ class TransferGuideController{
                     'serie' => $transferGuide['serie'],
                     'number' => (int)$transferGuide['number']
                 ]);
-        
+                echo json_encode($tciResponse);
                 if($tciResponse['success']){
                     $response['success'] = true;
                 }
