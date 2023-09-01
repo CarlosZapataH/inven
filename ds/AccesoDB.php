@@ -9,7 +9,7 @@ class AccesoDB {
         if( self::$pdo == null ) {
             try {
                 $parm = parse_ini_file("connect.ini");
-                $url = 'mysql:host='.$_ENV['DB_HOST'].";dbname=".$_ENV['DB_NAME'].";port=".$_ENV['6969'];
+                $url = 'mysql:host='.$_ENV['DB_HOST'].";dbname=".$_ENV['DB_NAME'].";port=".$_ENV['DB_PORT'];
                 $user = $_ENV['DB_USER'];
                 $pass = $_ENV['DB_PASSWORD'];
                 self::$pdo = new PDO($url,$user,$pass);
