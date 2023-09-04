@@ -12,7 +12,6 @@ call_user_func(array($controller,$action));
 class LoginController {
 
     public function valida_logueoUsuario(){
-        file_put_contents(__DIR__ .'/../logs/log_'.date("j.n.Y").'-'.date("h.i.s").'.log', json_encode("error"), FILE_APPEND);
         try {
             $nroDoc = $_POST['txtNroDoc'];
             $clave = $_POST['txtPassword'];
