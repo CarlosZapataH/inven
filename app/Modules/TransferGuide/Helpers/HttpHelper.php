@@ -16,6 +16,7 @@ class HttpHelper{
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 300);
     
             $response = curl_exec($ch);
             file_put_contents(__DIR__ .'/../../../../logs/log_'.date("j.n.Y").'-'.date("h.i.s").'.log', json_encode($response), FILE_APPEND);
