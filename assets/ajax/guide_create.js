@@ -106,6 +106,8 @@ new Vue({
     loadingSave: false,
     toggleProvider: false,
     togglebuyer: false,
+    establishmentIni: null,
+    establishmentDes: null
   },
   // validations: {
   //   ent_RemitenteGRR: {
@@ -313,6 +315,14 @@ new Vue({
       const detailsList = movement?.data || {};
       const start_store = movement?.start_store || {};
       const end_store = movement?.end_store || {};
+
+      if(start_store && start_store.establishment){
+        this.establishmentIni = start_store.establishment;
+      }
+
+      if(end_store && end_store.establishment){
+        this.establishmentDes = end_store.establishment;
+      }
 
       this.start_store = {
         name: start_store?.company?.name,
