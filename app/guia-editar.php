@@ -588,6 +588,13 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                         <div class="card-body">
                             <h6>Punto de Partida</h6>
+                            <div class="establishment_ini mt-3" v-if="establishmentIni">
+                                <label class="col-sm-3 col-form-label px-0">
+                                    <span class="font-weight-bold mr-2">Establecimiento: </span>
+                                    <span class="establishment_ini_title" v-text="establishmentIni.code + ' - ' + establishmentIni.type"></span>
+                                </label>
+                            </div>
+
                             <br>
                             <input-ubigeo v-model="start_store.ubigeo" initial-name="PP" ref="ppUbigeoSelects"></input-ubigeo>
                             <div class="form-group row">
@@ -624,6 +631,13 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             <hr>
 
                             <h6 class="mb-4">Punto de Llegada</h6>
+                            <div class="establishment_ini mt-3" v-if="establishmentDes">
+                                <label class="col-sm-3 col-form-label px-0">
+                                    <span class="font-weight-bold mr-2">Establecimiento: </span>
+                                    <span class="establishment_ini_title" v-text="establishmentDes.code + ' - ' + establishmentDes.type"></span>
+                                </label>
+                            </div>
+                            
                             <br>
                             <input-ubigeo v-model="end_store.ubigeo" :is-edit="!!end_store.alternative_address" initial-name="PL" ref="plUbigeoSelects"></input-ubigeo>
                             <div class="form-group row">
