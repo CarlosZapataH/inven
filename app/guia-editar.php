@@ -631,7 +631,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             <hr>
 
                             <h6 class="mb-4">Punto de Llegada</h6>
-                            <div class="establishment_ini mt-3" v-if="establishmentDes">
+                            <div class="establishment_ini mt-3">
                                 <label class="col-sm-3 col-form-label px-0">
                                     <span class="font-weight-bold mr-2">Establecimiento: </span>
                                     <span class="establishment_ini_title" v-text="establishmentDes?(establishmentDes.code + ' - ' + establishmentDes.type):'Sin establecimiento'"></span>
