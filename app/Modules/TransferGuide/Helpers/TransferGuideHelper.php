@@ -82,6 +82,24 @@ class TransferGuideHelper{
                             $flagNewCompany = true;
                         }
 
+                        $establishmentIni = null;
+                        if($row['establishment_ini_id']){
+                            $establishmentIni = [
+                                'id' => $row['establishment_ini_id'],
+                                'code' => $row['establishment_ini_code'],
+                                'type' => $row['establishment_ini_type']
+                            ];
+                        }
+
+                        $establishmentDes = null;
+                        if($row['establishment_des_id']){
+                            $establishmentDes = [
+                                'id' => $row['establishment_des_id'],
+                                'code' => $row['establishment_des_code'],
+                                'type' => $row['establishment_des_type']
+                            ];
+                        }
+
                         $newRow = [
                             'id' => $row['id'],
                             'name' => $row['name'],
@@ -147,6 +165,7 @@ class TransferGuideHelper{
                                     'province' => $row['establishment_ini_id']?$row['province_ini_name']:$row['u_alm_ini_province_name'],
                                     'department' => $row['establishment_ini_id']?$row['department_ini_name']:$row['u_alm_ini_department_name']
                                 ],
+                                'establishmentParent' => $establishmentIni
                             ],
                             'end_store' => [
                                 'id' => $row['almacen_des_id'],
@@ -174,6 +193,7 @@ class TransferGuideHelper{
                                     'province' => $row['u_alm_des_province_name'],
                                     'department' => $row['u_alm_des_department_name']
                                 ],
+                                'establishmentParent' => $establishmentDes
                             ],
                             'details' => [
                                 [
