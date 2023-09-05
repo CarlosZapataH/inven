@@ -169,7 +169,7 @@ class TCIService{
                                 $response['success'] = true;
                             // }
                         }
-                        else if($data['at_CodigoError'] != "0"){
+                        else if($data['at_CodigoError'] != "0" && $data['at_CodigoError'] != "-1"){
                             $response['success'] = true;
                         }
                         // $response['success'] = self::isBoolString($data['at_NivelResultado']);

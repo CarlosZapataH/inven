@@ -119,8 +119,12 @@ class TransitMovementRepository extends CommonRepository implements ITransitMove
                     inventario.cactivo_inv as inventario_cactivo_inv,
                     inventario.cinventario_inv as inventario_cinventario_inv,
                     establishment_ini.id as establishment_ini_id,
+                    establishment_ini.code as establishment_ini_code,
+                    establishment_ini.type as establishment_ini_type,
                     establishment_ini.address as establishment_ini_address,
                     establishment_des.id as establishment_des_id,
+                    establishment_des.code as establishment_des_code,
+                    establishment_des.type as establishment_des_type,
                     establishment_des.address as establishment_des_address,
                     (
                         SELECT 

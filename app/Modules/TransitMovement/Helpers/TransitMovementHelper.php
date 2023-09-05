@@ -22,6 +22,15 @@ class TransitMovementHelper{
                 if($indexExist < 0){
                     $newItem = [];
                     $newItem['id'] = $row['id_movt'];
+
+                    $establishmentIni = null;
+                    if($row['establishment_ini_id']){
+                        $establishmentIni = [
+                            'id' => $row['establishment_ini_id'],
+                            'code' => $row['establishment_ini_code'],
+                            'type' => $row['establishment_ini_type']
+                        ];
+                    }
                     
                     $newItem['start_store'] = [
                         'id' => $row['almacen_ini_id'],
@@ -41,11 +50,21 @@ class TransitMovementHelper{
                             'id' => $row['establishment_ini_id']?$row['u_est_ini_id_ubigeo']:$row['u_alm_ini_id_ubigeo'],
                             'name' => $row['establishment_ini_id']?$row['u_est_ini_nombre_ubigeo']:$row['u_alm_ini_nombre_ubigeo'],
                             'code' => $row['establishment_ini_id']?$row['u_est_ini_codigo_inei']:$row['u_alm_ini_codigo_inei']
-                        ]
+                        ],
+                        'establishment' => $establishmentIni
                     ];
                     
                     if($row['almacen_ini_id']){
                         $startStore = $newItem['start_store'];
+                    }
+
+                    $establishmentDes = null;
+                    if($row['establishment_des_id']){
+                        $establishmentDes = [
+                            'id' => $row['establishment_des_id'],
+                            'code' => $row['establishment_des_code'],
+                            'type' => $row['establishment_des_type']
+                        ];
                     }
         
                     $newItem['end_store'] = [
@@ -68,7 +87,8 @@ class TransitMovementHelper{
                             'id' => $row['establishment_des_id']?$row['u_est_des_id_ubigeo']:$row['u_alm_des_id_ubigeo'],
                             'name' => $row['establishment_des_id']?$row['u_est_des_nombre_ubigeo']:$row['u_alm_des_nombre_ubigeo'],
                             'code' => $row['establishment_des_id']?$row['u_est_des_codigo_inei']:$row['u_alm_des_codigo_inei']
-                        ]
+                        ],
+                        'establishment' => $establishmentDes
                     ];
 
                     if($row['almacen_des_id']){
