@@ -933,4 +933,8 @@ class TransferGuideController{
 
         return $dataResponse;
     }
+
+    private function testConnectionTci(){
+        return "HOLA";
+    }
 }

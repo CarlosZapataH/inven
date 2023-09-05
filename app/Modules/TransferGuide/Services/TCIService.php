@@ -15,7 +15,7 @@ class TCIService{
     public function __construct() {
         $this->httpHelper = new HttpHelper();
         $this->baseUrl = $_ENV['TCI_URL_EMISION'];
-        $this->$baseUrlReversion = $_ENV['TCI_URL_REVERSION'];
+        $this->baseUrlReversion = $_ENV['TCI_URL_REVERSION'];
     }
 
     /*
