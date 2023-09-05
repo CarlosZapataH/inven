@@ -544,10 +544,10 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                         </div>
                         <div class="card-body">
                             <h6>Punto de Partida</h6>
-                            <div class="establishment_ini mt-3" v-if="establishmentIni">
+                            <div class="establishment_ini mt-3">
                                 <label class="col-sm-3 col-form-label px-0">
                                     <span class="font-weight-bold mr-2">Establecimiento: </span>
-                                    <span class="establishment_ini_title" v-text="establishmentIni.code + ' - ' + establishmentIni.type"></span>
+                                    <span class="establishment_ini_title" v-text="establishmentIni?(establishmentIni.code + ' - ' + establishmentIni.type):'Sin establecimiento'"></span>
                                 </label>
                             </div>
                            
@@ -590,7 +590,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             <div class="establishment_ini mt-3" v-if="establishmentDes">
                                 <label class="col-sm-3 col-form-label px-0">
                                     <span class="font-weight-bold mr-2">Establecimiento: </span>
-                                    <span class="establishment_ini_title" v-text="establishmentDes.code + ' - ' + establishmentDes.type"></span>
+                                    <span class="establishment_ini_title" v-text="establishmentDes?(establishmentDes.code + ' - ' + establishmentDes.type):'Sin establecimiento'"></span>
                                 </label>
                             </div>
 
