@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../../Helpers/LoadEnv.php';
+
 class TransitMovementHelper{
     public function __construct() {
     }
@@ -72,7 +74,8 @@ class TransitMovementHelper{
                         'name' => $row['almacen_des_titulo_alm'],
                         'address' => $row['establishment_des_id']?$row['establishment_des_address']:$row['almacen_des_direccion_alm'],
                         'establishment_id' => $row['establishment_des_id'],
-                        'email_principal' => $row['transfers_guides_email_principal'],
+                        'email_principal' => $_ENV['TRANSFER_GUIDE_PRINCIPAL_EMAIL'],
+                        // 'email_principal' => $row['transfers_guides_email_principal'],$_ENV['TCI_URL_EMISION']
                         'email_secondary' => $row['transfers_guides_email_secondary'],
                         'company' => [
                             'id' => $row['company_des_id'],

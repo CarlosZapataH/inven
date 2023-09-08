@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../TransitMovement/Repository/TransitMovementReposit
 require_once __DIR__ . '/../../../../config/Config.php';
 require_once __DIR__ . '/../../Ubigeo/Repository/UbigeoRepository.php';
 require_once __DIR__ . '/../../Util/Helpers/IndicatorServiceHelper.php';
+require_once __DIR__ . '/../../../Helpers/LoadEnv.php';
 
 class ValidationTransferGuide{
     private $config;
@@ -243,15 +244,16 @@ class ValidationTransferGuide{
 
     private function validateEmailsStoreCompany(){
         if($this->send){
-            if(!ValidateHelper::validateProperty($this->data, ['end_store.email_principal'])){
+            /* if(!ValidateHelper::validateProperty($this->data, ['end_store.email_principal'])){
                 $this->addErrors(['end_store.email_principal' => 'El correo electrónico primario del almacén de llegada es obligatorio.']);
-            }
+            } */
             /* if(!ValidateHelper::validateProperty($this->data, ['end_store.email_secondary'])){
                 $this->addErrors(['end_store.email_secondary' => 'El correo electrónico secundario del almacén de llegada es obligatorio.']);
             } */
         }
         
-        $this->guide['email_principal'] = ValidateHelper::validateProperty($this->data, ['end_store.email_principal'])?$this->data['end_store']['email_principal']:null;
+        $this->guide['email_principal'] = $_ENV['TRANSFER_GUIDE_PRINCIPAL_EMAIL'];
+        // $this->guide['email_principal'] = ValidateHelper::validateProperty($this->data, ['end_store.email_principal'])?$this->data['end_store']['email_principal']:null;
         $this->guide['email_secondary'] = ValidateHelper::validateProperty($this->data, ['end_store.email_secondary'])?$this->data['end_store']['email_secondary']:null;
     }
 

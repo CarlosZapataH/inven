@@ -254,7 +254,7 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                                     <span class="text-danger font-weight-bold">*</span>
                                 </label>
                                 <div class="col-sm-9">
-                                    <input v-model="end_store.email_principal" name="DES_Correo_Principal" v-validate="'required|email'" type="email" class="form-control">
+                                    <input v-model="end_store.email_principal" name="DES_Correo_Principal" v-validate="'required|email'" type="email" class="form-control" disabled>
                                     <span class="text-danger">{{ errors.first('DES_Correo_Principal') }}</span>
                                 </div>
                             </div>
