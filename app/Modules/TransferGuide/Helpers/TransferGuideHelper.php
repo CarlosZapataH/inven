@@ -274,7 +274,7 @@ class TransferGuideHelper{
                             $hours = GlobalHelper::getDiffHours($row['tci_send_date'], $row['tci_response_date']);
                             $isLast = GlobalHelper::firstDateThanSecond($dateSend, $dateResponse);
                             if(
-                                $diffMinutes >= 10 &&
+                                $diffMinutes >= 5 &&
                                 (
                                     !$row['tci_response_date'] ||
                                     ($row['tci_response_date'] && $isLast)
