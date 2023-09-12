@@ -1,5 +1,6 @@
 <?php
 include('header.php');
+require_once __DIR__ . '/Helpers/LoadEnv.php';
 require_once '../model/AlmacenModel.php';
 require_once '../model/GerenciaModel.php';
 require_once '../model/ServicioModel.php';
@@ -8,7 +9,8 @@ $obj_serv = new ServicioModel();
 $obj_alm = new AlmacenModel();
 $lstSev = $obj_serv->lst_servicios_Asignados_Activos_xIDUS($user['id_us']);
 $obj_pf = new PerfilModel();
-$dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);?>
+$dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
+?>
 <input type="hidden" id="acc_report" value="<?=$dtllePerfil['reporte_perfil']?>">
 <input type="hidden" id="acc_importExport" value="<?=$dtllePerfil['importar_perfil']?>">
 <div class="container-fluid" id="divTabla" style="display:inline-block">
@@ -104,12 +106,18 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);?>
                     Buscar
                 </button>
             </div>
-            <div class="col-lg-2 col-md-3 col-sm-12">
-                <button type="button" class="btn btn-primary btn-hover-transform" id="openCosolidate">
-                    <i class="ti-pencil-alt mr-10"></i>
-                    Generar Guía
-                </button>
-            </div>
+            <?php
+                if((int)$dtllePerfil['create_guide'] == 1){
+                    ?>
+                        <div class="col-lg-2 col-md-3 col-sm-12">
+                            <button type="button" class="btn btn-primary btn-hover-transform" id="openCosolidate">
+                                <i class="ti-pencil-alt mr-10"></i>
+                                Generar Guía
+                            </button>
+                        </div>
+                    <?php
+                }
+            ?>
         </div>
     </div>
     <hr class="no-padding mb-0 mt-0">

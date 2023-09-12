@@ -6,6 +6,7 @@ require_once '../model/AlmacenModel.php';
 require_once '../model/GerenciaModel.php';
 require_once '../model/ServicioModel.php';
 require_once '../model/PerfilModel.php';
+require_once __DIR__ . '/Helpers/LoadEnv.php';
 $obj_serv = new ServicioModel();
 $obj_alm = new AlmacenModel();
 $lstSev = $obj_serv->lst_servicios_Asignados_Activos_xIDUS($user['id_us']);
@@ -22,7 +23,14 @@ if (sizeof($lstSev) == 1) {
 $obj_pf = new PerfilModel();
 $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
-
+$appUrl = $_ENV['APP_URL'].'/app/sistema.php';
+if((int)$dtllePerfil['create_guide'] !== 1){
+    ?>
+    <script>
+        window.location = <?php echo '"'.$appUrl.'"'; ?>
+    </script>
+    <?php
+}
 /**
  * start code
  */

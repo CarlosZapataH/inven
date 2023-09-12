@@ -270,11 +270,11 @@ class TransferGuideHelper{
                             $dateResponse = substr($row['tci_response_date'], 10);
                             $now = date('Y-m-d');
 
-                            $hoursNow = GlobalHelper::getDiffHours($row['tci_send_date'], date("Y-m-d H:i:s"));
+                            $diffMinutes = GlobalHelper::getDiffMinutes($row['tci_send_date'], date("Y-m-d H:i:s"));
                             $hours = GlobalHelper::getDiffHours($row['tci_send_date'], $row['tci_response_date']);
                             $isLast = GlobalHelper::firstDateThanSecond($dateSend, $dateResponse);
                             if(
-                                $hoursNow >= 1 &&
+                                $diffMinutes >= 10 &&
                                 (
                                     !$row['tci_response_date'] ||
                                     ($row['tci_response_date'] && $isLast)

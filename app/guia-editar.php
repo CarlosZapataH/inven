@@ -6,6 +6,7 @@ require_once '../model/AlmacenModel.php';
 require_once '../model/GerenciaModel.php';
 require_once '../model/ServicioModel.php';
 require_once '../model/PerfilModel.php';
+require_once __DIR__ . '/Helpers/LoadEnv.php';
 $obj_serv = new ServicioModel();
 $obj_alm = new AlmacenModel();
 $lstSev = $obj_serv->lst_servicios_Asignados_Activos_xIDUS($user['id_us']);
@@ -22,7 +23,14 @@ if (sizeof($lstSev) == 1) {
 $obj_pf = new PerfilModel();
 $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
-
+$appUrl = $_ENV['APP_URL'].'/app/sistema.php';
+if((int)$dtllePerfil['edit_guide'] !== 1){
+    ?>
+    <script>
+        window.location = <?php echo '"'.$appUrl.'"'; ?>
+    </script>
+    <?php
+}
 /**
  * start code
  */
@@ -94,9 +102,15 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
                             <li class="breadcrumb-item text-muted">Formulario para generar guía de remisión electrónica (GRE)</li>
                         </ol>
                     </div>
-                    <div class="col-12 col-md-auto" v-if="movement">
-                        <button v-if="movement.flag_reversion == 0 && (movement.tci_response_type == 1 || movement.tci_response_type == 2)" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
-                    </div>
+                    <?php
+                        if((int)$dtllePerfil['revert_guide'] == 1){
+                    ?>
+                        <div class="col-12 col-md-auto" v-if="movement">
+                            <button v-if="movement.flag_reversion == 0 && (movement.tci_response_type == 1 || movement.tci_response_type == 2)" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
+                        </div>
+                    <?php
+                        }
+                    ?>
                 </div>
 
                 <div v-if="movement">

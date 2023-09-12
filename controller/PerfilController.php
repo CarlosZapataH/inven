@@ -64,6 +64,27 @@ class PerfilController {
                         $optDevolver ='<i class="text-success-800 ti-check"></i>';
                     }
 
+                    // GUIDE
+                    $opCreateGuide = "";
+                    if((int)$perfil['create_guide'] == 1){
+                        $opCreateGuide ='<i class="text-success-800 ti-check"></i>';
+                    }
+
+                    $opEditGuide = "";
+                    if((int)$perfil['edit_guide'] == 1){
+                        $opEditGuide ='<i class="text-success-800 ti-check"></i>';
+                    }
+
+                    $opRevertGuide = "";
+                    if((int)$perfil['revert_guide'] == 1){
+                        $opRevertGuide ='<i class="text-success-800 ti-check"></i>';
+                    }
+
+                    $opShowGuide = "";
+                    if((int)$perfil['show_guide'] == 1){
+                        $opShowGuide ='<i class="text-success-800 ti-check"></i>';
+                    }
+
                     $row = array(
                         0 => "",
                         1 => $perfil['id_perfil'],
@@ -78,7 +99,11 @@ class PerfilController {
                         10=> $optTransfer,
                         11=> $optRetiro,
                         12=> $optDevolver,
-                        13=> $estado
+                        13=> $estado,
+                        14=> $opCreateGuide,
+                        15=> $opEditGuide,
+                        16=> $opRevertGuide,
+                        17=> $opShowGuide,
                     );
 
                     array_push($datos, $row);
@@ -207,6 +232,47 @@ class PerfilController {
                                 </div>
                             </div>
                         </div>
+                        <hr>
+                        <h4>Opciones de acceso para el perfil - Guías de Remisión:</h4>
+                        <hr>
+                        <div class="row">
+                            <div class="col-12 col-md-8 mx-auto">
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Crear guía
+                                                <input type="checkbox" name="chkCreateGuide" value="1" <?php if((int)$dtllePerfil['create_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Editar guía
+                                                <input type="checkbox" name="chkEditGuide" value="1" <?php if((int)$dtllePerfil['edit_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Revertir guía
+                                                <input type="checkbox" name="chkRevertGuide" value="1" <?php if((int)$dtllePerfil['revert_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Visualizar guía
+                                                <input type="checkbox" name="chkShowGuide" value="1" <?php if((int)$dtllePerfil['show_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <hr class="no-margin no-padding">
                     <div class="card-footer">
@@ -254,6 +320,16 @@ class PerfilController {
             $opDevolver = 0;
             if(!is_null($_POST['chkDevolver'])){ $opDevolver = (int)$_POST['chkDevolver']; }
 
+            // GUIDE
+            $opCreateGuide = 0;
+            if(!is_null($_POST['chkCreateGuide'])){ $opCreateGuide = (int)$_POST['chkCreateGuide']; }
+            $opEditGuide = 0;
+            if(!is_null($_POST['chkEditGuide'])){ $opEditGuide = (int)$_POST['chkEditGuide']; }
+            $opRevertGuide = 0;
+            if(!is_null($_POST['chkRevertGuide'])){ $opRevertGuide = (int)$_POST['chkRevertGuide']; }
+            $opShowGuide = 0;
+            if(!is_null($_POST['chkShowGuide'])){ $opShowGuide = (int)$_POST['chkShowGuide']; }
+
             $datesPF[0] = $obj_fn->quitar_caracteresEspeciales($_POST['titulo_pf']);
             $datesPF[1] = $obj_fn->quitar_caracteresEspeciales($_POST['des_pf']);
             $datesPF[2] = $opNuevo;
@@ -266,6 +342,10 @@ class PerfilController {
             $datesPF[9] = $opTransfer;
             $datesPF[10] = $opRetirar;
             $datesPF[11] = $opDevolver;
+            $datesPF[12]= $opCreateGuide;
+            $datesPF[13]= $opEditGuide;
+            $datesPF[14]= $opRevertGuide;
+            $datesPF[15]= $opShowGuide;
             $val = 0;
             $obj_model = new PerfilModel();
             $insertPF = $obj_model->registrar_Perfil($datesPF);
@@ -436,6 +516,48 @@ class PerfilController {
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
+                        <h4>Opciones de acceso para el perfil - Guías de Remisión:</h4>
+                        <hr>
+                        <div class="row">
+                            <div class="col-12 col-md-8 mx-auto">
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Crear guía
+                                                <input type="checkbox" name="chkCreateGuide" value="1" <?php if((int)$dtllePerfil['create_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Editar guía
+                                                <input type="checkbox" name="chkEditGuide" value="1" <?php if((int)$dtllePerfil['edit_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Revertir guía
+                                                <input type="checkbox" name="chkRevertGuide" value="1" <?php if((int)$dtllePerfil['revert_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Visualizar guía
+                                                <input type="checkbox" name="chkShowGuide" value="1" <?php if((int)$dtllePerfil['show_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <hr class="no-margin no-padding">
                     <div class="card-footer">
@@ -484,6 +606,16 @@ class PerfilController {
             $opDevolver = 0;
             if(!is_null($_POST['chkDevolver'])){ $opDevolver = (int)$_POST['chkDevolver']; }
 
+            // GUIDE
+            $opCreateGuide = 0;
+            if(!is_null($_POST['chkCreateGuide'])){ $opCreateGuide = (int)$_POST['chkCreateGuide']; }
+            $opEditGuide = 0;
+            if(!is_null($_POST['chkEditGuide'])){ $opEditGuide = (int)$_POST['chkEditGuide']; }
+            $opRevertGuide = 0;
+            if(!is_null($_POST['chkRevertGuide'])){ $opRevertGuide = (int)$_POST['chkRevertGuide']; }
+            $opShowGuide = 0;
+            if(!is_null($_POST['chkShowGuide'])){ $opShowGuide = (int)$_POST['chkShowGuide']; }
+
             $datesPF[0] = $obj_fn->quitar_caracteresEspeciales($_POST['titulo_pf']);
             $datesPF[1] = $obj_fn->quitar_caracteresEspeciales($_POST['des_pf']);
             $datesPF[2] = $opNuevo;
@@ -496,7 +628,11 @@ class PerfilController {
             $datesPF[9] = $opTransfer;
             $datesPF[10]= $opRetirar;
             $datesPF[11]= $opDevolver;
-            $datesPF[12]= (int)$_POST['idpf'];
+            $datesPF[12]= $opCreateGuide;
+            $datesPF[13]= $opEditGuide;
+            $datesPF[14]= $opRevertGuide;
+            $datesPF[15]= $opShowGuide;
+            $datesPF[16]= (int)$_POST['idpf'];
             $val = 0;
             $obj_pf = new PerfilModel();
             $updatePF = $obj_pf->update_Perfil($datesPF);

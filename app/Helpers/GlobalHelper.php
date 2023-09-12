@@ -91,4 +91,10 @@ class GlobalHelper{
         $secondDate = new DateTime($second);
         return ($firstDate >= $secondDate);
     }
+
+    public static function getDiffMinutes($startDate, $endDate){
+        $minutes = (strtotime($startDate)-strtotime($endDate))/60;
+        $minutes = abs($minutes); $minutes = floor($minutes);
+        return $minutes;
+    }
 }

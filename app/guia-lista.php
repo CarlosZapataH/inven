@@ -1,5 +1,6 @@
 <?php
 include('header.php');
+require_once __DIR__ . '/Helpers/LoadEnv.php';
 require_once '../assets/util/Session.php';
 require_once '../controller/ControlSesion.php';
 require_once '../model/AlmacenModel.php';
@@ -22,7 +23,14 @@ if (sizeof($lstSev) == 1) {
 $obj_pf = new PerfilModel();
 $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 
-
+$appUrl = $_ENV['APP_URL'].'/app/sistema.php';
+if((int)$dtllePerfil['show_guide'] !== 1){
+    ?>
+    <script>
+        window.location = <?php echo '"'.$appUrl.'"'; ?>
+    </script>
+    <?php
+}
 /**
  * start code
  */
