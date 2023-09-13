@@ -48,6 +48,7 @@ class TransferGuideController{
     private $id;
     private $newCode;
     private $tciResponse;
+    private $user;
 
     public function __construct()
     {
@@ -138,6 +139,7 @@ class TransferGuideController{
                     }
 
                     if(!$this->data['errors']){
+                        $this->user = Session::getAttribute("usuario");
                         $this->storeData();
                         $this->updateRelations();
                         
@@ -433,6 +435,8 @@ class TransferGuideController{
                 }
 
                 if(!$this->data['errors']){
+                    $this->user = Session::getAttribute("usuario");
+
                     if($response['data']){
                         $status = false;
                         if(isset($response['data']['at_NivelResultado'])){
@@ -447,7 +451,8 @@ class TransferGuideController{
                                 'tci_reversion_date' => date("Y-m-d H:i:s"),
                                 'tci_reversion_send' => $tciResponse['content_send'],
                                 'tci_reversion_response' => $tciResponse['original'],
-                                'number_reversion' => $numberReversion
+                                'number_reversion' => $numberReversion,
+                                'user_revert_id' => $this->user['id_us']
                             ]);
                             $this->restoreMovements();
                         }
@@ -478,10 +483,12 @@ class TransferGuideController{
 
     private function storeData(){
         if($this->data['guide']['id']){
+            $this->data['guide']['user_update_id'] = $this->user['id_us'];
             $this->transferGuideRepository->update($this->data['guide']['id'], $this->data['guide']);
             $this->id = $this->data['guide']['id'];
         }
         else{
+            $this->data['guide']['user_register_id'] = $this->user['id_us'];
             $this->id = $this->transferGuideRepository->store($this->data['guide']);
         }
 
