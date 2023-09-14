@@ -271,6 +271,19 @@ new Vue({
       readGuide({ id: this.idGuide }).then((response) => {
         this.movement = response?.data || {};
         this.setData();
+      })
+      .catch(error => {
+        if(error?.response?.data?.code == 409){
+          swal.fire({
+            title: "",
+            type: "warning",
+            text: error.response.data.message,
+            showConfirmButton: false,
+            timer: 5000,
+          }).then(()=>{
+            window.location.href = "/app/guia-lista.php";
+          });
+        }
       });
     },
 

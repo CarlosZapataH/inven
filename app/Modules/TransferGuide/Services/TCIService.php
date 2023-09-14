@@ -155,7 +155,7 @@ class TCIService{
                 $data = isset($response['response'][$action.'Response'][$action.'Result'])?$response['response'][$action.'Response'][$action.'Result'] : null;
                 if($data){
                     if(isset($data['at_CodigoError'])){
-                        if($data['at_CodigoError'] != "0"){
+                        if($data['at_CodigoError'] != "0" && $data['at_CodigoError'] != "-1"){
                             $response['code'] = 400;
                         }
                         // && isset($data['at_NivelResultado'])

@@ -133,6 +133,7 @@ class TransferGuideHelper{
                             'new_document' => $row['new_document'],
                             'new_company_name' => $row['new_company_name'],
                             'new_document_type_code' => $row['document_types_new_code'],
+                            'user_register_id' => $row['user_register_id'],
                             'start_store' => [
                                 'id' => $row['almacen_ini_id'],
                                 'name' => $row['almacen_ini_titulo_alm'],
@@ -327,92 +328,6 @@ class TransferGuideHelper{
                         }
                     }
                 }
-
-
-                /* foreach($data as $index => $row){
-                    // START STORE
-                    if(!isset($response['start_store']['document_type']) && $row['document_types_ini_code']){
-                       $response['start_store']['document_type'] = $row['document_types_ini_code'];
-                    }  
-                    if(!isset($response['start_store']['name']) && $row['company_ini_name']){
-                        $response['start_store']['name'] = $row['company_ini_name'];
-                    }  
-                    if(!isset($response['start_store']['commercial_name']) && $row['company_ini_commercial_name']){
-                        $response['start_store']['commercial_name'] = $row['company_ini_commercial_name'];
-                    }  
-                    if(!isset($response['start_store']['ubigeo']) && $row['u_alm_ini_codigo_inei']){
-                        $response['start_store']['ubigeo'] = $row['u_alm_ini_codigo_inei'];
-                    }  
-                    if(!isset($response['start_store']['address']) && $row['almacen_ini_direccion_alm']){
-                        $response['start_store']['address'] = $row['almacen_ini_direccion_alm'];
-                    }  
-                    if(!isset($response['start_store']['document']) && $row['company_ini_document']){
-                        $response['start_store']['document'] = $row['company_ini_document'];
-                    }  
-
-                    // END STORE
-                    if(!isset($response['end_store']['document_type']) && $row['document_types_des_code']){
-                        $response['end_store']['document_type'] = $row['document_types_des_code'];
-                    }  
-                    if(!isset($response['end_store']['name']) && $row['company_des_name']){
-                         $response['end_store']['name'] = $row['company_des_name'];
-                    }  
-                    if(!isset($response['end_store']['commercial_name']) && $row['company_des_commercial_name']){
-                         $response['end_store']['commercial_name'] = $row['company_des_commercial_name'];
-                    }
-                    if(!isset($response['end_store']['ubigeo']) && $row['u_alm_des_codigo_inei']){
-                         $response['end_store']['ubigeo'] = $row['u_alm_des_codigo_inei'];
-                    }
-                    if(!isset($response['end_store']['address']) && $row['almacen_des_direccion_alm']){
-                         $response['end_store']['address'] = $row['almacen_des_direccion_alm'];
-                    }
-                    if(!isset($response['end_store']['document']) && $row['company_des_document']){
-                         $response['end_store']['document'] = $row['company_des_document'];
-                    }
-
-                    $existTransport = false;
-                    foreach($response['transports'] as $rTrans){
-                        if($row['transports_id'] == $rTrans['id']){
-                            $existTransport = true;
-                        }
-                    }
-
-                    if(!$existTransport){
-                        array_push($response['transports'], [
-                            'id' => $row['transports_id'],
-                            'start_date' => $row['transports_fecha_inicio'],
-                            'document_type' => $row['transports_tipo_documento'],
-                            'document' => $row['transports_documento'],
-                            'company_name' => $row['transports_razon_social'],
-                            'mtc_number' => $row['transports_numero_mtc'],
-                            'license' => $row['transports_license'],
-                            'name' => $row['transports_name'],
-                            'last_name' => $row['transports_last_name']
-                        ]);
-                    }
-
-                    $existVehicle = false;
-                    foreach($response['vehicles'] as $rVeh){
-                        if($row['vehicles_id'] == $rVeh['id']){
-                            $existVehicle = true;
-                        }
-                    }
-
-                    if(!$existVehicle){
-                        array_push($response['vehicles'], [
-                            'id' => $row['vehicles_id'],
-                            'plate' => $row['vehicles_plate']
-                        ]);
-                    }
-
-                    array_push($response['detail'], [
-                        'cant_mde' => $row['cant_mde'],
-                        'um_sunat_code' => $row['um_sunat_code'],
-                        'des_mde' => $row['des_mde'],
-                        'cod_inv' => $row['inventario_cod_inv'],
-                        'additional_description' => $row['additional_description']
-                    ]);
-                } */
             }
         }
         

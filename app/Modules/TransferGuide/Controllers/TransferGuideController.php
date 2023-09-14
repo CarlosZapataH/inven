@@ -25,6 +25,7 @@ require_once __DIR__ . '/../../../Helpers/GlobalHelper.php';
 require_once __DIR__ . '/../Validation/ValidationTransferGuide.php';
 require_once __DIR__ . '/../../../Models/TransferGuide.php';
 require_once __DIR__ . '/../../TransferGuideHistory/Repository/TransferGuideHistoryRepository.php';
+require_once __DIR__ . '/../../Profile/Repository/ProfileRepository.php';
 
 $controller = new TransferGuideController();
 call_user_func(array($controller,$action));
@@ -42,6 +43,7 @@ class TransferGuideController{
     private $transferGuideDetailRepository;
     private $validationTransferGuide;
     private $ubigeoRepository;
+    private $profileRepository;
 
     
     private $data;
@@ -49,6 +51,7 @@ class TransferGuideController{
     private $newCode;
     private $tciResponse;
     private $user;
+    private $profile;
 
     public function __construct()
     {
@@ -62,6 +65,7 @@ class TransferGuideController{
         $this->buyerRepository = new BuyerRepository();
         $this->transferGuideDetailRepository = new TransferGuideDetailRepository();
         $this->ubigeoRepository = new UbigeoRepository();
+        $this->profileRepository = new ProfileRepository();
     }
 
     public function index(){
@@ -73,8 +77,13 @@ class TransferGuideController{
             'code' => 400
         ];
         try {
+            $this->recoverSession();
             $filters = GlobalHelper::getUrlData();
             unset($filters['action']);
+            if((int)$this->profile['admin_guide'] != 1){
+                $filters['user_register_id'] = (int)$this->user['id_us'];
+            }
+            
             $data = $this->transferGuideRepository->findWithPaginate($filters);
             $response['success'] = true;
             $response['data'] = $data;
@@ -101,10 +110,17 @@ class TransferGuideController{
             $id = (int)$_GET['id'];
             $datos = $this->transferGuideRepository->findOneWithDetails($id);
             if($datos){
-                $response['data'] = $datos;
-                $response['code'] = 200;
-                $response['success'] = true;
-                $response['message'] = 'Información obtenida exitosamente.';
+                $this->recoverSession();
+                if($datos['user_register_id'] == $this->user['id_us'] || (int)$this->profile['admin_guide'] == 1){
+                    $response['data'] = $datos;
+                    $response['code'] = 200;
+                    $response['success'] = true;
+                    $response['message'] = 'Información obtenida exitosamente.';
+                }
+                else{
+                    $response['code'] = 409;
+                    $response['message'] = 'No cuentas con acceso a este registro.';
+                }
             }
         } 
         catch (PDOException $e) {
@@ -127,6 +143,7 @@ class TransferGuideController{
                 
                 if(!$this->data['errors']){
                     $this->data = $this->data['data'];
+                    $this->recoverSession();
 
                     if($this->data['guide']['id']){
                         $transferGuideExist = $this->transferGuideRepository->findOneWithDetails($this->data['guide']['id']);
@@ -136,10 +153,17 @@ class TransferGuideController{
                         else if($transferGuideExist['tci_response_description'] == 'Aceptado' || $transferGuideExist['flag_reversion']){
                             $this->data['errors'] = ['No es posible editar guias aprobadas o anuladas.'];
                         }
+
+                        if($transferGuideExist){
+                            if($transferGuideExist['user_register_id'] != $this->user['id_us'] && (int)$this->profile['admin_guide'] != 1){
+                                $this->data['errors'] = ['permission' => 'No cuentas con acceso a este registro.'];
+                                $response['code'] = 409;
+                                $response['success'] = false;
+                            }
+                        }
                     }
 
                     if(!$this->data['errors']){
-                        $this->user = Session::getAttribute("usuario");
                         $this->storeData();
                         $this->updateRelations();
                         
@@ -190,6 +214,11 @@ class TransferGuideController{
                 'tciResponse' => $this->tciResponse
             ]);
         }
+
+        if(!$response['success']){
+            $response['code'] = 400;
+        }
+
         http_response_code($response['code']);
         echo json_encode($response);
         
@@ -390,6 +419,8 @@ class TransferGuideController{
         try {
             $data = GlobalHelper::getPostData();
             if (json_last_error() === JSON_ERROR_NONE){
+                $this->recoverSession();
+
                 if(!ValidateHelper::validateProperty($data, ['id'])){
                     $response['errors'] = ['id' => 'El id es obligatorio'];
                 }
@@ -410,6 +441,11 @@ class TransferGuideController{
                     }
                     else if($this->data['flag_reversion']){
                         $response['errors'] = ['sent' => 'El documento ya fue enviado para su reversión'];
+                    }
+                    else if($this->data['user_register_id'] != $this->user['id_us'] && (int)$this->profile['admin_guide'] != 1){
+                        $response['errors'] = ['permission' => 'No cuentas con acceso a este registro.'];
+                        $response['code'] = 409;
+                        $response['success'] = false;
                     }
                     else{
                         $numberReversion = $this->transferGuideRepository->getMaxNumberReversion();
@@ -651,7 +687,7 @@ class TransferGuideController{
                 $response['message'] = $tciResponse['message'];
         
                 $this->transferGuideRepository->update($transferGuide['id'], [
-                    'flag_sent' => true,
+                    'flag_sent' => $tciResponse['success'],
                     'sent_attempts' => $movement['sent_attempts'] + 1,
                     'tci_send' => $tciResponse['content_send'],
                     'tci_send_date' => date("Y-m-d H:i:s"),
@@ -661,7 +697,7 @@ class TransferGuideController{
                     'serie' => $transferGuide['serie'],
                     'number' => (int)$transferGuide['number']
                 ]);
-                echo json_encode($tciResponse);
+
                 if($tciResponse['success']){
                     $response['success'] = true;
                 }
@@ -880,6 +916,11 @@ class TransferGuideController{
         if(count($movementsIds) > 0){
             $this->transitMovementRepository->updateAvailable(implode(",", $movementsIds), 1);
         }
+    }
+
+    private function recoverSession(){
+        $this->user = Session::getAttribute("usuario");
+        $this->profile = $this->profileRepository->findBy('id_perfil', $this->user['perfil']);
     }
 
     // PROCESS

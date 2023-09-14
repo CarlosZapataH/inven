@@ -31,6 +31,11 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                     $conditions .= 'transfers_guides.date_issue <= "'. $filters['date_to'].'"';
                 }
 
+                if(isset($filters['user_register_id'])){
+                    if(strlen($conditions) > 0) $conditions .= ' AND ';
+                    $conditions .= 'transfers_guides.user_register_id = "'. $filters['user_register_id'].'"';
+                }
+
                 $conditions = ' WHERE ' . $conditions;
             }
 
@@ -120,6 +125,7 @@ class TransferGuideRepository extends CommonRepository implements ITransferGuide
                 transfers_guides.new_document_type_id,
                 transfers_guides.new_document,
                 transfers_guides.new_company_name,
+                transfers_guides.user_register_id,
                 almacen_ini.id_alm as almacen_ini_id,
                 almacen_ini.titulo_alm as almacen_ini_titulo_alm,
                 almacen_ini.direccion_alm as almacen_ini_direccion_alm,

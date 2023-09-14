@@ -85,6 +85,11 @@ class PerfilController {
                         $opShowGuide ='<i class="text-success-800 ti-check"></i>';
                     }
 
+                    $opAdminGuide = "";
+                    if((int)$perfil['admin_guide'] == 1){
+                        $opAdminGuide ='<i class="text-success-800 ti-check"></i>';
+                    }
+
                     $row = array(
                         0 => "",
                         1 => $perfil['id_perfil'],
@@ -104,6 +109,7 @@ class PerfilController {
                         15=> $opEditGuide,
                         16=> $opRevertGuide,
                         17=> $opShowGuide,
+                        18=> $opAdminGuide,
                     );
 
                     array_push($datos, $row);
@@ -270,6 +276,14 @@ class PerfilController {
                                             </label>
                                         </div>
                                     </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Administrar todas las guias
+                                                <input type="checkbox" name="chkAdminGuide" value="1" <?php if((int)$dtllePerfil['admin_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -329,6 +343,8 @@ class PerfilController {
             if(!is_null($_POST['chkRevertGuide'])){ $opRevertGuide = (int)$_POST['chkRevertGuide']; }
             $opShowGuide = 0;
             if(!is_null($_POST['chkShowGuide'])){ $opShowGuide = (int)$_POST['chkShowGuide']; }
+            $opAdminGuide = 0;
+            if(!is_null($_POST['chkAdminGuide'])){ $opAdminGuide = (int)$_POST['chkAdminGuide']; }
 
             $datesPF[0] = $obj_fn->quitar_caracteresEspeciales($_POST['titulo_pf']);
             $datesPF[1] = $obj_fn->quitar_caracteresEspeciales($_POST['des_pf']);
@@ -346,6 +362,7 @@ class PerfilController {
             $datesPF[13]= $opEditGuide;
             $datesPF[14]= $opRevertGuide;
             $datesPF[15]= $opShowGuide;
+            $datesPF[16]= $opAdminGuide;
             $val = 0;
             $obj_model = new PerfilModel();
             $insertPF = $obj_model->registrar_Perfil($datesPF);
@@ -555,6 +572,14 @@ class PerfilController {
                                             </label>
                                         </div>
                                     </div>
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label class="control control-outline control-outline-info control--checkbox">Administrar todas las guias
+                                                <input type="checkbox" name="chkAdminGuide" value="1" <?php if((int)$dtllePerfil['admin_guide']==1){ echo "checked";}?>>
+                                                <span class="control__indicator"></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -615,6 +640,8 @@ class PerfilController {
             if(!is_null($_POST['chkRevertGuide'])){ $opRevertGuide = (int)$_POST['chkRevertGuide']; }
             $opShowGuide = 0;
             if(!is_null($_POST['chkShowGuide'])){ $opShowGuide = (int)$_POST['chkShowGuide']; }
+            $opAdminGuide = 0;
+            if(!is_null($_POST['chkAdminGuide'])){ $opAdminGuide = (int)$_POST['chkAdminGuide']; }
 
             $datesPF[0] = $obj_fn->quitar_caracteresEspeciales($_POST['titulo_pf']);
             $datesPF[1] = $obj_fn->quitar_caracteresEspeciales($_POST['des_pf']);
@@ -632,7 +659,8 @@ class PerfilController {
             $datesPF[13]= $opEditGuide;
             $datesPF[14]= $opRevertGuide;
             $datesPF[15]= $opShowGuide;
-            $datesPF[16]= (int)$_POST['idpf'];
+            $datesPF[16]= $opAdminGuide;
+            $datesPF[17]= (int)$_POST['idpf'];
             $val = 0;
             $obj_pf = new PerfilModel();
             $updatePF = $obj_pf->update_Perfil($datesPF);
