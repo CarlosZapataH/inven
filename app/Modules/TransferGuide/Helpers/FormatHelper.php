@@ -104,7 +104,7 @@ class FormatHelper{
             }
 
             $storeEnd['at_NumeroDocumentoIdentidad'] = $data['end_store']['company']['document'];
-            if($data['end_store']['establishment_code'] && $data['end_store']['establishment_code'] != '' && $data['alternative_address']==0){
+            if($data['end_store']['establishment_code'] && $data['end_store']['establishment_code'] != '' && (int)$data['alternative_address']==0){
                 $storeEnd['at_CodigoEstablecimiento'] = $data['end_store']['establishment_code'];
             }
         }
