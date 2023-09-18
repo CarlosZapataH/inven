@@ -163,6 +163,10 @@ class TransferGuideController{
                         }
                     }
 
+                    if(!$this->user['id_us']){
+                        $this->data['errors'] = ['Ocurrio un problema con su sesión de usuario.'];
+                    }
+
                     if(!$this->data['errors']){
                         $this->storeData();
                         $this->updateRelations();
