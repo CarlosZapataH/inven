@@ -112,6 +112,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);
 </div>
 <div class="container-fluid" id="divResponse"></div>
 <div class="scrollToTop"><i class="fa fa-arrow-up"></i></div>
+
+<div class="loader-custom-container">
+    <span class="loader-custom"></span>
+</div>
+
 <?php
 include('footer.php');
 ?>
@@ -135,4 +140,44 @@ include('footer.php');
 <!--toastr-->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css<?=$version?>" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="../assets/ajax/inventario.js<?=$version?>"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+        $('.loader-custom-container').hide();
+    });
+</script>
+<style>
+    .loader-custom-container{
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0,0,0,.25);
+    }
+
+    .loader-custom {
+        width: 120px;
+        height: 120px;
+        border: 12px solid #FFF;
+        border-bottom-color: #FF3D00;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+    } 
+</style>

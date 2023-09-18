@@ -921,7 +921,7 @@ class InventarioDAO{
         }
     }
 
-    public function listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search = null){
+    public function listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search = null, $pagination = false){
         try{
             $pdo = AccesoDB::getPDO();
             $query = "
@@ -939,11 +939,17 @@ class InventarioDAO{
                 ";
             }
 
-            $query .= "LIMIT :offset, :limit";
+            if($pagination){
+                $query .= "LIMIT :offset, :limit";
+            }
+
             $stm = $pdo->prepare($query);
             $stm->bindParam(":id",$id, PDO::PARAM_INT);
-            $stm->bindParam(":offset",$offset, PDO::PARAM_INT);
-            $stm->bindParam(":limit",$itemsPerPage, PDO::PARAM_INT);
+
+            if($pagination){
+                $stm->bindParam(":offset",$offset, PDO::PARAM_INT);
+                $stm->bindParam(":limit",$itemsPerPage, PDO::PARAM_INT);
+            }
 
             $stm->execute();
             $lista = $stm->fetchAll(PDO::FETCH_ASSOC);

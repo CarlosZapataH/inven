@@ -483,6 +483,99 @@ function loadTbl_Inventario_INI(datos){
                         search: 'applied',
                         order: 'applied'
                     }
+                },
+                action: function(e, dt, node, config){
+                    $('.loader-custom-container').show();
+                    $.get('../controller/InventarioController.php?action=lst_Inventario_xServicio_All_JSON_DOWNLOAD', datos,function (response) {
+                        let data = JSON.parse(response);
+                        let exportData = [];
+                        data.data.forEach(item => {
+                            exportData.push({
+                                'ID': item.id_inv,
+                                'CODIGO': item.code,
+                                'DESCRIPCIÓN': item.des_inv,
+                                'U.M.': item.um_inv,
+                                'NRO. PARTE/SERIE': item.nroparte_inv,
+                                'C.ACTIVO': item.cactivo_inv,
+                                'C.INV': item.cinventario_inv,
+                                'MAPEL': item.cmapel_inv,
+                                'ONU': item.conu_inv,
+                                'STOCK': item.cant_inv,
+                                'CLASIFICACIÓN': item.calification
+                            });
+                        });
+                        // Crea un objeto Workbook de SheetJS
+                        let wb = XLSX.utils.book_new();
+                        let ws = XLSX.utils.json_to_sheet(exportData);
+                        
+
+                        for (let row = 0; row <= exportData.length; row++) {
+                            for (let col = 0; col <= 10; col++) {
+                              const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+                              // Add center alignment to every cell
+                              ws[cellRef].s = {
+                                alignment: { horizontal: "center" },
+                              };
+                              if (row === 0 || row === 1 || col === 0) {
+                                // Format headers and names
+                                ws[cellRef].s = {
+                                  ...ws[cellRef].s,
+                                  font: { bold: true },
+                                };
+                              }
+                            }
+                          }
+
+                        // Agrega la hoja al libro
+                        XLSX.utils.sheet_add_aoa(ws, [
+                            [
+                                '',
+                                '',
+                                '',
+                                '',
+                                '',
+                                config.title,
+                                '',
+                                '',
+                                '',
+                                '',
+                                '' 
+                            ],
+                            [
+                                'ID',
+                                'CODIGO',
+                                'DESCRIPCIÓN',
+                                'U.M.',
+                                'NRO. PARTE/SERIE',
+                                'C.ACTIVO',
+                                'C.INV',
+                                'MAPEL',
+                                'ONU',
+                                'STOCK',
+                                'CLASIFICACIÓN'
+                            ]
+                        ], { origin: "A1" });
+                        XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
+                        let f = new Date();
+                        // Crea un blob y una URL para descargar el archivo Excel
+                        let blob = XLSX.writeFile(wb, 'Export-Inventario-' + f.getDate() + (f.getMonth() +1) + f.getFullYear()+'.xlsx');
+                        $('.loader-custom-container').hide();
+                    }).always(function () {
+                    });
+
+                    
+                    /* var url = URL.createObjectURL(blob);
+
+                    // Crea un enlace oculto para la descarga
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'datos_exportados.xlsx';
+
+                    // Simula el clic en el enlace para iniciar la descarga
+                    a.click();
+
+                    // Libera el objeto URL
+                    URL.revokeObjectURL(url); */
                 }
             },
             {

@@ -401,9 +401,9 @@ class InventarioModel {
         }
     }
 
-    public function listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search = null){
+    public function listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search = null, $pagination = false){
         try { $obj_model = new InventarioDAO();
-            $listar = $obj_model->listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search);
+            $listar = $obj_model->listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search, $pagination);
             return $listar;
         } catch (PDOException $e) {
             throw $e;

@@ -59,7 +59,7 @@ class InventarioController {
             // $totalPages = ceil($totalItems['total'] / $itemsPerPage);
             // $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
             // $offset = ($currentPage - 1) * $itemsPerPage;
-            $listInventarios = $obj_inv->listar_Inventario_Detail_All($idAlmacen, $offset, $itemsPerPage, $search);
+            $listInventarios = $obj_inv->listar_Inventario_Detail_All($idAlmacen, $offset, $itemsPerPage, $search, true);
 
 
             // $lstInventario = $obj_inv->listar_Inventario_xIDAlmacen_All($idAlmacen);
@@ -110,6 +110,56 @@ class InventarioController {
                         9 => (int)$inventario['cant_inv'],
                         10=> $txtClasificacion,
                         11=> $btnEditar.$btnBaja.$btnEliminar
+                    );
+                    array_push($datos, $row);
+                }
+            }
+
+            $tabla = array('data' => $datos);
+            echo json_encode($tabla);
+            unset($datos);
+
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
+
+    public function lst_Inventario_xServicio_All_JSON_DOWNLOAD(){
+        try {
+            $obj_fn = new FuncionesModel();
+            $idAlmacen = (int)$_GET['almacen'];
+            $obj_inv = new InventarioModel();
+            $search = null;
+            if(isset($_GET['search'])){
+                if(is_array($_GET['search'])){
+                    if(isset($_GET['search']['value'])){
+                        if(!empty($_GET['search']['value'])){
+                            $search = $_GET['search']['value'];
+                        }
+                    }
+                }
+            }
+            $listInventarios = $obj_inv->listar_Inventario_Detail_All($idAlmacen, $offset, $itemsPerPage, $search, false);
+
+            $datos = array();
+            if(!is_null($listInventarios)){
+                
+                foreach($listInventarios as $inventario){
+                    $txtClasificacion = "";
+                    if(!is_null($inventario['des_cla'])){  $txtClasificacion = strtoupper(trim($inventario['des_cla'])); }
+                    
+                    $row = array(
+                        'id_inv' => $inventario['id_inv'],
+                        'code' => $campoInfo.$campoCodigo,
+                        'des_inv' => $inventario['des_inv'],
+                        'um_inv' => $inventario['um_inv'],
+                        'nroparte_inv' => $inventario['nroparte_inv'],
+                        'cactivo_inv' => $inventario['cactivo_inv'],
+                        'cinventario_inv' => $inventario['cinventario_inv'],
+                        'cmapel_inv' => $inventario['cmapel_inv'],
+                        'conu_inv' => $inventario['conu_inv'],
+                        'cant_inv' => (int)$inventario['cant_inv'],
+                        'calification' => $txtClasificacion
                     );
                     array_push($datos, $row);
                 }
