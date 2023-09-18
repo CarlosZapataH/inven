@@ -19,7 +19,7 @@ class HttpHelper{
             curl_setopt($ch, CURLOPT_TIMEOUT, 300);
     
             $response = curl_exec($ch);
-            file_put_contents(__DIR__ .'/../../../../logs/log_'.date("j.n.Y").'-'.date("h.i.s").'.log', json_encode($response), FILE_APPEND);
+            // file_put_contents(__DIR__ .'/../../../../logs/log_'.date("j.n.Y").'-'.date("h.i.s").'.log', json_encode($response), FILE_APPEND);
 
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
