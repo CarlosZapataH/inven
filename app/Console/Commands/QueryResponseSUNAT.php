@@ -16,7 +16,7 @@ function queryResponseSUNAT(){
                     'at_CantidadConsultar' => 100
                 ]
             ]);
-            
+            file_put_contents(__DIR__ .'/../../../logs/log_cron_'.date("j.n.Y").'-'.date("h.i.s").'.log', json_encode($tciResponse), FILE_APPEND);
             if($tciResponse['success']){
                 $documents = FormatHelper::parseResponseQueryResponseSUNAT($tciResponse['data']);
                 if(count($documents) > 0){
