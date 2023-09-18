@@ -901,4 +901,57 @@ class InventarioDAO{
             throw $e;
         }
     }
+
+    public function listar_Inventario_Detail_Count($id){
+        try{
+            $pdo = AccesoDB::getPDO();
+            $query = "
+                SELECT COUNT(*) as 'total' FROM inventario
+                WHERE id_alm = :id AND cant_inv > 0 AND condicion_inv = 1;
+            ";
+            $stm = $pdo->prepare($query);
+            $stm->bindParam(":id",$id, PDO::PARAM_INT);
+            $stm->execute();
+            $detalle = $stm->fetch(PDO::FETCH_ASSOC);
+            if(!$detalle){$detalle = null;}
+            $stm = null;
+            return $detalle;
+        } catch(PDOException $e){
+            throw $e;
+        }
+    }
+
+    public function listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search = null){
+        try{
+            $pdo = AccesoDB::getPDO();
+            $query = "
+                SELECT inventario.*, clasificacion.*, (
+                    SELECT count(*)
+                FROM movimientos mov INNER JOIN movimientos_detalle mvd ON mov.id_mov = mvd.id_mov
+                WHERE mvd.id_inv = inventario.id_inv AND mov.action_mov != 'IN' LIMIT 1
+                ) AS 'ex_mov_item' FROM inventario 
+                LEFT JOIN clasificacion ON clasificacion.id_cla = inventario.id_cla
+                WHERE id_alm = :id AND cant_inv > 0 AND condicion_inv = 1 ";
+
+            if($search){
+                $query .= "
+                    AND (inventario.cod_inv LIKE '%$search%' OR inventario.des_inv LIKE '%$search%')
+                ";
+            }
+
+            $query .= "LIMIT :offset, :limit";
+            $stm = $pdo->prepare($query);
+            $stm->bindParam(":id",$id, PDO::PARAM_INT);
+            $stm->bindParam(":offset",$offset, PDO::PARAM_INT);
+            $stm->bindParam(":limit",$itemsPerPage, PDO::PARAM_INT);
+
+            $stm->execute();
+            $lista = $stm->fetchAll(PDO::FETCH_ASSOC);
+            if(!$lista){$lista = null;}
+            $stm = null;
+            return $lista;
+        } catch(PDOException $e){
+            throw $e;
+        }
+    }
 }

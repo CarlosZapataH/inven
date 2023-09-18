@@ -43,15 +43,34 @@ class InventarioController {
             }
 
             $obj_inv = new InventarioModel();
-            $lstInventario = $obj_inv->listar_Inventario_xIDAlmacen_All($idAlmacen);
+            $itemsPerPage = isset($_GET['length']) ? $_GET['length'] : 25;
+            $offset = isset($_GET['start']) ? (int)$_GET['start'] : 0;
+            $search = null;
+            if(isset($_GET['search'])){
+                if(is_array($_GET['search'])){
+                    if(isset($_GET['search']['value'])){
+                        if(!empty($_GET['search']['value'])){
+                            $search = $_GET['search']['value'];
+                        }
+                    }
+                }
+            }
+            // $totalItems = $obj_inv->listar_Inventario_Detail_Count($idAlmacen);
+            // $totalPages = ceil($totalItems['total'] / $itemsPerPage);
+            // $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+            // $offset = ($currentPage - 1) * $itemsPerPage;
+            $listInventarios = $obj_inv->listar_Inventario_Detail_All($idAlmacen, $offset, $itemsPerPage, $search);
+
+
+            // $lstInventario = $obj_inv->listar_Inventario_xIDAlmacen_All($idAlmacen);
 
             $datos = array();
-            if(!is_null($lstInventario)){
-                foreach($lstInventario as $inventario){
-                    $dtlleClasifica = $obj_inv->detalle_Clasificacion_xID($inventario['id_cla']);
+            if(!is_null($listInventarios)){
+                foreach($listInventarios as $inventario){
+                    // $dtlleClasifica = $obj_inv->detalle_Clasificacion_xID($inventario['id_cla']);
 
                     $txtClasificacion = "";
-                    if(!is_null($dtlleClasifica)){  $txtClasificacion = strtoupper(trim($dtlleClasifica['des_cla'])); }
+                    if(!is_null($inventario['des_cla'])){  $txtClasificacion = strtoupper(trim($inventario['des_cla'])); }
 
                     $campoCodigo = "";
                     $campoInfo = '<a id="btnDetailInventary" class="cursor-pointer float-left text-hover-primary mr-7" title="Click para ver detalle" data-id="'.$inventario['id_inv'].'"><i class="ti-info-alt"></i></a>';
@@ -65,9 +84,9 @@ class InventarioController {
                     }
                     $btnEliminar = "";
                     if($accDelete == 1 ) {
-                        $obj_mov = new MovimientoModel();
-                        $exMovItem = $obj_mov->existe_MovimientoDetalle_xIdInventario($inventario['id_inv']);
-                        if((int)$exMovItem['nreg'] == 0) {
+                        // $obj_mov = new MovimientoModel();
+                        // $exMovItem = $obj_mov->existe_MovimientoDetalle_xIdInventario($inventario['id_inv']);
+                        if((int)$inventario['ex_mov_item'] == 0) {
                             $btnEliminar = '<a class="cursor-pointer ml-15 text-hover-danger"  id="deleteItem_Btn" data-id="' . $inventario['id_inv'] . '" title="Eliminar"><i class="f24 opacity-7 ti-trash"></i></a>';
                         }
                     }

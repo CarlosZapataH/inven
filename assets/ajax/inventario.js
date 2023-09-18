@@ -1,5 +1,6 @@
 var $Tbl_Inventario, swal, arrayVAL_exp = [], elementosP = [],$Nregistros = 0, $count = 0, successFileLoad = 0;
 var objinit = new init(), columVisi, columVisiMdl, $Tbl_ItemStock, optImport,optTable,optImport_notPermise;
+var totalItemsPagTable = 0;
 
 $.extend($.fn.dataTableExt.oStdClasses, {
     "sFilterInput": "form-control",
@@ -432,12 +433,14 @@ $(document).on('change', '#IdAlmacen', function() {
 
 function valida_existenciaInvetario(IdAlmacen,opImport) {
     "use strict";
+    totalItemsPagTable = 0;
     let divImport = $('#divLoad_import');
     let divContend = $('#divContend');
     divImport.empty();
     divContend.empty();
     $.get('../controller/InventarioController.php?action=validar_existenciaInventario_JSON', {'IdAlmacen':IdAlmacen},function (response) {
         let data = JSON.parse(response);
+        totalItemsPagTable = data.valor;
         if(parseInt(data.valor) > 0) {
             divContend.append(optTable);
             let datos = {
@@ -587,15 +590,17 @@ function loadTbl_Inventario_INI(datos){
             }
         ],
         scrollCollapse: false,
+        processing: true,
+        serverSide: true,
         ajax:{
             url: '../controller/InventarioController.php?action=lst_Inventario_xServicio_All_JSON',
             type : "get",
             data : datos,
             dataType : "json",
             error: function(e){
-                console.log(e.responseText);
+                // console.log(e);
             },complete:function (datos){
-                console.log(datos);
+                // console.log(datos);
             }
         },
         "initComplete": function(settings, json) {
@@ -611,6 +616,7 @@ function loadTbl_Inventario_INI(datos){
             $('#Tbl_Inventario_wrapper > div.datatable-header > div.dataTables_length > label > select').addClass('mr-15');
         },
         "drawCallback": function( settings ) {
+            console.log(settings)
             $('.dt-checkboxes-select-all > input').addClass('scale-chk-1-5 cursor-pointer');
             $('.dt-checkboxes').addClass('scale-chk-1-5 cursor-pointer');
         }

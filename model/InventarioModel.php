@@ -391,4 +391,22 @@ class InventarioModel {
             throw $e;
         }
     }
+
+    public function listar_Inventario_Detail_Count($id){
+        try { $obj_model = new InventarioDAO();
+            $listar = $obj_model->listar_Inventario_Detail_Count($id);
+            return $listar;
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
+
+    public function listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search = null){
+        try { $obj_model = new InventarioDAO();
+            $listar = $obj_model->listar_Inventario_Detail_All($id, $offset, $itemsPerPage, $search);
+            return $listar;
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
 }
