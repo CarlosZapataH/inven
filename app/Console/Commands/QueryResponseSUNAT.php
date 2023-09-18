@@ -64,8 +64,8 @@ function queryResponseSUNAT(){
                 echo json_encode($documents);
             }
     } 
-    catch (PDOException $e) {
-        // echo json_encode($e->getMessage());
+    catch (Exception $e) {
+        file_put_contents(__DIR__ .'/../../../logs/log_cron_error_'.date("j.n.Y").'-'.date("h.i.s").'.log', $e->getMessage(), FILE_APPEND);
     }
 }
 
