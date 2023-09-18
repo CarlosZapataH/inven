@@ -16,6 +16,7 @@ function queryResponseSUNAT(){
                     'at_CantidadConsultar' => 100
                 ]
             ]);
+            
             if($tciResponse['success']){
                 $documents = FormatHelper::parseResponseQueryResponseSUNAT($tciResponse['data']);
                 if(count($documents) > 0){

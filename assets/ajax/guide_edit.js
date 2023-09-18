@@ -162,8 +162,8 @@ new Vue({
     },
     hasObservationsTci() {
       return (
-        this.movement?.tci_response_type != 1 &&
-        this.movement?.flag_sent == 1 &&
+        ((this.movement?.tci_response_type != 1 &&
+        this.movement?.flag_sent == 1) || this.movement?.tci_response_code == 3) &&
         Array.isArray(this.movement?.tci_messages)
       );
     },

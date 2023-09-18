@@ -207,6 +207,7 @@ class TransferGuideController{
         catch (PDOException $e) {
             Session::setAttribute("error", $e->getMessage());
             $response['errors'] = [$e->getMessage()];
+            echo $e->getMessage();
         }
 
         if($this->tciResponse){
@@ -685,9 +686,9 @@ class TransferGuideController{
                 $this->tciResponse = json_encode($tciResponse);
                 $response['data'] = $tciResponse['data'];
                 $response['message'] = $tciResponse['message'];
-        
-                $this->transferGuideRepository->update($transferGuide['id'], [
-                    'flag_sent' => $tciResponse['success'],
+
+                $dataUpdate = [
+                    'flag_sent' => ($tciResponse['code_error'] >= 0)?true:false,
                     'sent_attempts' => $movement['sent_attempts'] + 1,
                     'tci_send' => $tciResponse['content_send'],
                     'tci_send_date' => date("Y-m-d H:i:s"),
@@ -696,7 +697,7 @@ class TransferGuideController{
                     'time_issue' => $transferGuide['time_issue'],
                     'serie' => $transferGuide['serie'],
                     'number' => (int)$transferGuide['number']
-                ]);
+                ];
 
                 if($tciResponse['success']){
                     $response['success'] = true;
@@ -704,6 +705,16 @@ class TransferGuideController{
                 else{
                     $response['errors'] = [$tciResponse['message']];
                 }
+
+                if($tciResponse['code_error'] < 0){
+                    $messageError = isset($tciResponse['message'])?$tciResponse['message']:'Error';
+                    $dataUpdate['tci_response_type'] = 1;
+                    $dataUpdate['tci_response_code'] = 3;
+                    $dataUpdate['tci_response_description'] = 'Rechazado';
+                    $dataUpdate['tci_confirm_status_response'] = '{"serie":"'.$transferGuide['serie'].'","number":"'.$transferGuide['number'].'","type_response":"1","code_response":"3","description":"Rechazado","date":"'.date('Y-m-d H:i:s').'","messages":["'.$messageError.'"]}';
+                }
+
+                $this->transferGuideRepository->update($transferGuide['id'], $dataUpdate);
             }
         }
         else{

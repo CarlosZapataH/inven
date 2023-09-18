@@ -106,7 +106,7 @@ if((int)$dtllePerfil['edit_guide'] !== 1){
                         if((int)$dtllePerfil['revert_guide'] == 1){
                     ?>
                         <div class="col-12 col-md-auto" v-if="movement">
-                            <button v-if="movement.flag_reversion == 0 && (movement.tci_response_type == 1 || movement.tci_response_type == 2)" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
+                            <button v-if="movement.flag_sent == 1 && movement.flag_reversion == 0 && (movement.tci_response_type == 1 || movement.tci_response_type == 2)" type="button" class="btn btn-sm btn-primary" @click="reverseGuides()" :disabled="loadingSave">Revertir GRE</button>
                         </div>
                     <?php
                         }

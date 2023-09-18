@@ -98,14 +98,13 @@ new Vue({
         {
           type: 3,
           value: "Rechazado",
-          class: "badge-danger",
+          class: "badge-red",
         },
-
         {
           type: 4,
           value: "Excepción",
-          class: "badge-orange",
-        },
+          class: "badge-purple",
+        }
       ];
 
       const defaultStatus = { value: "", class: "" };

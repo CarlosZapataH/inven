@@ -150,6 +150,7 @@ class TCIService{
 
     private function getResponse($response, $action){
         $data = null;
+        $codeError = -1;
         if($response['success']){
             if(isset($response['response'][$action.'Response'])){
                 $data = isset($response['response'][$action.'Response'][$action.'Result'])?$response['response'][$action.'Response'][$action.'Result'] : null;
@@ -161,6 +162,7 @@ class TCIService{
                         // && isset($data['at_NivelResultado'])
                         // if(!self::isBoolString($data['at_NivelResultado'])){
                         // }
+                        $codeError = (int)$data['at_CodigoError'];
                     }
 
                     if(isset($data['at_MensajeResultado'])){
@@ -185,6 +187,7 @@ class TCIService{
         }
 
         $response['data'] = $data;
+        $response['code_error'] = $codeError;
         $response['original'] = $response['response']['original'];
         unset($response['response']);
         return $response;

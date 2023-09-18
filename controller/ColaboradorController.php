@@ -409,6 +409,8 @@ class ColaboradorController {
                 }
             }
             else{//Actualizamos registro existente
+                $dtlleCol = $obj_col->buscar_colaborador_xId($idColaborador);
+                $datesUpdate[1] = $dtlleCol['ndoc_col'];
                 $datesUpdate[11] = $idColaborador;
                 $insert = $obj_col->update_Colaborador($datesUpdate);
                 if($insert) {

@@ -1005,6 +1005,16 @@ reset styles
 }
 */
 
+.badge-purple{
+    background-color: #662eed;
+    color: #fff;
+}
+
+.badge-red{
+    background-color: #dc2f2f;
+    color: #fff;
+}
+
 .text-primary {
     color: #0062cc !important;
 }

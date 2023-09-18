@@ -145,11 +145,11 @@ if((int)$dtllePerfil['show_guide'] !== 1){
                                 <td>{{guide.start_store.company.name}}</td>
                                 <td>{{guide?.flag_new_company ? guide?.new_company_name : guide.end_store.company.name}}</td>
                                 <td>
-                                    <span :class="['m-1 py-2 d-block badge ', getStatusProperty(guide.tci_response_type).class]" style="max-width: 140px;" v-if="guide.tci_response_type && guide?.flag_reversion == 0">
+                                    <span :class="['m-1 py-2 d-block badge ', getStatusProperty(guide.tci_response_code).class]" style="max-width: 140px;" v-if="guide.tci_response_type && guide?.flag_reversion == 0">
                                         {{guide.tci_response_description}}
                                     </span>
-                                    <span v-if="guide?.flag_sent == 0 && guide?.flag_reversion == 0" class="py-2 d-block badge badge-secondary m-1" style="max-width: 140px;">Borrador</span>
-                                    <span v-if="guide?.flag_reversion == 1" class="py-2 d-block badge badge-warning m-1" style="max-width: 140px;">Revertido</span>
+                                    <span v-if="guide?.flag_sent == 0 && guide?.flag_reversion == 0 && !guide.tci_response_code" class="py-2 d-block badge badge-secondary m-1" style="max-width: 140px;">Borrador</span>
+                                    <span v-if="guide?.flag_reversion == 1" class="py-2 d-block badge badge-danger m-1" style="max-width: 140px;">Revertido</span>
                                     <span v-if="guide?.flag_sent == 1 && guide?.tci_response_code == null" class="py-2 d-block badge badge-info m-1" style="max-width: 140px;">Pendiente</span>                                    
                                 </td>
                                 <td>
