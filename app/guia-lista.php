@@ -156,10 +156,10 @@ if((int)$dtllePerfil['show_guide'] !== 1){
                                     <a :href="'guia-editar.php?idMovimiento=' + guide.id" class="btn btn-primary btn-sm m-1">
                                         <i class="ti-file fz-10 position-left"></i> Ver
                                     </a>
-                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide, 'downloadPDF')" v-if="guide.tci_response_type == '1'">
+                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide, 'downloadPDF')" v-if="guide.tci_response_type == '1' || guide.tci_response_code == '1' || guide.tci_response_code == '2'">
                                         <i class="ti-download fz-10 position-left"></i> PDF
                                     </button>
-                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide, 'downloadXML')" v-if="guide.tci_response_type == '1'">
+                                    <button class="btn btn-primary btn-sm m-1" @click="listenBtnDownload(guide, 'downloadXML')" v-if="guide.tci_response_type == '1' || guide.tci_response_code == '1' || guide.tci_response_code == '2'">
                                         <i class="ti-download fz-10 position-left"></i> XML
                                     </button>
                                     <button class="btn btn-primary btn-sm m-1" @click="getGuideStatus(guide)" v-if="guide.flag_resend">

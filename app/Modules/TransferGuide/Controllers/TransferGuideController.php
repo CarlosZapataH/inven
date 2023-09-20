@@ -80,6 +80,7 @@ class TransferGuideController{
             $this->recoverSession();
             $filters = GlobalHelper::getUrlData();
             unset($filters['action']);
+            echo json_encode($this->user);
             if((int)$this->profile['admin_guide'] != 1){
                 $filters['user_register_id'] = (int)$this->user['id_us'];
             }
