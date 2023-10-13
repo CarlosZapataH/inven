@@ -452,9 +452,9 @@ class UsuarioController {
                         }
                     }
                 }
-                else{
-                    $val = 2;}
             }
+            else{
+                $val = 2;}
 
             echo json_encode(array('status'=>$val));
 
