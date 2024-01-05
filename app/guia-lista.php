@@ -171,7 +171,7 @@ if((int)$dtllePerfil['show_guide'] !== 1){
                     </table>
                 </div>
                 <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
+                    <ul class="pagination justify-content-center" style="flex-wrap: wrap;">
                         <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
                             <a class="page-link" @click.prevent="setCurrentPage(currentPage - 1)">Anterior</a>
                         </li>
