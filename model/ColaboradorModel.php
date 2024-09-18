@@ -124,4 +124,14 @@ class ColaboradorModel{
             throw $e;
         }
     }
+
+    public function buscar_colaborador_xId($id){
+        try {
+            $obj_dao = new ColaboradorDAO();
+            $detalle = $obj_dao->buscar_colaborador_xId($id);
+            return $detalle;
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
 }

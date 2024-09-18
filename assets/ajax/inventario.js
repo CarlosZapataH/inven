@@ -1,5 +1,6 @@
 var $Tbl_Inventario, swal, arrayVAL_exp = [], elementosP = [],$Nregistros = 0, $count = 0, successFileLoad = 0;
 var objinit = new init(), columVisi, columVisiMdl, $Tbl_ItemStock, optImport,optTable,optImport_notPermise;
+var totalItemsPagTable = 0;
 
 $.extend($.fn.dataTableExt.oStdClasses, {
     "sFilterInput": "form-control",
@@ -432,12 +433,14 @@ $(document).on('change', '#IdAlmacen', function() {
 
 function valida_existenciaInvetario(IdAlmacen,opImport) {
     "use strict";
+    totalItemsPagTable = 0;
     let divImport = $('#divLoad_import');
     let divContend = $('#divContend');
     divImport.empty();
     divContend.empty();
     $.get('../controller/InventarioController.php?action=validar_existenciaInventario_JSON', {'IdAlmacen':IdAlmacen},function (response) {
         let data = JSON.parse(response);
+        totalItemsPagTable = data.valor;
         if(parseInt(data.valor) > 0) {
             divContend.append(optTable);
             let datos = {
@@ -480,6 +483,99 @@ function loadTbl_Inventario_INI(datos){
                         search: 'applied',
                         order: 'applied'
                     }
+                },
+                action: function(e, dt, node, config){
+                    $('.loader-custom-container').show();
+                    $.get('../controller/InventarioController.php?action=lst_Inventario_xServicio_All_JSON_DOWNLOAD', datos,function (response) {
+                        let data = JSON.parse(response);
+                        let exportData = [];
+                        data.data.forEach(item => {
+                            exportData.push({
+                                'ID': item.id_inv,
+                                'CODIGO': item.code,
+                                'DESCRIPCIÓN': item.des_inv,
+                                'U.M.': item.um_inv,
+                                'NRO. PARTE/SERIE': item.nroparte_inv,
+                                'C.ACTIVO': item.cactivo_inv,
+                                'C.INV': item.cinventario_inv,
+                                'MAPEL': item.cmapel_inv,
+                                'ONU': item.conu_inv,
+                                'STOCK': item.cant_inv,
+                                'CLASIFICACIÓN': item.calification
+                            });
+                        });
+                        // Crea un objeto Workbook de SheetJS
+                        let wb = XLSX.utils.book_new();
+                        let ws = XLSX.utils.json_to_sheet(exportData);
+                        
+
+                        for (let row = 0; row <= exportData.length; row++) {
+                            for (let col = 0; col <= 10; col++) {
+                              const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
+                              // Add center alignment to every cell
+                              ws[cellRef].s = {
+                                alignment: { horizontal: "center" },
+                              };
+                              if (row === 0 || row === 1 || col === 0) {
+                                // Format headers and names
+                                ws[cellRef].s = {
+                                  ...ws[cellRef].s,
+                                  font: { bold: true },
+                                };
+                              }
+                            }
+                          }
+
+                        // Agrega la hoja al libro
+                        XLSX.utils.sheet_add_aoa(ws, [
+                            [
+                                '',
+                                '',
+                                '',
+                                '',
+                                '',
+                                config.title,
+                                '',
+                                '',
+                                '',
+                                '',
+                                '' 
+                            ],
+                            [
+                                'ID',
+                                'CODIGO',
+                                'DESCRIPCIÓN',
+                                'U.M.',
+                                'NRO. PARTE/SERIE',
+                                'C.ACTIVO',
+                                'C.INV',
+                                'MAPEL',
+                                'ONU',
+                                'STOCK',
+                                'CLASIFICACIÓN'
+                            ]
+                        ], { origin: "A1" });
+                        XLSX.utils.book_append_sheet(wb, ws, 'Hoja1');
+                        let f = new Date();
+                        // Crea un blob y una URL para descargar el archivo Excel
+                        let blob = XLSX.writeFile(wb, 'Export-Inventario-' + f.getDate() + (f.getMonth() +1) + f.getFullYear()+'.xlsx');
+                        $('.loader-custom-container').hide();
+                    }).always(function () {
+                    });
+
+                    
+                    /* var url = URL.createObjectURL(blob);
+
+                    // Crea un enlace oculto para la descarga
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'datos_exportados.xlsx';
+
+                    // Simula el clic en el enlace para iniciar la descarga
+                    a.click();
+
+                    // Libera el objeto URL
+                    URL.revokeObjectURL(url); */
                 }
             },
             {
@@ -587,15 +683,17 @@ function loadTbl_Inventario_INI(datos){
             }
         ],
         scrollCollapse: false,
+        processing: true,
+        serverSide: true,
         ajax:{
             url: '../controller/InventarioController.php?action=lst_Inventario_xServicio_All_JSON',
             type : "get",
             data : datos,
             dataType : "json",
             error: function(e){
-                console.log(e.responseText);
+                // console.log(e);
             },complete:function (datos){
-                console.log(datos);
+                // console.log(datos);
             }
         },
         "initComplete": function(settings, json) {
@@ -611,6 +709,7 @@ function loadTbl_Inventario_INI(datos){
             $('#Tbl_Inventario_wrapper > div.datatable-header > div.dataTables_length > label > select').addClass('mr-15');
         },
         "drawCallback": function( settings ) {
+            console.log(settings)
             $('.dt-checkboxes-select-all > input').addClass('scale-chk-1-5 cursor-pointer');
             $('.dt-checkboxes').addClass('scale-chk-1-5 cursor-pointer');
         }
@@ -1010,16 +1109,10 @@ $(document).on('submit','#formTransferirItem', function(e) {
             if (result.value) {
                 sga.blockUI.loading_body();
                 $.post('../controller/InventarioController.php?action=tranferir_Item_JSON', data, function (response) {
-                    console.log(response);
                     if (parseInt(response.status) === 1) {
                         if(parseInt(response.tipotransfer) === 2){
-                            let btngenFileGuia = '<div><a class="btn btn-danger btn-sm btn-hover-transform mt-10 cursor-pointer text-white" data-id="'+response.isetId+'" id="btnOptionsGuia_Export">' +
-                                    '   <b><i class="icon-download4 position-left"></i></b>\n' +
-                                    '   Descargar Guia [' + data.nguia_itm + ']'+
-                                    '</a></div>';
-
                             swal.fire({
-                                html: response.message+btngenFileGuia,
+                                html: response.message,
                                 type: "success",
                                 showCancelButton: false,
                                 showConfirmButton: true,
@@ -1973,6 +2066,7 @@ $(document).on('submit','#formDevolverItem', function(e) {
     "use strict";
     e.preventDefault();
     let data = $(this).serialize();
+    
     Swal.fire({
         html: 'Se va realizar la devolución de los Ítems descritos.<br>Desea continuar...!.',
         type: 'warning',
@@ -2178,7 +2272,7 @@ $(document).on('click','.tipoTransAlmacen', function() {
             '           <option value="Préstamo">Préstamo</option>' +
             '           <option value="Transferencia">Transferencia</option>' +
             '           <option value="Mantenimiento y Reparación">Mantenimiento y Reparación</option>' +
-            '           <option value="Devolución Proveedor">Devolución Proveedor</option>' +
+            '           <option value="Devolución">Devolución</option>' +
             '       </select>' +
             '   </div>' +
             '</div>';
@@ -2202,15 +2296,15 @@ $(document).on('click','.tipoTransAlmacen', function() {
             '                   name="fguia_itm" id="fguia_itm" maxlength="10" placeholder="**/**/****">' +
             '           </div>' +
             '       </div>' +
-            '       <div class="form-group row">' +
-            '           <label for="nguia_itm" class="col-sm-4 col-form-label text-lg-right text-md-right text-left">' +
-            '               Número de Guía <span class="text-danger font-weight-bold">*</span>' +
-            '           </label>' +
-            '           <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">' +
-            '               <input type="text" class="form-control input-md text-left" autocomplete="off" required' +
-            '                   id="nguia_itm" name="nguia_itm" maxlength="11" placeholder="***-*******">' +
-            '           </div>' +
-            '       </div>' +
+            // '       <div class="form-group row">' +
+            // '           <label for="nguia_itm" class="col-sm-4 col-form-label text-lg-right text-md-right text-left">' +
+            // '               Número de Guía <span class="text-danger font-weight-bold">*</span>' +
+            // '           </label>' +
+            // '           <div class="col-xl-3 col-lg-3 col-md-4 col-sm-5">' +
+            // '               <input type="text" class="form-control input-md text-left" autocomplete="off" required' +
+            // '                   id="nguia_itm" name="nguia_itm" maxlength="11" placeholder="***-*******">' +
+            // '           </div>' +
+            // '       </div>' +
             '       <div class="form-group row">' +
             '           <label for="nguia_itm" class="col-sm-4 col-form-label text-lg-right text-md-right text-left">' +
             '               Tiempo llegada estimada <span class="text-danger font-weight-bold">*</span>' +

@@ -409,6 +409,8 @@ class ColaboradorController {
                 }
             }
             else{//Actualizamos registro existente
+                $dtlleCol = $obj_col->buscar_colaborador_xId($idColaborador);
+                $datesUpdate[1] = $dtlleCol['ndoc_col'];
                 $datesUpdate[11] = $idColaborador;
                 $insert = $obj_col->update_Colaborador($datesUpdate);
                 if($insert) {
@@ -1029,6 +1031,10 @@ class ColaboradorController {
             $datosArray = array();
             $datosRegister = array();
             $archivo = "";
+            
+            // CUSTOM
+            $exist = [];
+            // END CUSTOM
 
             if(!is_null($detailService)) {
                 $desServicio = mb_strtoupper(trim($detailService['des_serv']), "UTF-8");
@@ -1081,7 +1087,10 @@ class ColaboradorController {
 
                         $datesSearching[0] = $idServicio;
                         $datesSearching[1] = $datosArray[$i][0];
-                        $detailPersonal = $obj_col->buscar_colaborador_xServicio($datesSearching);
+                        // CUSTOM
+                        $detailPersonal = $obj_col->buscar_colaborador_xnDoc($datesSearching[1]);
+                        // END CUSTOM
+                        // $detailPersonal = $obj_col->buscar_colaborador_xServicio($datesSearching);
                         if (is_null($detailPersonal)) {
                             $datesReg[0] = $idServicio;
                             $datesReg[1] = trim($datosArray[$i][0]);
@@ -1098,6 +1107,9 @@ class ColaboradorController {
                                 $successLoad++;
                             }
                         } else {
+                            // CUSTOM
+                            array_push($exist, $datesReg);
+                            // END CUSTOM
                             array_push($datosError, $datosArray[$i]);
                         }
                     }
@@ -1293,7 +1305,8 @@ class ColaboradorController {
                 'succesLoad'=>$successLoad,
                 'file'=>$archivo,
                 'readerType'=>$readerType,
-                'datarray'=>$datosArray
+                'datarray'=>$datosArray,
+                'exist' => $exist
             );
 
             echo json_encode($response);

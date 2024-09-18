@@ -43,15 +43,34 @@ class InventarioController {
             }
 
             $obj_inv = new InventarioModel();
-            $lstInventario = $obj_inv->listar_Inventario_xIDAlmacen_All($idAlmacen);
+            $itemsPerPage = isset($_GET['length']) ? $_GET['length'] : 25;
+            $offset = isset($_GET['start']) ? (int)$_GET['start'] : 0;
+            $search = null;
+            if(isset($_GET['search'])){
+                if(is_array($_GET['search'])){
+                    if(isset($_GET['search']['value'])){
+                        if(!empty($_GET['search']['value'])){
+                            $search = $_GET['search']['value'];
+                        }
+                    }
+                }
+            }
+            // $totalItems = $obj_inv->listar_Inventario_Detail_Count($idAlmacen);
+            // $totalPages = ceil($totalItems['total'] / $itemsPerPage);
+            // $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+            // $offset = ($currentPage - 1) * $itemsPerPage;
+            $listInventarios = $obj_inv->listar_Inventario_Detail_All($idAlmacen, $offset, $itemsPerPage, $search, true);
+
+
+            // $lstInventario = $obj_inv->listar_Inventario_xIDAlmacen_All($idAlmacen);
 
             $datos = array();
-            if(!is_null($lstInventario)){
-                foreach($lstInventario as $inventario){
-                    $dtlleClasifica = $obj_inv->detalle_Clasificacion_xID($inventario['id_cla']);
+            if(!is_null($listInventarios)){
+                foreach($listInventarios as $inventario){
+                    // $dtlleClasifica = $obj_inv->detalle_Clasificacion_xID($inventario['id_cla']);
 
                     $txtClasificacion = "";
-                    if(!is_null($dtlleClasifica)){  $txtClasificacion = strtoupper(trim($dtlleClasifica['des_cla'])); }
+                    if(!is_null($inventario['des_cla'])){  $txtClasificacion = strtoupper(trim($inventario['des_cla'])); }
 
                     $campoCodigo = "";
                     $campoInfo = '<a id="btnDetailInventary" class="cursor-pointer float-left text-hover-primary mr-7" title="Click para ver detalle" data-id="'.$inventario['id_inv'].'"><i class="ti-info-alt"></i></a>';
@@ -65,9 +84,9 @@ class InventarioController {
                     }
                     $btnEliminar = "";
                     if($accDelete == 1 ) {
-                        $obj_mov = new MovimientoModel();
-                        $exMovItem = $obj_mov->existe_MovimientoDetalle_xIdInventario($inventario['id_inv']);
-                        if((int)$exMovItem['nreg'] == 0) {
+                        // $obj_mov = new MovimientoModel();
+                        // $exMovItem = $obj_mov->existe_MovimientoDetalle_xIdInventario($inventario['id_inv']);
+                        if((int)$inventario['ex_mov_item'] == 0) {
                             $btnEliminar = '<a class="cursor-pointer ml-15 text-hover-danger"  id="deleteItem_Btn" data-id="' . $inventario['id_inv'] . '" title="Eliminar"><i class="f24 opacity-7 ti-trash"></i></a>';
                         }
                     }
@@ -91,6 +110,56 @@ class InventarioController {
                         9 => (int)$inventario['cant_inv'],
                         10=> $txtClasificacion,
                         11=> $btnEditar.$btnBaja.$btnEliminar
+                    );
+                    array_push($datos, $row);
+                }
+            }
+
+            $tabla = array('data' => $datos);
+            echo json_encode($tabla);
+            unset($datos);
+
+        } catch (PDOException $e) {
+            throw $e;
+        }
+    }
+
+    public function lst_Inventario_xServicio_All_JSON_DOWNLOAD(){
+        try {
+            $obj_fn = new FuncionesModel();
+            $idAlmacen = (int)$_GET['almacen'];
+            $obj_inv = new InventarioModel();
+            $search = null;
+            if(isset($_GET['search'])){
+                if(is_array($_GET['search'])){
+                    if(isset($_GET['search']['value'])){
+                        if(!empty($_GET['search']['value'])){
+                            $search = $_GET['search']['value'];
+                        }
+                    }
+                }
+            }
+            $listInventarios = $obj_inv->listar_Inventario_Detail_All($idAlmacen, $offset, $itemsPerPage, $search, false);
+
+            $datos = array();
+            if(!is_null($listInventarios)){
+                
+                foreach($listInventarios as $inventario){
+                    $txtClasificacion = "";
+                    if(!is_null($inventario['des_cla'])){  $txtClasificacion = strtoupper(trim($inventario['des_cla'])); }
+                    
+                    $row = array(
+                        'id_inv' => $inventario['id_inv'],
+                        'code' => $campoInfo.$campoCodigo,
+                        'des_inv' => $inventario['des_inv'],
+                        'um_inv' => $inventario['um_inv'],
+                        'nroparte_inv' => $inventario['nroparte_inv'],
+                        'cactivo_inv' => $inventario['cactivo_inv'],
+                        'cinventario_inv' => $inventario['cinventario_inv'],
+                        'cmapel_inv' => $inventario['cmapel_inv'],
+                        'conu_inv' => $inventario['conu_inv'],
+                        'cant_inv' => (int)$inventario['cant_inv'],
+                        'calification' => $txtClasificacion
                     );
                     array_push($datos, $row);
                 }
@@ -1854,7 +1923,7 @@ class InventarioController {
             else if((int)$_POST['tipoTransfer'] == 2){
                 $ttMotivo = "";
                 $ttFechaGuia = "0000-00-00";
-                $ttNroGuia = "";
+                $ttNroGuia = null;
                 $ttDias = 0;
                 $persona1 = "";
                 $ndoc1 = "";
@@ -1862,7 +1931,7 @@ class InventarioController {
                 $ndoc2 = "";
                 if(!empty(trim($_POST['motivo_itm']))){ $ttMotivo = trim($_POST['motivo_itm']); }
                 if(!empty(trim($_POST['fguia_itm']))){ $ttFechaGuia = $obj_fn->fecha_ESP_ENG($_POST['fguia_itm']); }
-                if(!empty(trim($_POST['nguia_itm']))){ $ttNroGuia = $_POST['nguia_itm']; }
+                // if(!empty(trim($_POST['nguia_itm']))){ $ttNroGuia = $_POST['nguia_itm']; }
                 if(!empty(trim($_POST['ndias_itm'])) and (int)$_POST['ndias_itm']>0){ $ttDias = (int)$_POST['ndias_itm']; }
 
                 if(!empty(trim($_POST['aper1_itm']))){ $persona1 = $_POST['aper1_itm']; }
@@ -3332,6 +3401,8 @@ class InventarioController {
                         $btnValeGuia='<button type="button" class="btn btn-outline-danger btn-hover-transform fz-16" id="dataExportPDF_Vale" data-id="' . $movimiento['id_mov'] . '" title="Generar"><i class="fa fa-file-pdf-o mr-7"></i>Vale</button>';
                     }
 
+                    $btnValeGuia = $btnValeGuia .'<a class="btn btn-blue" href="guia-crear.php?idMovimiento='.$movimiento['id_mov'].'&tipo=interno">Crear GRE</a>';
+
                     $txtSolicitado = "-.-";
                     if(!is_null($movimiento['solicitado_mov'])){$txtSolicitado = $movimiento['solicitado_mov'];}
                     $nroDocumento = "-.-";
@@ -3405,22 +3476,35 @@ class InventarioController {
                 $obj_alm = new AlmacenModel();
                 foreach($lstMovimientos as $movimiento){
                     $almcenDestino = "";
+                    $almcenOrigen = "";
+                    if((int)$movimiento['id_alm_ini'] != 0) {
+                        $dtlleAlmacen = $obj_alm->detalle_Almacen_xID($movimiento['id_alm_ini']);
+                        if(is_array($dtlleAlmacen)){
+                            $almcenOrigen = $dtlleAlmacen['titulo_alm'];
+                        }
+                    }
                     if((int)$movimiento['id_alm_des'] != 0) {
                         $dtlleAlmacen = $obj_alm->detalle_Almacen_xID($movimiento['id_alm_des']);
                         if(is_array($dtlleAlmacen)){
                             $almcenDestino = $dtlleAlmacen['titulo_alm'];
                         }
-                    }
+                    }                    
                     $btnGuia = "";
-                    $numberGuia = '<span class="font-weight-bold text-danger">--°--</span>';
+                    //$numberGuia = '<span class="font-weight-bold text-danger">--°--</span>';
 
                     if ($movimiento['action_mov'] == "TRA" && !is_null($movimiento['nroguia_mov'] && $optionReporte == 1)){
-                        $numberGuia = $movimiento['nroguia_mov'];
-                        $btnGuia='<button type="button" class="btn btn-outline-danger btn-hover-transform fz-16" id="dataExportPDF_Guia" data-opt="1" data-id="' . $obj_fn->encrypt_decrypt("encrypt",$movimiento['id_movt']) . '" title="Generar"><i class="fa fa-file-pdf-o mr-7"></i> Guia</button>';
+                        //$numberGuia = $movimiento['nroguia_mov'];
+                        $btnGuia = $movimiento['id_movt'];
+                        // $btnGuia='
+                        // <a class="btn btn-outline-info btn-hover-transform fz-16 mb-2" href="guia-crear.php?idMovimiento='.$movimiento['id_movt'].'&tipo=externo">Crear GRE</a>
+                        // <button type="button" class="btn btn-outline-danger btn-hover-transform fz-16" id="dataExportPDF_Guia" data-opt="1" data-id="' . $obj_fn->encrypt_decrypt("encrypt",$movimiento['id_movt']) . '" title="Generar"><i class="fa fa-file-pdf-o mr-7"></i> Guia</button>';
                     }
 
-                    $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Transito</span>';
-                    if($movimiento['estd_transito'] == "I"){ $estdTra = '<span class="alert btn-block bg-success text-white mb-0" style="padding:.25rem 1.2rem;">Ingresado</span>';}
+                    // $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Transito</span>';
+                    // if($movimiento['estd_transito'] == "I"){ $estdTra = '<span class="alert btn-block bg-success text-white mb-0" style="padding:.25rem 1.2rem;">Ingresado</span>';}
+
+                    $estdTra = '<span class="alert btn-block bg-warning mb-0" style="padding:.25rem 1.2rem;">Registrado</span>';
+                    if($movimiento['flag_available'] == "1"){ $estdTra = '<span class="alert btn-block bg-success text-white mb-0" style="padding:.25rem 1.2rem;">Disponible</span>';}
 
                     $txtSolicitado = "-.-";
                     if(!is_null($movimiento['solicitado_mov'])){$txtSolicitado = $movimiento['solicitado_mov'];}
@@ -3432,11 +3516,12 @@ class InventarioController {
                         0 => $movimiento['nro_mov'],
                         1 => $obj_fn->fecha_ENG_ESP($movimiento['fecha_mov']),
                         2 => $txtRecibido,
-                        3 => $movimiento['motivotransfer_mov'],
-                        4 => $almcenDestino,
-                        5 => $numberGuia,
+                        3 => $movimiento['motivotransfer_mov'],                         
+                        4 => $almcenOrigen,    
+                        5 => $almcenDestino,
                         6 => $estdTra,
-                        7 => $btnGuia
+                        7 => $btnGuia,
+                        8 => $movimiento['flag_available']
                     );
                     array_push($datos, $row);
                 }

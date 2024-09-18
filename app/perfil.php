@@ -38,6 +38,11 @@ $dtllePerfil = $obj_pf->detalle_Perfil_xID($user['perfil']);?>
                             <th>Retirar</th>
                             <th>Devolver</th>
                             <th>Estado</th>
+                            <th>Crear guía</th>
+                            <th>Editar guía</th>
+                            <th>Revertir guía</th>
+                            <th>Visualizar guía</th>
+                            <th>Administrar todas las guias</th>
                         </tr>
                         </thead>
                     </table>

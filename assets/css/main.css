@@ -760,9 +760,9 @@ reset styles
     border-bottom-left-radius: .25rem;
 }
 
-.btn {
+/* .btn {
     padding: .6rem 1.2rem;
-}
+} */
 
 .custom-select {
     height: calc(2.3rem + 2px);
@@ -1004,6 +1004,16 @@ reset styles
     background-color: #c397f7;
 }
 */
+
+.badge-purple{
+    background-color: #662eed;
+    color: #fff;
+}
+
+.badge-red{
+    background-color: #dc2f2f;
+    color: #fff;
+}
 
 .text-primary {
     color: #0062cc !important;
@@ -6287,3 +6297,17 @@ Notify
     background: #dc3545 !important;
 }
 
+.activex {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.dropdown-menu.dropdown-menu-sm {
+    max-width: 300px;
+    max-height: 300px;
+    overflow-y: auto;    
+}
+
+.dropdown-item {
+    white-space: initial;
+}

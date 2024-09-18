@@ -16,6 +16,12 @@ $per=$objpermiso->obtener_permisos($user['id_us'],$opcion=NULL);
 $objpermiso->menus($per);
 
 ?>
+<!-- <li>
+    <a  href="guia-lista.php" class="cursor-pointer ">
+        <i class="ti-list"></i>
+        Lista de GRE
+    </a>
+</li> -->
 <li>
     <a class="cursor-pointer " id="btnGenerarToken">
         <i class="ti-key"></i>

@@ -273,4 +273,20 @@ class ColaboradorDAO{
             throw $e;
         }
     }
+
+    public function buscar_colaborador_xId($id){
+        try{
+            $pdo = AccesoDB::getPDO();
+            $query = "SELECT * FROM colaborador WHERE id_col = :id LIMIT 1";
+            $stm = $pdo->prepare($query);
+            $stm->bindParam(":id",$id);
+            $stm->execute();
+            $detalle = $stm->fetch(PDO::FETCH_ASSOC);
+            if(!$detalle){$detalle = null;}
+            $stm = null;
+            return $detalle;
+        } catch(PDOException $e){
+            throw $e;
+        }
+    }
 }

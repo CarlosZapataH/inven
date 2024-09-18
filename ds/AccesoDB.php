@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../app/Helpers/LoadEnv.php';
+
 class AccesoDB {
 
     private static $pdo = null;
@@ -7,9 +9,9 @@ class AccesoDB {
         if( self::$pdo == null ) {
             try {
                 $parm = parse_ini_file("connect.ini");
-                $url = $parm["01"];
-                $user = $parm["02"];
-                $pass = $parm["03"];
+                $url = 'mysql:host='.$_ENV['DB_HOST'].";dbname=".$_ENV['DB_NAME'].";port=".$_ENV['DB_PORT'];
+                $user = $_ENV['DB_USER'];
+                $pass = $_ENV['DB_PASSWORD'];
                 self::$pdo = new PDO($url,$user,$pass);
                 self::$pdo->exec("set names utf8");
                 self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
